@@ -48,9 +48,10 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 | **STT** | **Công việc** | **Loại công việc** | **Quy định / Công thức liên quan** | **Biểu mẫu liên quan** | **Ghi chú** |
 |----|----|----|----|----|----|
 | 1 | Tiếp nhận đặt bàn trực tiếp/qua điện thoại | Lưu trữ | PV_QĐ1 | PV_BM1 | Xem bảng quy định |
-| 2 | Ghi nhận gọi món | Lưu trữ | Món phải có trong thực đơn, trạng thái \"Còn hàng\". SL \> 0. | PV_BM2 |  |
-| 3 | Bàn giao cho bếp | Xử lý | Tự động phân loại: Món ăn → Bếp, Đồ uống → Quầy pha chế. | PV_BM3 |  |
-| 4 | Phục vụ món ra bàn | Xử lý | Nhận thông báo khi món đã xong. Xác nhận đã phục vụ. |  |  |
+| 2 | Tiếp nhận khách đã đặt bàn (check-in) | Cập nhật | Chuyển trạng thái bàn "Đã đặt" → "Có khách" khi khách đến. | PV_BM5 |  |
+| 3 | Ghi nhận gọi món | Lưu trữ | Món phải có trong thực đơn, trạng thái "Còn hàng". SL > 0. | PV_BM2 |  |
+| 4 | Bàn giao cho bếp / quầy pha chế | Xử lý | Tự động phân loại: Món ăn → Bếp, Đồ uống → Quầy pha chế. Kích hoạt khi Phục vụ chốt order. | PV_BM3 |  |
+| 5 | Phục vụ món ra bàn | Cập nhật | Nhận thông báo khi món "Đã xong". Xác nhận đã phục vụ → trạng thái món chuyển "Đã phục vụ". | PV_BM4 |  |
 
 ## Bộ phận Bếp
 
@@ -63,13 +64,11 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 
 | **STT** | **Công việc** | **Loại công việc** | **Quy định / Công thức liên quan** | **Biểu mẫu liên quan** | **Ghi chú** |
 |----|----|----|----|----|----|
-| 1 | Lập phiếu nhập kho | Lưu trữ | Ghi nhận: NVL, SL, đơn giá, nhà cung cấp, ngày nhập. | K_BM1 |  |
-| 2 | Lập phiếu xuất kho | Lưu trữ | Ghi nhận: NVL, SL, đơn giá, bộ phận nhận, ngày xuất. | K_BM2 |  |
-| 3 | Tính hóa đơn nhập kho | Tính toán | Tổng giá trị nhập = ∑ (SL nhập × Đơn giá). | K_BM1 |  |
-| 4 | Tính hóa đơn xuất kho | Tính toán | Tổng giá trị xuất = ∑ (SL xuất × Đơn giá). | K_BM2 |  |
-| 5 | Báo cáo tồn kho | Kết xuất | Tồn cuối = Tồn đầu + Nhập − Xuất. | K_BM3 |  |
-| 6 | Báo cáo nhập kho | Kết xuất | Thống kê tổng NVL đã nhập trong khoảng thời gian. | K_BM4 |  |
-| 7 | Báo cáo xuất kho | Kết xuất | Thống kê tổng NVL đã xuất trong khoảng thời gian. | K_BM5 |  |
+| 1 | Lập phiếu nhập kho | Lưu trữ | K_QĐ1. Tính ngay tổng giá trị nhập = ∑ (SL × Đơn giá). | K_BM1 | Bao gồm tính hóa đơn nhập |
+| 2 | Lập phiếu xuất kho | Lưu trữ | K_QĐ1. Không xuất quá tồn. Tính ngay tổng giá trị xuất = ∑ (SL × Đơn giá). | K_BM2 | Bao gồm tính hóa đơn xuất |
+| 3 | Báo cáo tồn kho | Kết xuất | Tồn cuối = Tồn đầu + Nhập − Xuất. | K_BM3 |  |
+| 4 | Báo cáo nhập kho | Kết xuất | Thống kê tổng NVL đã nhập trong khoảng thời gian. | K_BM4 |  |
+| 5 | Báo cáo xuất kho | Kết xuất | Thống kê tổng NVL đã xuất trong khoảng thời gian. | K_BM5 |  |
 
 ## Quản lý (Admin)
 
@@ -77,8 +76,16 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 |----|----|----|----|----|----|
 | 1 | Quản lý thực đơn | Lưu trữ | Thêm/sửa/xóa món. Cập nhật trạng thái, đơn giá. | QL_BM1 |  |
 | 2 | Quản lý bàn | Lưu trữ | Thêm/sửa/xóa bàn. Thiết lập sức chứa, khu vực. | QL_BM2 |  |
-| 3 | Quản lý tài khoản | Lưu trữ | Tạo/sửa/khóa tài khoản. Phân quyền theo vai trò. |  |  |
-| 4 | Xem báo cáo tổng hợp | Kết xuất | Xem tất cả báo cáo: doanh thu, tồn kho, nhập/xuất. |  |  |
+| 3 | Quản lý tài khoản | Lưu trữ | QL_QĐ1. Tạo/sửa/khóa tài khoản. Phân quyền theo vai trò. | QL_BM3 |  |
+| 4 | Xem báo cáo tổng hợp | Kết xuất | Xem tất cả báo cáo: doanh thu, tồn kho, nhập/xuất. | QL_BM4 |  |
+| 5 | Cấu hình hệ thống | Lưu trữ | QL_QĐ2. Thiết lập tỷ lệ VAT, thời gian tự hủy đặt bàn, giờ hoạt động. | QL_BM5 |  |
+
+## Toàn hệ thống
+
+| **STT** | **Công việc** | **Loại công việc** | **Quy định / Công thức liên quan** | **Biểu mẫu liên quan** | **Ghi chú** |
+|----|----|----|----|----|----|
+| 1 | Đăng nhập / Đăng xuất | Xử lý | QL_QĐ1. Xác thực tài khoản, tạo phiên làm việc, ghi log. | SYS_BM1 | Áp dụng cho mọi vai trò |
+| 2 | Sao lưu / Phục hồi dữ liệu | Xử lý | Định kỳ tự động + thủ công khi cần. Chỉ Admin thực hiện phục hồi. |  | Xem mục 5 |
 
 # 3. DANH SÁCH CÁC YÊU CẦU {#danh-sách-các-yêu-cầu}
 
@@ -129,6 +136,37 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 <p>- Trạng thái: Chờ → Đang chế biến → Đã xong.</p>
 <p>- Không bỏ qua bước trạng thái.</p>
 <p>- Khi Đã xong → tự động thông báo Phục vụ.</p></td>
+</tr>
+<tr>
+<td>4</td>
+<td>K_QĐ1</td>
+<td>Quy định nhập/xuất kho</td>
+<td><p>- Phiếu nhập: NVL phải có trong danh mục; SL > 0; đơn giá > 0; phải gán nhà cung cấp.</p>
+<p>- Phiếu xuất: SL xuất ≤ tồn kho hiện tại; phải gán bộ phận nhận (Bếp/Quầy pha chế).</p>
+<p>- Mỗi phiếu phải có người lập; phiếu đã lưu không sửa, chỉ tạo phiếu điều chỉnh.</p>
+<p>- Tồn kho cập nhật tức thời sau khi lưu phiếu: Tồn mới = Tồn cũ + Nhập − Xuất.</p>
+<p>- Cảnh báo khi tồn ≤ định mức tối thiểu của NVL (cấu hình theo từng NVL).</p></td>
+</tr>
+<tr>
+<td>5</td>
+<td>QL_QĐ1</td>
+<td>Quy định tài khoản và phân quyền</td>
+<td><p>- Mỗi nhân viên có 1 tài khoản, gắn 1 vai trò: Admin / Phục vụ / Bếp / Thu ngân / Kho.</p>
+<p>- Mật khẩu: tối thiểu 8 ký tự, có chữ và số; lưu dạng băm (hash), không lưu plaintext.</p>
+<p>- Khóa tài khoản sau 5 lần đăng nhập sai liên tiếp; chỉ Admin mở khóa.</p>
+<p>- Phiên làm việc tự đăng xuất sau 30 phút không thao tác (cấu hình).</p>
+<p>- Ma trận chức năng ↔ vai trò: hệ thống chặn truy cập chức năng không thuộc vai trò.</p>
+<p>- Mọi thao tác quan trọng (thanh toán, nhập/xuất kho, đổi cấu hình) đều ghi log audit (ai, khi nào, làm gì).</p></td>
+</tr>
+<tr>
+<td>6</td>
+<td>QL_QĐ2</td>
+<td>Quy định cấu hình hệ thống</td>
+<td><p>- Tỷ lệ VAT: số thực ∈ [0, 0.2]; có cờ bật/tắt áp dụng.</p>
+<p>- Thời gian tự hủy đặt bàn quá hạn: số nguyên phút, mặc định 15, ∈ [5, 60].</p>
+<p>- Giờ hoạt động nhà hàng: giờ mở – giờ đóng; chỉ trong khoảng này mới cho phép đặt bàn và gọi món.</p>
+<p>- Định kỳ sao lưu dữ liệu: mặc định 1 lần/ngày vào giờ đóng cửa.</p>
+<p>- Mọi thay đổi cấu hình ghi log (ai, khi nào, giá trị cũ → mới).</p></td>
 </tr>
 </tbody>
 </table>
@@ -284,6 +322,50 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 | 2       |             |        |                      | Chờ chế biến   |
 
 
+### B_BM2:
+
+**MÀN HÌNH CẬP NHẬT TRẠNG THÁI MÓN (KITCHEN DISPLAY)**
+
+**Bộ phận:** \[ \] Bếp \[ \] Quầy pha chế
+
+**Nhân viên:** \...\...\...\...\...\...\...\...\...\...\...\...\...\...\...\.....
+
+| **STT** | **Bàn** | **Tên món** | **SL** | **Ghi chú** | **Thời gian nhận** | **Trạng thái** | **Hành động** |
+|---------|---------|-------------|--------|-------------|--------------------|----------------|---------------|
+| 1       |         |             |        |             |                    | Chờ chế biến   | \[Bắt đầu\]   |
+| 2       |         |             |        |             |                    | Đang chế biến  | \[Hoàn thành\]|
+
+**Bộ lọc:** \[ \] Tất cả \[ \] Chờ \[ \] Đang chế biến \[ \] Đã xong
+
+
+### PV_BM4:
+
+**XÁC NHẬN PHỤC VỤ MÓN**
+
+**NV phục vụ:** \...\...\...\...\...\...\...\...\...\...\...\...\...\...\...\.....
+
+**Thời gian:** \...\...\...\...\...\...\...\...\...\...\...\...\...\...\...\.....
+
+| **STT** | **Bàn** | **Tên món** | **SL** | **Trạng thái** | **Hành động** |
+|---------|---------|-------------|--------|----------------|----------------|
+| 1       |         |             |        | Đã xong        | \[Đã phục vụ\] |
+| 2       |         |             |        | Đã xong        | \[Đã phục vụ\] |
+
+*Ghi chú: chỉ hiển thị các món có trạng thái "Đã xong" chưa phục vụ.*
+
+
+### PV_BM5:
+
+**CHECK-IN KHÁCH ĐÃ ĐẶT BÀN**
+
+**NV phục vụ:** \...\...\...\...\...\...\...\...\...\...\...\...\...\...\...\.....
+
+| **STT** | **Mã đặt** | **Tên khách** | **SĐT** | **Bàn** | **Thời gian đặt** | **Số người** | **Hành động** |
+|---------|------------|---------------|---------|---------|-------------------|--------------|----------------|
+| 1       |            |               |         |         |                   |              | \[Nhận bàn\] \[Hủy\] |
+| 2       |            |               |         |         |                   |              | \[Nhận bàn\] \[Hủy\] |
+
+
 ### K_BM1:
 
 **PHIẾU NHẬP KHO**
@@ -409,6 +491,81 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 | 1       |            | Tầng 1      |              | Trống          |             |
 | 2       |            | Sân vườn    |              | Có khách       |             |
 
+
+### QL_BM3:
+
+**MÀN HÌNH QUẢN LÝ TÀI KHOẢN**
+
+**Chức năng:** \[ Thêm \] \[ Sửa \] \[ Khóa/Mở khóa \] \[ Đặt lại mật khẩu \] \[ Tìm kiếm \]
+
+| **STT** | **Mã NV** | **Họ tên** | **Tên đăng nhập** | **Vai trò** | **Trạng thái** | **Ngày tạo** |
+|---------|-----------|------------|--------------------|-------------|----------------|--------------|
+| 1       |           |            |                    | Phục vụ     | Hoạt động      |              |
+| 2       |           |            |                    | Thu ngân    | Đã khóa        |              |
+
+**Vai trò:** Admin / Phục vụ / Bếp / Thu ngân / Kho
+
+
+### QL_BM4:
+
+**BÁO CÁO TỔNG HỢP (DASHBOARD QUẢN LÝ)**
+
+**Từ ngày:** \...\...\...\...\...\...\...\...\.....  **Đến ngày:** \...\...\...\...\...\...\...\...\.....
+
+**A. Doanh thu**
+
+| **STT** | **Ngày** | **Số hóa đơn** | **Tổng doanh thu** | **Tiền mặt** | **Chuyển khoản** |
+|---------|----------|----------------|--------------------|--------------|------------------|
+| 1       |          |                |                    |              |                  |
+
+**Tổng doanh thu kỳ:** \...\...\...\...\.....
+
+**B. Top món bán chạy**
+
+| **STT** | **Tên món** | **Số lượng đã bán** | **Doanh thu** |
+|---------|-------------|---------------------|---------------|
+| 1       |             |                     |               |
+
+**C. Tồn kho cảnh báo (≤ định mức tối thiểu)**
+
+| **STT** | **Tên NVL** | **ĐVT** | **Tồn hiện tại** | **Định mức tối thiểu** |
+|---------|-------------|---------|------------------|------------------------|
+| 1       |             |         |                  |                        |
+
+**Ngày lập:** \...\...\...\...\...\...\.....  **Người lập:** \...\...\...\...\...\...\.....
+
+
+### QL_BM5:
+
+**MÀN HÌNH CẤU HÌNH HỆ THỐNG**
+
+| **Tham số** | **Giá trị hiện tại** | **Giá trị mới** |
+|---|---|---|
+| Áp dụng thuế VAT | \[ \] Bật \[ \] Tắt |  |
+| Tỷ lệ VAT (%) |  |  |
+| Thời gian tự hủy đặt bàn quá hạn (phút) |  |  |
+| Giờ mở cửa |  |  |
+| Giờ đóng cửa |  |  |
+| Thời gian phiên đăng nhập (phút) |  |  |
+| Lịch sao lưu tự động (HH:MM) |  |  |
+
+**Người sửa:** \...\...\...\...\.....  **Thời gian:** \...\...\...\...\.....
+
+\[ Lưu \] \[ Khôi phục mặc định \]
+
+
+### SYS_BM1:
+
+**MÀN HÌNH ĐĂNG NHẬP**
+
+**Tên đăng nhập:** \...\...\...\...\...\...\...\...\.....
+
+**Mật khẩu:** \...\...\...\...\...\...\...\...\.....
+
+\[ Đăng nhập \] \[ Quên mật khẩu \]
+
+*Ghi chú: Sau 5 lần sai liên tiếp → khóa tài khoản. Liên hệ Admin để mở khóa.*
+
 # 5. BẢNG YÊU CẦU CHỨC NĂNG HỆ THỐNG {#bảng-yêu-cầu-chức-năng-hệ-thống}
 
 <table>
@@ -428,18 +585,47 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 <tr>
 <td>1</td>
 <td>Phân quyền sử dụng</td>
-<td><p>- Admin: tất cả chức năng (quản lý tài khoản, thực đơn, bàn, báo cáo).</p>
-<p>- Phục vụ: đặt bàn, gọi món, bàn giao bếp, phục vụ món.</p>
+<td><p>- Admin: tất cả chức năng (quản lý tài khoản, thực đơn, bàn, cấu hình, báo cáo tổng hợp, sao lưu/phục hồi).</p>
+<p>- Phục vụ: đặt bàn, check-in, gọi món, bàn giao bếp, xác nhận phục vụ món.</p>
 <p>- Bếp: nhận phiếu order, cập nhật trạng thái món.</p>
-<p>- Thu ngân: thanh toán, xuất hóa đơn, báo cáo doanh thu.</p>
-<p>- Kho: phiếu nhập/xuất kho, báo cáo kho.</p></td>
+<p>- Thu ngân: thanh toán, xuất hóa đơn, in lại hóa đơn, báo cáo doanh thu.</p>
+<p>- Kho: phiếu nhập/xuất kho, báo cáo tồn/nhập/xuất.</p>
+<p>- Mọi vai trò: đăng nhập/đăng xuất, đổi mật khẩu cá nhân.</p></td>
 </tr>
 <tr>
 <td>2</td>
+<td>Xác thực và phiên làm việc</td>
+<td><p>- Đăng nhập bằng tên đăng nhập + mật khẩu (đã băm).</p>
+<p>- Mỗi yêu cầu chức năng được kiểm tra quyền theo ma trận vai trò ↔ chức năng.</p>
+<p>- Phiên tự đăng xuất sau khoảng thời gian cấu hình không thao tác (mặc định 30 phút).</p></td>
+</tr>
+<tr>
+<td>3</td>
 <td>Sao lưu và phục hồi</td>
-<td><p>- Sao lưu dữ liệu định kỳ.</p>
-<p>- Phục hồi khi có sự cố.</p>
-<p>- Chỉ Admin có quyền thực hiện.</p></td>
+<td><p>- Sao lưu tự động định kỳ (mặc định cuối ngày) + sao lưu thủ công khi cần.</p>
+<p>- Lưu tối thiểu 30 bản sao lưu gần nhất.</p>
+<p>- Phục hồi khi có sự cố — chỉ Admin có quyền thực hiện.</p>
+<p>- Ghi log mỗi lần sao lưu/phục hồi (thời gian, người thực hiện, kết quả).</p></td>
+</tr>
+<tr>
+<td>4</td>
+<td>Ghi log audit</td>
+<td><p>- Ghi log các thao tác quan trọng: đăng nhập/đăng xuất, thanh toán, nhập/xuất kho, thay đổi cấu hình, quản lý tài khoản.</p>
+<p>- Lưu: thời gian, người thao tác, loại thao tác, đối tượng tác động.</p>
+<p>- Log lưu tối thiểu 1 năm; chỉ Admin truy vấn được.</p></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Số lượng người dùng đồng thời</td>
+<td><p>- Hỗ trợ tối thiểu 20 người dùng truy cập đồng thời trong giờ cao điểm.</p>
+<p>- Mỗi tài khoản chỉ được đăng nhập trên 1 phiên tại 1 thời điểm.</p></td>
+</tr>
+<tr>
+<td>6</td>
+<td>Thời gian lưu trữ dữ liệu</td>
+<td><p>- Hóa đơn, phiếu nhập/xuất kho: lưu tối thiểu 5 năm theo quy định kế toán.</p>
+<p>- Phiếu order, đặt bàn: lưu tối thiểu 2 năm.</p>
+<p>- Log audit: tối thiểu 1 năm.</p></td>
 </tr>
 </tbody>
 </table>
@@ -454,6 +640,9 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 | 4 | Tốc độ xử lý nhanh | Hiệu quả | Ghi order ≤ 5s. Xuất hóa đơn ≤ 10s. Lập báo cáo ≤ 30s. |
 | 5 | Hỗ trợ in phiếu | Tương thích | Tương thích máy in nhiệt 80mm và máy in A4. |
 | 6 | Hoạt động ổn định | Tin cậy | Liên tục trong giờ kinh doanh, tự xử lý lỗi kết nối. |
+| 7 | Bảo mật xác thực | Bảo mật | Mật khẩu băm (bcrypt/argon2), không lưu plaintext. HTTPS cho mọi giao tiếp. |
+| 8 | Chống truy cập trái phép | Bảo mật | Kiểm tra phân quyền ở mỗi API. Khóa tài khoản sau 5 lần sai. Phiên tự hết hạn. |
+| 9 | Toàn vẹn dữ liệu giao dịch | Tin cậy | Thanh toán và cập nhật tồn kho dùng transaction (atomic). Rollback nếu lỗi giữa chừng. |
 
 # 7. SƠ ĐỒ LUỒNG DỮ LIỆU CHO TỪNG YÊU CẦU {#sơ-đồ-luồng-dữ-liệu-cho-từng-yêu-cầu}
 
@@ -554,6 +743,124 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 >
 > **Bước 9:** Kết thúc.
 
+### 7.1.3. Bàn giao cho bếp / quầy pha chế (Loại: Xử lý) {#bàn-giao-cho-bếp-quầy-pha-chế-loại-xử-lý}
+
+**Sơ đồ luồng dữ liệu:**
+
+|  | **Nhân viên Phục vụ** |  |
+|:--:|:--:|:--:|
+|  | ↓ D1 ↑ D6 |  |
+| **Thiết bị nhập** → D2 → | **Xử lý Bàn giao bếp / pha chế** | → D5 → **Thiết bị xuất** |
+|  | ↑ D3 ↓ D4 |  |
+|  | **══ Bộ nhớ phụ (CSDL) ══** |  |
+
+**Mô tả các luồng dữ liệu:**
+
+| **Ký hiệu** | **Mô tả chi tiết** |
+|----|----|
+| D1 | Thông tin do Phục vụ thao tác: lệnh "Chốt order" (xác nhận chuyển order xuống bếp/pha chế) cho một bàn cụ thể. |
+| D2 | Không có. |
+| D3 | Đọc từ CSDL: Chi tiết phiếu order chưa chuyển (món, loại MA/DU, SL, ghi chú). Đọc loại món để phân luồng (Món ăn → Bếp; Đồ uống → Quầy pha chế). |
+| D4 | Ghi vào CSDL: Phát sinh 1 hoặc 2 phiếu chuyển (PV_BM3) — một cho Bếp (nếu có món ăn), một cho Quầy pha chế (nếu có đồ uống). Cập nhật trạng thái từng dòng món thành "Chờ chế biến". |
+| D5 | Xuất ra máy in (tùy chọn): Phiếu chuyển bếp / phiếu chuyển pha chế (PV_BM3) in ra tại khu vực tương ứng. |
+| D6 | Hiển thị cho Phục vụ: Kết quả chốt order, danh sách các phiếu vừa chuyển. |
+
+**Thuật toán xử lý:**
+
+> **Bước 1:** Nhận D1: Phục vụ chọn bàn và bấm "Chốt order".
+>
+> **Bước 2:** Đọc D3: lấy các dòng món của order chưa chuyển bếp/pha chế.
+>
+> **Bước 3:** Phân loại theo trường "Loại món": MA → nhóm Bếp; DU → nhóm Quầy pha chế.
+>
+> **Bước 4:** Với mỗi nhóm không rỗng: phát sinh mã phiếu chuyển, ghi D4 vào CSDL.
+>
+> **Bước 5:** Cập nhật trạng thái dòng món thành "Chờ chế biến".
+>
+> **Bước 6:** Xuất D5: in phiếu chuyển ra máy in của khu vực tương ứng (nếu cấu hình bật in).
+>
+> **Bước 7:** Hiển thị D6: thông báo chuyển thành công, danh sách phiếu.
+>
+> **Bước 8:** Kết thúc.
+
+### 7.1.4. Phục vụ món ra bàn (Loại: Cập nhật) {#phục-vụ-món-ra-bàn-loại-cập-nhật}
+
+**Sơ đồ luồng dữ liệu:**
+
+|  | **Nhân viên Phục vụ** |  |
+|:--:|:--:|:--:|
+|  | ↓ D1 ↑ D6 |  |
+| **Thiết bị nhập** → D2 → | **Xử lý Phục vụ món ra bàn** | → D5 → **Thiết bị xuất** |
+|  | ↑ D3 ↓ D4 |  |
+|  | **══ Bộ nhớ phụ (CSDL) ══** |  |
+
+**Mô tả các luồng dữ liệu:**
+
+| **Ký hiệu** | **Mô tả chi tiết** |
+|----|----|
+| D1 | Thông tin do Phục vụ chọn: dòng món cần xác nhận đã phục vụ (theo bàn, mã món). |
+| D2 | Không có. |
+| D3 | Đọc từ CSDL: Danh sách các dòng món có trạng thái "Đã xong" nhưng chưa được Phục vụ xác nhận đem ra bàn. |
+| D4 | Ghi vào CSDL: Cập nhật trạng thái dòng món → "Đã phục vụ", ghi thời gian phục vụ và mã NV phục vụ. |
+| D5 | Không có. |
+| D6 | Hiển thị cho Phục vụ: Danh sách món "Đã xong" cần phục vụ (PV_BM4); thông báo cập nhật thành công; thông báo realtime khi có món mới sẵn sàng. |
+
+**Thuật toán xử lý:**
+
+> **Bước 1:** Đọc D3: truy vấn các dòng món trạng thái "Đã xong" của các bàn được phân công.
+>
+> **Bước 2:** Hiển thị D6: danh sách món sẵn sàng phục vụ (PV_BM4).
+>
+> **Bước 3:** Nhận D1: Phục vụ chọn dòng món và bấm "Đã phục vụ".
+>
+> **Bước 4:** Kiểm tra: trạng thái hiện tại của dòng món phải là "Đã xong" (tránh cập nhật trùng).
+>
+> **Bước 5:** Ghi D4: cập nhật trạng thái → "Đã phục vụ", ghi thời gian + mã NV.
+>
+> **Bước 6:** Hiển thị D6: thông báo thành công, loại dòng món vừa cập nhật khỏi danh sách chờ.
+>
+> **Bước 7:** Kết thúc.
+
+### 7.1.5. Tiếp nhận khách đã đặt bàn — Check-in (Loại: Cập nhật) {#check-in-khách-đặt-bàn-loại-cập-nhật}
+
+**Sơ đồ luồng dữ liệu:**
+
+|  | **Nhân viên Phục vụ** |  |
+|:--:|:--:|:--:|
+|  | ↓ D1 ↑ D6 |  |
+| **Thiết bị nhập** → D2 → | **Xử lý Check-in đặt bàn** | → D5 → **Thiết bị xuất** |
+|  | ↑ D3 ↓ D4 |  |
+|  | **══ Bộ nhớ phụ (CSDL) ══** |  |
+
+**Mô tả các luồng dữ liệu:**
+
+| **Ký hiệu** | **Mô tả chi tiết** |
+|----|----|
+| D1 | Thông tin do Phục vụ thao tác: chọn phiếu đặt bàn của khách đến (theo mã đặt hoặc SĐT) và bấm "Nhận bàn". |
+| D2 | Không có. |
+| D3 | Đọc từ CSDL: Danh sách đặt bàn trạng thái "Đã đặt" trong khoảng thời gian gần (giờ hiện tại ± cấu hình). |
+| D4 | Ghi vào CSDL: Cập nhật phiếu đặt bàn → "Đã nhận bàn"; cập nhật bàn → "Có khách"; ghi thời gian check-in. |
+| D5 | Không có. |
+| D6 | Hiển thị cho Phục vụ: Danh sách đặt bàn chờ check-in (PV_BM5); thông báo thành công và mở màn hình gọi món cho bàn. |
+
+**Thuật toán xử lý:**
+
+> **Bước 1:** Đọc D3: lấy danh sách đặt bàn trạng thái "Đã đặt" sắp đến/đã qua giờ.
+>
+> **Bước 2:** Hiển thị D6: PV_BM5 cho Phục vụ chọn.
+>
+> **Bước 3:** Nhận D1: Phục vụ chọn phiếu đặt và bấm "Nhận bàn".
+>
+> **Bước 4:** Kiểm tra: bàn vẫn ở trạng thái "Đã đặt" (chưa bị job tự hủy).
+>
+> **Bước 5:** Ghi D4: cập nhật phiếu đặt → "Đã nhận bàn"; bàn → "Có khách"; ghi thời gian check-in.
+>
+> **Bước 6:** Hiển thị D6: chuyển hướng sang màn hình gọi món của bàn.
+>
+> **Bước 7:** Kết thúc.
+
+*Ghi chú:* Việc tự động hủy phiếu đặt quá hạn (PV_QĐ1) do một job định kỳ trong hệ thống thực hiện, không thuộc luồng tương tác này.
+
 ## 7.2. Sơ đồ luồng dữ liệu các yêu cầu Bộ phận Thu ngân {#sơ-đồ-luồng-dữ-liệu-các-yêu-cầu-bộ-phận-thu-ngân}
 
 ### 7.2.1. Xử lý thanh toán (Loại: Tính toán) {#xử-lý-thanh-toán-loại-tính-toán}
@@ -641,6 +948,46 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 > **Bước 6:** Xuất D5: in báo cáo ra máy in (nếu Thu ngân yêu cầu).
 >
 > **Bước 7:** Kết thúc.
+
+### 7.2.3. Xuất / In lại hóa đơn (Loại: Kết xuất) {#xuất-in-lại-hóa-đơn-loại-kết-xuất}
+
+**Sơ đồ luồng dữ liệu:**
+
+|  | **Thu ngân** |  |
+|:--:|:--:|:--:|
+|  | ↓ D1 ↑ D6 |  |
+| **Thiết bị nhập** → D2 → | **Xử lý Xuất / In lại hóa đơn** | → D5 → **Thiết bị xuất** |
+|  | ↑ D3 ↓ D4 |  |
+|  | **══ Bộ nhớ phụ (CSDL) ══** |  |
+
+**Mô tả các luồng dữ liệu:**
+
+| **Ký hiệu** | **Mô tả chi tiết** |
+|----|----|
+| D1 | Thông tin do Thu ngân nhập: Số hóa đơn cần in (hoặc tra theo bàn + ngày), số bản in. |
+| D2 | Không có. |
+| D3 | Đọc từ CSDL: Hóa đơn (tổng tiền, VAT, hình thức TT), chi tiết món của hóa đơn, thông tin nhà hàng (tên, địa chỉ, MST từ CSDL Cấu hình). |
+| D4 | Ghi vào CSDL: Ghi log audit (ai in lại, hóa đơn nào, lúc nào, số bản). Không sửa nội dung hóa đơn gốc. |
+| D5 | Xuất ra máy in: Hóa đơn thanh toán (TN_BM3) — có thể đánh dấu "BẢN SAO" nếu in lại lần ≥ 2. |
+| D6 | Hiển thị cho Thu ngân: Xem trước hóa đơn, kết quả in. |
+
+**Thuật toán xử lý:**
+
+> **Bước 1:** Nhận D1: Thu ngân nhập số hóa đơn (hoặc chọn từ danh sách hóa đơn theo bàn/ngày).
+>
+> **Bước 2:** Đọc D3: lấy hóa đơn, chi tiết món, thông tin nhà hàng.
+>
+> **Bước 3:** Nếu không tìm thấy → thông báo lỗi D6 → kết thúc.
+>
+> **Bước 4:** Hiển thị D6: bản xem trước hóa đơn theo TN_BM3.
+>
+> **Bước 5:** Thu ngân xác nhận in. Nếu đây là lần in ≥ 2 → đánh dấu "BẢN SAO".
+>
+> **Bước 6:** Xuất D5: in hóa đơn ra máy in.
+>
+> **Bước 7:** Ghi D4: lưu log in lại.
+>
+> **Bước 8:** Kết thúc.
 
 ## 7.3. Sơ đồ luồng dữ liệu các yêu cầu Bộ phận Bếp {#sơ-đồ-luồng-dữ-liệu-các-yêu-cầu-bộ-phận-bếp}
 
@@ -804,6 +1151,132 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 >
 > **Bước 7:** Kết thúc.
 
+### 7.4.3. Lập phiếu xuất kho (Loại: Lưu trữ) {#lập-phiếu-xuất-kho-loại-lưu-trữ}
+
+**Sơ đồ luồng dữ liệu:**
+
+|  | **Nhân viên Kho** |  |
+|:--:|:--:|:--:|
+|  | ↓ D1 ↑ D6 |  |
+| **Thiết bị nhập** → D2 → | **Xử lý Lập phiếu xuất kho** | → D5 → **Thiết bị xuất** |
+|  | ↑ D3 ↓ D4 |  |
+|  | **══ Bộ nhớ phụ (CSDL) ══** |  |
+
+**Mô tả các luồng dữ liệu:**
+
+| **Ký hiệu** | **Mô tả chi tiết** |
+|----|----|
+| D1 | Thông tin do NV Kho nhập: Ngày xuất, bộ phận nhận (Bếp/Quầy pha chế), danh sách NVL (tên, ĐVT, SL, đơn giá), ghi chú (dựa vào K_BM2). |
+| D2 | Không có. |
+| D3 | Đọc từ CSDL: Danh mục NVL, tồn kho hiện tại của từng NVL, danh sách bộ phận nhận. |
+| D4 | Ghi vào CSDL: Phiếu xuất kho (mã phiếu tự phát sinh + D1 + tổng giá trị xuất). Cập nhật tồn kho: Tồn mới = Tồn cũ − SL xuất. |
+| D5 | Xuất ra máy in: Phiếu xuất kho (K_BM2). |
+| D6 | Hiển thị cho NV Kho: Danh mục NVL kèm tồn hiện tại để chọn. Kết quả lưu thành công, tổng giá trị xuất. |
+
+**Thuật toán xử lý:**
+
+> **Bước 1:** Đọc D3: lấy danh mục NVL + tồn hiện tại, danh sách bộ phận nhận.
+>
+> **Bước 2:** Hiển thị D6: danh mục NVL + tồn cho NV Kho chọn.
+>
+> **Bước 3:** Nhận D1: NV Kho nhập ngày, chọn bộ phận nhận, chọn NVL, nhập SL, đơn giá.
+>
+> **Bước 4:** Kiểm tra quy định K_QĐ1: SL > 0; đơn giá > 0; SL xuất ≤ tồn hiện tại.
+>
+> **Bước 5:** Nếu vi phạm → thông báo lỗi D6 → quay lại Bước 3.
+>
+> **Bước 6:** Tính tổng giá trị xuất = ∑(SL × Đơn giá).
+>
+> **Bước 7:** Phát sinh mã phiếu, ghi D4: lưu phiếu xuất vào CSDL trong 1 transaction.
+>
+> **Bước 8:** Cập nhật tồn kho: Tồn mới = Tồn cũ − SL xuất (cùng transaction). Nếu tồn mới ≤ định mức tối thiểu → đánh dấu cảnh báo.
+>
+> **Bước 9:** Hiển thị D6: thông báo thành công, tổng giá trị xuất, cảnh báo tồn thấp (nếu có).
+>
+> **Bước 10:** Xuất D5: in phiếu xuất kho (K_BM2) nếu cần.
+>
+> **Bước 11:** Kết thúc.
+
+### 7.4.4. Báo cáo nhập kho (Loại: Kết xuất) {#báo-cáo-nhập-kho-loại-kết-xuất}
+
+**Sơ đồ luồng dữ liệu:**
+
+|  | **Nhân viên Kho** |  |
+|:--:|:--:|:--:|
+|  | ↓ D1 ↑ D6 |  |
+| **Thiết bị nhập** → D2 → | **Xử lý Lập báo cáo nhập kho** | → D5 → **Thiết bị xuất** |
+|  | ↑ D3 ↓ D4 |  |
+|  | **══ Bộ nhớ phụ (CSDL) ══** |  |
+
+**Mô tả các luồng dữ liệu:**
+
+| **Ký hiệu** | **Mô tả chi tiết** |
+|----|----|
+| D1 | Thông tin do NV Kho nhập: Ngày bắt đầu, ngày kết thúc kỳ báo cáo. Tùy chọn lọc theo NCC. |
+| D2 | Không có. |
+| D3 | Đọc từ CSDL: Tất cả phiếu nhập kho trong khoảng thời gian, chi tiết NVL từng phiếu, danh sách NCC. |
+| D4 | Không có (báo cáo chỉ đọc). |
+| D5 | Xuất ra máy in: Báo cáo nhập kho (K_BM4). |
+| D6 | Hiển thị cho NV Kho: Bảng báo cáo K_BM4 (NVL, tổng SL nhập, tổng giá trị, NCC). |
+
+**Thuật toán xử lý:**
+
+> **Bước 1:** Nhận D1: NV Kho nhập khoảng thời gian (và NCC nếu có).
+>
+> **Bước 2:** Kiểm tra: ngày bắt đầu ≤ ngày kết thúc.
+>
+> **Bước 3:** Đọc D3: truy vấn các phiếu nhập trong khoảng [BĐ, KT] (lọc theo NCC nếu có).
+>
+> **Bước 4:** Tổng hợp theo NVL: tổng SL nhập, tổng giá trị nhập, NCC chính.
+>
+> **Bước 5:** Tính tổng giá trị nhập kỳ = ∑ (tổng giá trị từng NVL).
+>
+> **Bước 6:** Hiển thị D6: báo cáo theo K_BM4.
+>
+> **Bước 7:** Xuất D5: in K_BM4 nếu NV Kho yêu cầu.
+>
+> **Bước 8:** Kết thúc.
+
+### 7.4.5. Báo cáo xuất kho (Loại: Kết xuất) {#báo-cáo-xuất-kho-loại-kết-xuất}
+
+**Sơ đồ luồng dữ liệu:**
+
+|  | **Nhân viên Kho** |  |
+|:--:|:--:|:--:|
+|  | ↓ D1 ↑ D6 |  |
+| **Thiết bị nhập** → D2 → | **Xử lý Lập báo cáo xuất kho** | → D5 → **Thiết bị xuất** |
+|  | ↑ D3 ↓ D4 |  |
+|  | **══ Bộ nhớ phụ (CSDL) ══** |  |
+
+**Mô tả các luồng dữ liệu:**
+
+| **Ký hiệu** | **Mô tả chi tiết** |
+|----|----|
+| D1 | Thông tin do NV Kho nhập: Ngày bắt đầu, ngày kết thúc kỳ báo cáo. Tùy chọn lọc theo bộ phận nhận. |
+| D2 | Không có. |
+| D3 | Đọc từ CSDL: Tất cả phiếu xuất kho trong khoảng thời gian, chi tiết NVL từng phiếu. |
+| D4 | Không có (báo cáo chỉ đọc). |
+| D5 | Xuất ra máy in: Báo cáo xuất kho (K_BM5). |
+| D6 | Hiển thị cho NV Kho: Bảng báo cáo K_BM5 (NVL, tổng SL xuất, tổng giá trị, BP nhận). |
+
+**Thuật toán xử lý:**
+
+> **Bước 1:** Nhận D1: NV Kho nhập khoảng thời gian (và bộ phận nhận nếu có).
+>
+> **Bước 2:** Kiểm tra: ngày bắt đầu ≤ ngày kết thúc.
+>
+> **Bước 3:** Đọc D3: truy vấn phiếu xuất trong khoảng [BĐ, KT] (lọc bộ phận nếu có).
+>
+> **Bước 4:** Tổng hợp theo NVL: tổng SL xuất, tổng giá trị xuất, bộ phận nhận.
+>
+> **Bước 5:** Tính tổng giá trị xuất kỳ = ∑ (tổng giá trị từng NVL).
+>
+> **Bước 6:** Hiển thị D6: báo cáo theo K_BM5.
+>
+> **Bước 7:** Xuất D5: in K_BM5 nếu yêu cầu.
+>
+> **Bước 8:** Kết thúc.
+
 ## 7.5. Sơ đồ luồng dữ liệu các yêu cầu Quản lý (Admin) {#sơ-đồ-luồng-dữ-liệu-các-yêu-cầu-quản-lý-admin}
 
 ### 7.5.1. Quản lý thực đơn (Loại: Lưu trữ) {#quản-lý-thực-đơn-loại-lưu-trữ}
@@ -845,3 +1318,251 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 > **Bước 7:** Hiển thị D6: thông báo thành công, cập nhật lại danh sách.
 >
 > **Bước 8:** Kết thúc.
+
+### 7.5.2. Quản lý bàn (Loại: Lưu trữ) {#quản-lý-bàn-loại-lưu-trữ}
+
+**Sơ đồ luồng dữ liệu:**
+
+|  | **Quản lý (Admin)** |  |
+|:--:|:--:|:--:|
+|  | ↓ D1 ↑ D6 |  |
+| **Thiết bị nhập** → D2 → | **Xử lý Quản lý bàn** | → D5 → **Thiết bị xuất** |
+|  | ↑ D3 ↓ D4 |  |
+|  | **══ Bộ nhớ phụ (CSDL) ══** |  |
+
+**Mô tả các luồng dữ liệu:**
+
+| **Ký hiệu** | **Mô tả chi tiết** |
+|----|----|
+| D1 | Thông tin do Admin nhập: Số bàn, khu vực, sức chứa, ghi chú; lệnh thêm/sửa/xóa (dựa vào QL_BM2). |
+| D2 | Không có. |
+| D3 | Đọc từ CSDL: Danh sách bàn hiện tại + trạng thái (Trống/Có khách/Đã đặt). |
+| D4 | Ghi vào CSDL: Thêm bàn / cập nhật / xóa (đánh dấu ngừng sử dụng). Không xóa cứng nếu bàn đang có khách hoặc đã đặt. |
+| D5 | Không có. |
+| D6 | Hiển thị cho Admin: Bảng danh sách bàn (QL_BM2); kết quả thao tác. |
+
+**Thuật toán xử lý:**
+
+> **Bước 1:** Đọc D3: lấy danh sách bàn từ CSDL.
+>
+> **Bước 2:** Hiển thị D6: bảng bàn theo QL_BM2.
+>
+> **Bước 3:** Nhận D1: Admin thao tác thêm/sửa/xóa.
+>
+> **Bước 4:** Kiểm tra: số bàn không trùng (khi thêm); sức chứa > 0; khi xóa → bàn phải ở trạng thái "Trống".
+>
+> **Bước 5:** Nếu vi phạm → thông báo lỗi D6 → quay lại Bước 3.
+>
+> **Bước 6:** Ghi D4: thực hiện thao tác trên CSDL Bàn.
+>
+> **Bước 7:** Hiển thị D6: thông báo thành công.
+>
+> **Bước 8:** Kết thúc.
+
+### 7.5.3. Quản lý tài khoản (Loại: Lưu trữ) {#quản-lý-tài-khoản-loại-lưu-trữ}
+
+**Sơ đồ luồng dữ liệu:**
+
+|  | **Quản lý (Admin)** |  |
+|:--:|:--:|:--:|
+|  | ↓ D1 ↑ D6 |  |
+| **Thiết bị nhập** → D2 → | **Xử lý Quản lý tài khoản** | → D5 → **Thiết bị xuất** |
+|  | ↑ D3 ↓ D4 |  |
+|  | **══ Bộ nhớ phụ (CSDL) ══** |  |
+
+**Mô tả các luồng dữ liệu:**
+
+| **Ký hiệu** | **Mô tả chi tiết** |
+|----|----|
+| D1 | Thông tin do Admin nhập: Họ tên, tên đăng nhập, mật khẩu khởi tạo, vai trò; lệnh thêm/sửa/khóa/mở khóa/đặt lại mật khẩu (dựa vào QL_BM3). |
+| D2 | Không có. |
+| D3 | Đọc từ CSDL: Danh sách tài khoản hiện có, danh mục vai trò, ma trận phân quyền. |
+| D4 | Ghi vào CSDL: Thêm/sửa tài khoản (mật khẩu hash), khóa/mở khóa, đặt lại mật khẩu. Ghi log audit (ai làm gì, lúc nào). |
+| D5 | Không có. |
+| D6 | Hiển thị cho Admin: Danh sách tài khoản (QL_BM3); kết quả thao tác. |
+
+**Thuật toán xử lý:**
+
+> **Bước 1:** Đọc D3: lấy danh sách tài khoản và vai trò từ CSDL.
+>
+> **Bước 2:** Hiển thị D6: bảng QL_BM3 và các nút chức năng.
+>
+> **Bước 3:** Nhận D1: Admin thao tác.
+>
+> **Bước 4:** Kiểm tra quy định QL_QĐ1: tên đăng nhập không trùng; mật khẩu ≥ 8 ký tự + có chữ và số; vai trò hợp lệ; không cho phép Admin tự khóa chính mình.
+>
+> **Bước 5:** Nếu vi phạm → thông báo lỗi D6 → quay lại Bước 3.
+>
+> **Bước 6:** Băm mật khẩu (nếu có), ghi D4 vào CSDL Tài khoản.
+>
+> **Bước 7:** Ghi D4 (log audit): thao tác Admin vừa thực hiện.
+>
+> **Bước 8:** Hiển thị D6: thông báo thành công.
+>
+> **Bước 9:** Kết thúc.
+
+### 7.5.4. Cấu hình hệ thống (Loại: Lưu trữ) {#cấu-hình-hệ-thống-loại-lưu-trữ}
+
+**Sơ đồ luồng dữ liệu:**
+
+|  | **Quản lý (Admin)** |  |
+|:--:|:--:|:--:|
+|  | ↓ D1 ↑ D6 |  |
+| **Thiết bị nhập** → D2 → | **Xử lý Cấu hình hệ thống** | → D5 → **Thiết bị xuất** |
+|  | ↑ D3 ↓ D4 |  |
+|  | **══ Bộ nhớ phụ (CSDL) ══** |  |
+
+**Mô tả các luồng dữ liệu:**
+
+| **Ký hiệu** | **Mô tả chi tiết** |
+|----|----|
+| D1 | Thông tin do Admin nhập: Giá trị mới cho các tham số: bật/tắt VAT, tỷ lệ VAT, thời gian tự hủy đặt bàn, giờ mở/đóng cửa, thời gian phiên, lịch sao lưu (dựa vào QL_BM5). |
+| D2 | Không có. |
+| D3 | Đọc từ CSDL: Giá trị hiện tại của tất cả tham số cấu hình. |
+| D4 | Ghi vào CSDL: Giá trị mới của các tham số. Ghi log audit (giá trị cũ → mới, ai, khi nào). |
+| D5 | Không có. |
+| D6 | Hiển thị cho Admin: Màn hình QL_BM5; kết quả lưu cấu hình. |
+
+**Thuật toán xử lý:**
+
+> **Bước 1:** Đọc D3: lấy cấu hình hiện tại.
+>
+> **Bước 2:** Hiển thị D6: QL_BM5 với giá trị hiện tại.
+>
+> **Bước 3:** Nhận D1: Admin nhập giá trị mới.
+>
+> **Bước 4:** Kiểm tra quy định QL_QĐ2: VAT ∈ [0, 0.2]; thời gian hủy ∈ [5, 60] phút; giờ mở < giờ đóng; thời gian phiên > 0.
+>
+> **Bước 5:** Nếu vi phạm → thông báo lỗi D6 → quay lại Bước 3.
+>
+> **Bước 6:** Ghi D4: lưu giá trị mới + log audit.
+>
+> **Bước 7:** Hiển thị D6: thông báo thành công; nhắc Admin nếu thay đổi có hiệu lực ngay hay phải đăng nhập lại.
+>
+> **Bước 8:** Kết thúc.
+
+### 7.5.5. Xem báo cáo tổng hợp (Loại: Kết xuất) {#xem-báo-cáo-tổng-hợp-loại-kết-xuất}
+
+**Sơ đồ luồng dữ liệu:**
+
+|  | **Quản lý (Admin)** |  |
+|:--:|:--:|:--:|
+|  | ↓ D1 ↑ D6 |  |
+| **Thiết bị nhập** → D2 → | **Xử lý Lập báo cáo tổng hợp** | → D5 → **Thiết bị xuất** |
+|  | ↑ D3 ↓ D4 |  |
+|  | **══ Bộ nhớ phụ (CSDL) ══** |  |
+
+**Mô tả các luồng dữ liệu:**
+
+| **Ký hiệu** | **Mô tả chi tiết** |
+|----|----|
+| D1 | Thông tin do Admin nhập: Khoảng thời gian báo cáo, các mục cần xem (doanh thu / top món / cảnh báo tồn / nhập-xuất). |
+| D2 | Không có. |
+| D3 | Đọc từ CSDL: Hóa đơn, chi tiết order, phiếu nhập, phiếu xuất, tồn kho hiện tại, định mức tối thiểu. |
+| D4 | Không có (báo cáo chỉ đọc). |
+| D5 | Xuất ra máy in: Báo cáo tổng hợp (QL_BM4). |
+| D6 | Hiển thị cho Admin: Dashboard QL_BM4 với 3 phần (doanh thu, top món, cảnh báo tồn). |
+
+**Thuật toán xử lý:**
+
+> **Bước 1:** Nhận D1: Admin nhập kỳ báo cáo và chọn mục.
+>
+> **Bước 2:** Kiểm tra: ngày bắt đầu ≤ ngày kết thúc.
+>
+> **Bước 3:** Đọc D3 — phần A (Doanh thu): tổng hợp hóa đơn theo ngày + theo hình thức thanh toán.
+>
+> **Bước 4:** Đọc D3 — phần B (Top món): tổng hợp số lượng bán + doanh thu theo món, sắp giảm dần, lấy top N.
+>
+> **Bước 5:** Đọc D3 — phần C (Cảnh báo tồn): lọc NVL có tồn ≤ định mức tối thiểu.
+>
+> **Bước 6:** Hiển thị D6: QL_BM4 đầy đủ 3 phần.
+>
+> **Bước 7:** Xuất D5: in nếu Admin yêu cầu.
+>
+> **Bước 8:** Kết thúc.
+
+## 7.6. Sơ đồ luồng dữ liệu các chức năng hệ thống {#sơ-đồ-luồng-dữ-liệu-các-chức-năng-hệ-thống}
+
+### 7.6.1. Đăng nhập / Đăng xuất (Loại: Xử lý) {#đăng-nhập-đăng-xuất-loại-xử-lý}
+
+**Sơ đồ luồng dữ liệu:**
+
+|  | **Người dùng (mọi vai trò)** |  |
+|:--:|:--:|:--:|
+|  | ↓ D1 ↑ D6 |  |
+| **Thiết bị nhập** → D2 → | **Xử lý Đăng nhập / Đăng xuất** | → D5 → **Thiết bị xuất** |
+|  | ↑ D3 ↓ D4 |  |
+|  | **══ Bộ nhớ phụ (CSDL) ══** |  |
+
+**Mô tả các luồng dữ liệu:**
+
+| **Ký hiệu** | **Mô tả chi tiết** |
+|----|----|
+| D1 | Thông tin do Người dùng nhập: Tên đăng nhập + mật khẩu (đăng nhập); hoặc lệnh "Đăng xuất". |
+| D2 | Không có. |
+| D3 | Đọc từ CSDL: Tài khoản theo tên đăng nhập (trạng thái, hash mật khẩu, số lần sai liên tiếp, vai trò), thời gian phiên (từ CSDL Cấu hình). |
+| D4 | Ghi vào CSDL: Tăng/đặt lại số lần sai; khóa tài khoản nếu sai ≥ 5; tạo phiên đăng nhập (token + thời điểm hết hạn); kết thúc phiên khi đăng xuất; ghi log audit. |
+| D5 | Không có. |
+| D6 | Hiển thị cho Người dùng: Màn hình đăng nhập SYS_BM1; kết quả đăng nhập (thành công → mở giao diện theo vai trò; thất bại → thông báo lỗi); kết quả đăng xuất. |
+
+**Thuật toán xử lý:**
+
+> **Bước 1:** Nhận D1: tên đăng nhập + mật khẩu (hoặc lệnh "Đăng xuất").
+>
+> **Bước 2 (Đăng nhập):** Đọc D3: tài khoản theo tên đăng nhập.
+>
+> **Bước 3:** Nếu không tồn tại HOẶC trạng thái "Đã khóa" → thông báo lỗi D6 → kết thúc.
+>
+> **Bước 4:** So khớp mật khẩu (hash). Nếu sai → ghi D4 (tăng số lần sai); nếu lần sai ≥ 5 → khóa tài khoản; thông báo lỗi D6 → kết thúc.
+>
+> **Bước 5:** Nếu đúng → ghi D4: reset số lần sai, tạo phiên (token, hạn = giờ hiện tại + thời gian phiên), log audit.
+>
+> **Bước 6:** Hiển thị D6: mở giao diện theo vai trò.
+>
+> **Bước 7 (Đăng xuất):** Ghi D4: kết thúc phiên + log audit. Hiển thị D6: về màn hình đăng nhập.
+>
+> **Bước 8:** Kết thúc.
+
+### 7.6.2. Sao lưu / Phục hồi dữ liệu (Loại: Xử lý) {#sao-lưu-phục-hồi-dữ-liệu-loại-xử-lý}
+
+**Sơ đồ luồng dữ liệu:**
+
+|  | **Quản lý (Admin)** |  |
+|:--:|:--:|:--:|
+|  | ↓ D1 ↑ D6 |  |
+| **Thiết bị nhập** → D2 → | **Xử lý Sao lưu / Phục hồi** | → D5 → **Thiết bị xuất** |
+|  | ↑ D3 ↓ D4 |  |
+|  | **══ Bộ nhớ phụ (CSDL) ══** |  |
+
+**Mô tả các luồng dữ liệu:**
+
+| **Ký hiệu** | **Mô tả chi tiết** |
+|----|----|
+| D1 | Thông tin do Admin nhập: Lệnh "Sao lưu ngay" hoặc "Phục hồi" + chọn bản sao lưu nguồn. |
+| D2 | File bản sao lưu (.bak) nạp vào (khi phục hồi từ file ngoài). |
+| D3 | Đọc từ CSDL: Toàn bộ dữ liệu nghiệp vụ (khi sao lưu); danh sách bản sao lưu hiện có; cấu hình lịch sao lưu. |
+| D4 | Ghi vào CSDL: Ghi nhận thông tin bản sao lưu (tên, kích thước, thời điểm, người thực hiện); log audit. Khi phục hồi: thay thế toàn bộ CSDL hiện tại. |
+| D5 | Xuất ra thiết bị lưu trữ: File bản sao lưu (.bak) ghi ra ổ đĩa / thư mục cấu hình. |
+| D6 | Hiển thị cho Admin: Danh sách bản sao lưu; tiến độ; kết quả thành công/thất bại. |
+
+**Thuật toán xử lý:**
+
+> **Bước 1:** Đọc D3: lấy danh sách bản sao lưu hiện có và cấu hình.
+>
+> **Bước 2:** Hiển thị D6: danh sách + nút "Sao lưu ngay" / "Phục hồi".
+>
+> **Bước 3:** Nhận D1: Admin chọn thao tác.
+>
+> **Bước 4 (Sao lưu):** Đọc D3 toàn bộ CSDL → ghi D5 ra file .bak → ghi D4 thông tin bản sao lưu + log → xóa bản sao lưu cũ vượt số bản giữ lại.
+>
+> **Bước 5 (Phục hồi):** Yêu cầu Admin xác nhận 2 lần (vì phá hủy dữ liệu hiện tại). Nhận D2 (file .bak) hoặc chọn từ danh sách.
+>
+> **Bước 6:** Khóa hệ thống (không cho người khác thao tác). Thay thế CSDL bằng dữ liệu từ bản sao lưu.
+>
+> **Bước 7:** Ghi D4: log audit (đã phục hồi từ bản nào, lúc nào, ai).
+>
+> **Bước 8:** Mở khóa hệ thống. Hiển thị D6: kết quả.
+>
+> **Bước 9:** Kết thúc.
+
+*Ghi chú:* Sao lưu tự động theo lịch trong QL_QĐ2 do scheduler thực hiện ngầm, không cần tương tác Admin; thuật toán giống Bước 4 nhưng được kích hoạt bằng cron.
