@@ -33,7 +33,7 @@ Quản lý thiết lập danh sách bàn: số bàn, khu vực, sức chứa, tr
 
 Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ phận Bếp, Thu ngân, Bộ phận Kho.
 
-# 2. BẢNG YÊU CẦU CHỨC NĂNG NGHIỆP VỤ {#bảng-yêu-cầu-chức-năng-nghiệp-vụ}
+# 2. DANH SÁCH CÁC YÊU CẦU {#danh-sách-các-yêu-cầu}
 
 ## Bộ phận Thu ngân
 
@@ -76,18 +76,11 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 |----|----|----|----|----|----|
 | 1 | Quản lý thực đơn | Lưu trữ | Thêm/sửa/xóa món. Cập nhật trạng thái, đơn giá. | QL_BM1 |  |
 | 2 | Quản lý bàn | Lưu trữ | Thêm/sửa/xóa bàn. Thiết lập sức chứa, khu vực. | QL_BM2 |  |
-| 3 | Quản lý tài khoản | Phân quyền | QL_QĐ1. Tạo/sửa/khóa tài khoản. Phân quyền theo vai trò. | QL_BM3 |  |
-| 4 | Xem báo cáo tổng hợp | Kết xuất | Xem tất cả báo cáo: doanh thu, tồn kho, nhập/xuất. | QL_BM4 |  |
-| 5 | Cấu hình hệ thống | Môi trường | QL_QĐ2. Thiết lập tỷ lệ VAT, thời gian tự hủy đặt bàn, giờ hoạt động. | QL_BM5 |  |
+| 3 | Xem báo cáo tổng hợp | Kết xuất | Xem tất cả báo cáo: doanh thu, tồn kho, nhập/xuất. | QL_BM4 |  |
 
-## Toàn hệ thống
+*Ghi chú:* Các chức năng hệ thống do Admin thực hiện (quản lý tài khoản, cấu hình hệ thống, sao lưu/phục hồi) và chức năng đăng nhập áp dụng cho mọi vai trò được liệt kê tại §5 — không thuộc nhóm nghiệp vụ.
 
-| **STT** | **Công việc** | **Loại công việc** | **Quy định / Công thức liên quan** | **Biểu mẫu liên quan** | **Ghi chú** |
-|----|----|----|----|----|----|
-| 1 | Đăng nhập / Đăng xuất | Phân quyền | QL_QĐ1. Xác thực tài khoản, tạo phiên làm việc, ghi log. | SYS_BM1 | Áp dụng cho mọi vai trò |
-| 2 | Sao lưu / Phục hồi dữ liệu | Sao lưu | Định kỳ tự động + thủ công khi cần. Chỉ Admin thực hiện phục hồi. |  | Xem mục 5 |
-
-# 3. DANH SÁCH CÁC YÊU CẦU {#danh-sách-các-yêu-cầu}
+# 3. BẢNG YÊU CẦU CHỨC NĂNG NGHIỆP VỤ {#bảng-yêu-cầu-chức-năng-nghiệp-vụ}
 
 <table>
 <colgroup>
@@ -251,6 +244,8 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 ### PV_BM1:
 
 **PHIẾU ĐẶT BÀN**
+
+**Mã đặt bàn:** \...\...\...\...\...\...\...\...\...\...\...\...\...\...\...\..... *(tự phát sinh khi lưu)*
 
 **Tên khách:** \...\...\...\...\...\...\...\...\...\...\...\...\...\...\...\.....
 
@@ -568,6 +563,17 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 
 # 5. BẢNG YÊU CẦU CHỨC NĂNG HỆ THỐNG {#bảng-yêu-cầu-chức-năng-hệ-thống}
 
+## 5.1. Danh sách chức năng hệ thống
+
+| **STT** | **Công việc** | **Loại công việc** | **Quy định / Công thức liên quan** | **Biểu mẫu liên quan** | **Vai trò** | **DFD** |
+|----|----|----|----|----|----|----|
+| 1 | Đăng nhập / Đăng xuất | Phân quyền | QL_QĐ1. Xác thực tài khoản, tạo phiên làm việc, ghi log. | SYS_BM1 | Mọi vai trò | §7.6.1 |
+| 2 | Quản lý tài khoản | Phân quyền | QL_QĐ1. Tạo/sửa/khóa tài khoản. Phân quyền theo vai trò. | QL_BM3 | Admin | §7.5.3 |
+| 3 | Cấu hình hệ thống | Môi trường | QL_QĐ2. Thiết lập tỷ lệ VAT, thời gian tự hủy đặt bàn, giờ hoạt động. | QL_BM5 | Admin | §7.5.4 |
+| 4 | Sao lưu / Phục hồi dữ liệu | Sao lưu | Định kỳ tự động + thủ công khi cần. Chỉ Admin thực hiện phục hồi. |  | Admin | §7.6.2 |
+
+## 5.2. Yêu cầu chung về hệ thống
+
 <table>
 <colgroup>
 <col style="width: 6%" />
@@ -676,28 +682,32 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 |----|----|
 | D1 | Thông tin đặt bàn do khách hàng cung cấp trực tiếp hoặc qua điện thoại, được Nhân viên Phục vụ nhập vào hệ thống, gồm: tên khách, SĐT, số người, thời gian đặt, hình thức đặt bàn và bàn được chọn. |
 | D2 | Không có. |
-| D3 | Đọc từ CSDL: Danh sách bàn (số bàn, khu vực, sức chứa, trạng thái), giờ hoạt động nhà hàng, thời gian tự động hủy đặt bàn. |
-| D4 | Ghi vào CSDL: Thông tin đặt bàn (D1 + mã đặt bàn tự phát sinh). Cập nhật trạng thái bàn thành \"Đã đặt\". |
+| D3 | Đọc từ CSDL: Danh sách bàn (số bàn, khu vực, sức chứa, trạng thái); **danh sách phiếu đặt còn hiệu lực của bàn** (để kiểm tra trùng thời gian); giờ hoạt động nhà hàng; thời lượng dự kiến mỗi lượt đặt và thời gian tự động hủy đặt bàn (từ cấu hình). |
+| D4 | Ghi vào CSDL: Thông tin đặt bàn (D1 + mã đặt bàn tự phát sinh). Cập nhật trạng thái bàn thành "Đã đặt" **chỉ khi phiếu đặt áp dụng cho khung giờ hiện tại**; với phiếu cho khung giờ tương lai, trạng thái bàn giữ nguyên — ràng buộc thời gian được kiểm tra qua phiếu đặt. |
 | D5 | Không có. |
 | D6 | Hiển thị cho Phục vụ: Danh sách bàn trống để chọn, kết quả đặt bàn (thành công/thất bại). |
 
 **Thuật toán xử lý:**
 
-> **Bước 1:** Đọc D3: lấy danh sách bàn trống, giờ hoạt động từ CSDL.
+> **Bước 1:** Đọc D3: lấy danh sách bàn, giờ hoạt động, thời lượng dự kiến mỗi lượt từ CSDL.
 >
-> **Bước 2:** Hiển thị D6: danh sách bàn trống để Phục vụ chọn.
+> **Bước 2:** Hiển thị D6: danh sách bàn để Phục vụ chọn (kèm trạng thái và các khung giờ đã được đặt).
 >
 > **Bước 3:** Nhận D1 từ Phục vụ: tên khách, SĐT, số người, thời gian, bàn được chọn.
 >
-> **Bước 4:** Kiểm tra quy định PV_QĐ1: thời gian có trong giờ hoạt động không? Bàn còn trống không? Số người ≤ sức chứa không?
+> **Bước 4:** Kiểm tra quy định PV_QĐ1:
+>   - (a) Thời gian đặt nằm trong giờ hoạt động.
+>   - (b) Số người ≤ sức chứa của bàn.
+>   - (c) **Không có phiếu đặt khác trên cùng bàn trùng khoảng [thời gian đặt, thời gian đặt + thời lượng dự kiến]** (xét cả phiếu trạng thái "Đã đặt" và "Đã nhận bàn").
+>   - (d) Tại thời điểm đặt, bàn không đang ở trạng thái "Có khách" cho lượt khách hiện tại.
 >
-> **Bước 5:** Nếu không thỏa quy định → thông báo lỗi D6 → quay lại Bước 3.
+> **Bước 5:** Nếu vi phạm bất kỳ điều kiện nào → thông báo lỗi D6 (chỉ rõ điều kiện vi phạm) → quay lại Bước 3.
 >
-> **Bước 6:** Nếu thỏa → phát sinh mã đặt bàn, ghi D4 vào CSDL Đặt bàn.
+> **Bước 6:** Nếu thỏa → phát sinh mã đặt bàn, ghi D4 vào CSDL Đặt bàn (trạng thái phiếu = "Đã đặt").
 >
-> **Bước 7:** Cập nhật trạng thái bàn thành \"Đã đặt\" trong CSDL Bàn.
+> **Bước 7:** **Nếu thời gian đặt thuộc khung giờ hiện tại** (chênh lệch trong ngưỡng cấu hình) → cập nhật trạng thái bàn thành "Đã đặt" trong CSDL Bàn. Nếu là đặt cho tương lai → giữ nguyên trạng thái bàn, ràng buộc thời gian được giữ qua phiếu đặt.
 >
-> **Bước 8:** Hiển thị D6: thông báo đặt bàn thành công.
+> **Bước 8:** Hiển thị D6: thông báo đặt bàn thành công, kèm mã đặt bàn.
 >
 > **Bước 9:** Kết thúc.
 
@@ -718,30 +728,32 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 |----|----|
 | D1 | Thông tin gọi món do Phục vụ nhập: Bàn số, danh sách món (tên món, số lượng, ghi chú) (dựa vào PV_BM2). |
 | D2 | Không có. |
-| D3 | Đọc từ CSDL: Danh sách thực đơn (tên, loại, đơn giá, trạng thái Còn hàng/Hết), danh sách bàn đang có khách. |
-| D4 | Ghi vào CSDL: Phiếu order (mã order tự phát sinh + D1 + đơn giá tra từ thực đơn). Cập nhật trạng thái bàn thành \"Có khách\". |
+| D3 | Đọc từ CSDL: Danh sách thực đơn (tên, loại, đơn giá, trạng thái Còn hàng/Hết); **trạng thái hiện tại của bàn** ("Trống" / "Có khách" / "Đã đặt"). |
+| D4 | Ghi vào CSDL: Phiếu order (mã order tự phát sinh + D1 + đơn giá tra từ thực đơn). Nếu bàn đang "Trống" (walk-in) → cập nhật trạng thái bàn thành "Có khách". Nếu bàn đã "Có khách" → giữ nguyên. |
 | D5 | Không có. |
 | D6 | Hiển thị cho Phục vụ: Thực đơn để chọn món, kết quả ghi nhận (thành công/thất bại, tổng tạm tính). |
 
 **Thuật toán xử lý:**
 
-> **Bước 1:** Đọc D3: lấy danh sách thực đơn (chỉ các món Còn hàng), danh sách bàn.
+> **Bước 1:** Đọc D3: lấy danh sách thực đơn (chỉ các món Còn hàng), thông tin bàn được chọn.
 >
 > **Bước 2:** Hiển thị D6: thực đơn cho Phục vụ chọn.
 >
 > **Bước 3:** Nhận D1: Phục vụ chọn bàn, chọn món, nhập số lượng, ghi chú.
 >
-> **Bước 4:** Kiểm tra: Món có trong thực đơn không? Trạng thái \"Còn hàng\"? Số lượng \> 0?
+> **Bước 4:** **Kiểm tra trạng thái bàn**: chỉ chấp nhận nếu bàn = "Trống" (walk-in tự mở bàn) hoặc "Có khách" (đã check-in / đã có order trước đó). Nếu bàn = "Đã đặt" → thông báo lỗi D6 ("Bàn đang giữ chỗ — vui lòng thực hiện check-in trước") → kết thúc.
 >
-> **Bước 5:** Nếu không thỏa → thông báo lỗi D6 → quay lại Bước 3.
+> **Bước 5:** Kiểm tra dữ liệu món: món có trong thực đơn; trạng thái "Còn hàng"; số lượng > 0.
 >
-> **Bước 6:** Phát sinh mã order, tra đơn giá từ D3, ghi D4 vào CSDL Phiếu Order.
+> **Bước 6:** Nếu vi phạm → thông báo lỗi D6 → quay lại Bước 3.
 >
-> **Bước 7:** Cập nhật trạng thái bàn thành \"Có khách\" (nếu chưa) trong CSDL Bàn.
+> **Bước 7:** Phát sinh mã order, tra đơn giá từ D3, ghi D4 vào CSDL Phiếu Order.
 >
-> **Bước 8:** Hiển thị D6: thông báo ghi nhận thành công, tổng tạm tính.
+> **Bước 8:** Nếu bàn đang "Trống" → cập nhật trạng thái bàn thành "Có khách" trong CSDL Bàn.
 >
-> **Bước 9:** Kết thúc.
+> **Bước 9:** Hiển thị D6: thông báo ghi nhận thành công, tổng tạm tính.
+>
+> **Bước 10:** Kết thúc.
 
 ### 7.1.3. Bàn giao cho bếp / quầy pha chế (Loại: Lưu trữ) {#bàn-giao-cho-bếp-quầy-pha-chế-loại-lưu-trữ}
 
@@ -878,7 +890,7 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 
 | **Ký hiệu** | **Mô tả chi tiết** |
 |----|----|
-| D1 | Thông tin do Thu ngân nhập: Bàn số cần thanh toán, tiền khách đưa, hình thức thanh toán (tiền mặt/chuyển khoản). |
+| D1 | Thông tin do Thu ngân nhập: Bàn số cần thanh toán; hình thức thanh toán (tiền mặt/chuyển khoản); **tiền khách đưa (chỉ bắt buộc khi hình thức = tiền mặt)**; mã/ảnh xác nhận giao dịch (tùy chọn khi chuyển khoản). |
 | D2 | Không có. |
 | D3 | Đọc từ CSDL: Chi tiết phiếu order của bàn (tên món, SL, đơn giá, trạng thái), tỷ lệ VAT (từ CSDL Cấu hình). |
 | D4 | Ghi vào CSDL: Kết quả tính toán (tổng tiền, thuế, tổng thanh toán, tiền thừa) → lưu vào CSDL Hóa đơn. Cập nhật trạng thái bàn → \"Trống\". |
@@ -899,11 +911,13 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 >
 > **Bước 6:** Hiển thị D6: màn hình thanh toán (danh sách món, tổng, thuế, tổng thanh toán).
 >
-> **Bước 7:** Nhận D1 (tiếp): tiền khách đưa, hình thức thanh toán.
+> **Bước 7:** Nhận D1 (tiếp): hình thức thanh toán.
 >
-> **Bước 8:** Tính tiền thừa = Tiền khách đưa − Tổng thanh toán. Kiểm tra tiền thừa ≥ 0.
+> **Bước 8:** Phân nhánh theo hình thức:
+>   - **(a) Tiền mặt**: nhận tiền khách đưa; tính tiền thừa = Tiền khách đưa − Tổng thanh toán; kiểm tra tiền khách đưa ≥ Tổng thanh toán. Nếu thiếu → thông báo lỗi D6 → quay lại nhận thêm.
+>   - **(b) Chuyển khoản**: tiền thừa = 0; Thu ngân xác nhận đã nhận được tiền (có thể đối chiếu mã/ảnh giao dịch — tùy chọn). Nếu chưa nhận được → hủy thao tác.
 >
-> **Bước 9:** Ghi D4: lưu hóa đơn vào CSDL Hóa đơn. Cập nhật trạng thái bàn → \"Trống\".
+> **Bước 9:** Ghi D4: lưu hóa đơn vào CSDL Hóa đơn (gồm hình thức, tiền khách đưa nếu có, tiền thừa). Cập nhật trạng thái bàn → "Trống".
 >
 > **Bước 10:** Hiển thị D6: kết quả thanh toán thành công, tiền thừa.
 >
@@ -1006,26 +1020,28 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 
 | **Ký hiệu** | **Mô tả chi tiết** |
 |----|----|
-| D1 | Không có (hệ thống tự động gửi phiếu, Bếp chỉ xác nhận). |
+| D1 | Lệnh do Bếp thao tác: chọn phiếu cần xem chi tiết / yêu cầu in phiếu. |
 | D2 | Không có. |
-| D3 | Đọc từ CSDL: Danh sách phiếu order có trạng thái \"Chờ chế biến\" (sắp theo thời gian FIFO), chi tiết từng phiếu (bàn, món, SL, ghi chú). |
-| D4 | Ghi vào CSDL: Cập nhật trạng thái phiếu order thành \"Đã nhận\" và ghi thời gian nhận. |
-| D5 | Xuất ra máy in: Phiếu order bếp (B_BM1). |
-| D6 | Hiển thị cho Bếp: Danh sách phiếu order đang chờ, chi tiết từng phiếu. |
+| D3 | Đọc từ CSDL: Danh sách phiếu order có trạng thái "Chờ chế biến" (sắp theo thời gian FIFO), chi tiết từng phiếu (bàn, món, SL, ghi chú). |
+| D4 | Không có (chức năng chỉ tra cứu, không ghi CSDL). Việc chuyển trạng thái phiếu/món được thực hiện qua chức năng "Cập nhật trạng thái món" (§7.3.2). |
+| D5 | Xuất ra máy in: Phiếu order bếp (B_BM1) khi Bếp yêu cầu in. |
+| D6 | Hiển thị cho Bếp: Danh sách phiếu order đang chờ và chi tiết từng phiếu. |
 
 **Thuật toán xử lý:**
 
-> **Bước 1:** Đọc D3: lấy danh sách phiếu order có trạng thái \"Chờ chế biến\", sắp theo thứ tự thời gian (FIFO).
+> **Bước 1:** Đọc D3: lấy danh sách phiếu order có trạng thái "Chờ chế biến", sắp theo thứ tự thời gian (FIFO).
 >
 > **Bước 2:** Hiển thị D6: danh sách phiếu order đang chờ cho Bếp xem.
 >
-> **Bước 3:** Bếp chọn phiếu order để xác nhận đã nhận.
+> **Bước 3:** Nhận D1: Bếp chọn phiếu để xem chi tiết hoặc yêu cầu in.
 >
-> **Bước 4:** Ghi D4: cập nhật trạng thái phiếu → \"Đã nhận\", ghi thời gian nhận.
+> **Bước 4:** Hiển thị D6: chi tiết phiếu được chọn (bàn, các món, SL, ghi chú).
 >
-> **Bước 5:** Xuất D5: in phiếu order bếp (B_BM1) ra máy in.
+> **Bước 5:** Nếu Bếp yêu cầu in → xuất D5: in phiếu order bếp (B_BM1) ra máy in.
 >
 > **Bước 6:** Kết thúc.
+
+*Ghi chú:* Bếp bắt đầu chế biến bằng cách chuyển trạng thái món sang "Đang chế biến" qua chức năng §7.3.2 — đó chính là dấu hiệu đã nhận phiếu (không cần lưu trữ riêng).
 
 ### 7.3.2. Cập nhật trạng thái món (Loại: Lưu trữ) {#cập-nhật-trạng-thái-món-loại-lưu-trữ}
 
