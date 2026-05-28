@@ -48,17 +48,17 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 | **STT** | **Công việc** | **Loại công việc** | **Quy định / Công thức liên quan** | **Biểu mẫu liên quan** | **Ghi chú** |
 |----|----|----|----|----|----|
 | 1 | Tiếp nhận đặt bàn trực tiếp/qua điện thoại | Lưu trữ | PV_QĐ1 | PV_BM1 | Xem bảng quy định |
-| 2 | Tiếp nhận khách đã đặt bàn (check-in) | Cập nhật | Chuyển trạng thái bàn "Đã đặt" → "Có khách" khi khách đến. | PV_BM5 |  |
+| 2 | Tiếp nhận khách đã đặt bàn (check-in) | Lưu trữ | Chuyển trạng thái bàn "Đã đặt" → "Có khách" khi khách đến. | PV_BM5 |  |
 | 3 | Ghi nhận gọi món | Lưu trữ | Món phải có trong thực đơn, trạng thái "Còn hàng". SL > 0. | PV_BM2 |  |
-| 4 | Bàn giao cho bếp / quầy pha chế | Xử lý | Tự động phân loại: Món ăn → Bếp, Đồ uống → Quầy pha chế. Kích hoạt khi Phục vụ chốt order. | PV_BM3 |  |
-| 5 | Phục vụ món ra bàn | Cập nhật | Nhận thông báo khi món "Đã xong". Xác nhận đã phục vụ → trạng thái món chuyển "Đã phục vụ". | PV_BM4 |  |
+| 4 | Bàn giao cho bếp / quầy pha chế | Lưu trữ | Tự động phân loại: Món ăn → Bếp, Đồ uống → Quầy pha chế. Kích hoạt khi Phục vụ chốt order. | PV_BM3 |  |
+| 5 | Phục vụ món ra bàn | Lưu trữ | Nhận thông báo khi món "Đã xong". Xác nhận đã phục vụ → trạng thái món chuyển "Đã phục vụ". | PV_BM4 |  |
 
 ## Bộ phận Bếp
 
 | **STT** | **Công việc** | **Loại công việc** | **Quy định / Công thức liên quan** | **Biểu mẫu liên quan** | **Ghi chú** |
 |----|----|----|----|----|----|
-| 1 | Nhận phiếu order | Xử lý | Nhận phiếu theo thứ tự thời gian. Xác nhận đã nhận. Kiểm tra nguyên liệu. | B_BM1 |  |
-| 2 | Cập nhật trạng thái món | Cập nhật | Chờ chế biến → Đang chế biến → Đã xong. Thông báo tự động cho Phục vụ. |  |  |
+| 1 | Nhận phiếu order | Tra cứu | Nhận phiếu theo thứ tự thời gian. Xác nhận đã nhận. Kiểm tra nguyên liệu. | B_BM1 |  |
+| 2 | Cập nhật trạng thái món | Lưu trữ | Chờ chế biến → Đang chế biến → Đã xong. Thông báo tự động cho Phục vụ. | B_BM2 |  |
 
 ## Bộ phận Kho
 
@@ -76,16 +76,16 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 |----|----|----|----|----|----|
 | 1 | Quản lý thực đơn | Lưu trữ | Thêm/sửa/xóa món. Cập nhật trạng thái, đơn giá. | QL_BM1 |  |
 | 2 | Quản lý bàn | Lưu trữ | Thêm/sửa/xóa bàn. Thiết lập sức chứa, khu vực. | QL_BM2 |  |
-| 3 | Quản lý tài khoản | Lưu trữ | QL_QĐ1. Tạo/sửa/khóa tài khoản. Phân quyền theo vai trò. | QL_BM3 |  |
+| 3 | Quản lý tài khoản | Phân quyền | QL_QĐ1. Tạo/sửa/khóa tài khoản. Phân quyền theo vai trò. | QL_BM3 |  |
 | 4 | Xem báo cáo tổng hợp | Kết xuất | Xem tất cả báo cáo: doanh thu, tồn kho, nhập/xuất. | QL_BM4 |  |
-| 5 | Cấu hình hệ thống | Lưu trữ | QL_QĐ2. Thiết lập tỷ lệ VAT, thời gian tự hủy đặt bàn, giờ hoạt động. | QL_BM5 |  |
+| 5 | Cấu hình hệ thống | Môi trường | QL_QĐ2. Thiết lập tỷ lệ VAT, thời gian tự hủy đặt bàn, giờ hoạt động. | QL_BM5 |  |
 
 ## Toàn hệ thống
 
 | **STT** | **Công việc** | **Loại công việc** | **Quy định / Công thức liên quan** | **Biểu mẫu liên quan** | **Ghi chú** |
 |----|----|----|----|----|----|
-| 1 | Đăng nhập / Đăng xuất | Xử lý | QL_QĐ1. Xác thực tài khoản, tạo phiên làm việc, ghi log. | SYS_BM1 | Áp dụng cho mọi vai trò |
-| 2 | Sao lưu / Phục hồi dữ liệu | Xử lý | Định kỳ tự động + thủ công khi cần. Chỉ Admin thực hiện phục hồi. |  | Xem mục 5 |
+| 1 | Đăng nhập / Đăng xuất | Phân quyền | QL_QĐ1. Xác thực tài khoản, tạo phiên làm việc, ghi log. | SYS_BM1 | Áp dụng cho mọi vai trò |
+| 2 | Sao lưu / Phục hồi dữ liệu | Sao lưu | Định kỳ tự động + thủ công khi cần. Chỉ Admin thực hiện phục hồi. |  | Xem mục 5 |
 
 # 3. DANH SÁCH CÁC YÊU CẦU {#danh-sách-các-yêu-cầu}
 
@@ -743,7 +743,7 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 >
 > **Bước 9:** Kết thúc.
 
-### 7.1.3. Bàn giao cho bếp / quầy pha chế (Loại: Xử lý) {#bàn-giao-cho-bếp-quầy-pha-chế-loại-xử-lý}
+### 7.1.3. Bàn giao cho bếp / quầy pha chế (Loại: Lưu trữ) {#bàn-giao-cho-bếp-quầy-pha-chế-loại-lưu-trữ}
 
 **Sơ đồ luồng dữ liệu:**
 
@@ -783,7 +783,7 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 >
 > **Bước 8:** Kết thúc.
 
-### 7.1.4. Phục vụ món ra bàn (Loại: Cập nhật) {#phục-vụ-món-ra-bàn-loại-cập-nhật}
+### 7.1.4. Phục vụ món ra bàn (Loại: Lưu trữ) {#phục-vụ-món-ra-bàn-loại-lưu-trữ}
 
 **Sơ đồ luồng dữ liệu:**
 
@@ -821,7 +821,7 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 >
 > **Bước 7:** Kết thúc.
 
-### 7.1.5. Tiếp nhận khách đã đặt bàn — Check-in (Loại: Cập nhật) {#check-in-khách-đặt-bàn-loại-cập-nhật}
+### 7.1.5. Tiếp nhận khách đã đặt bàn — Check-in (Loại: Lưu trữ) {#check-in-khách-đặt-bàn-loại-lưu-trữ}
 
 **Sơ đồ luồng dữ liệu:**
 
@@ -991,7 +991,7 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 
 ## 7.3. Sơ đồ luồng dữ liệu các yêu cầu Bộ phận Bếp {#sơ-đồ-luồng-dữ-liệu-các-yêu-cầu-bộ-phận-bếp}
 
-### 7.3.1. Nhận phiếu order (Loại: Xử lý) {#nhận-phiếu-order-loại-xử-lý}
+### 7.3.1. Nhận phiếu order (Loại: Tra cứu) {#nhận-phiếu-order-loại-tra-cứu}
 
 **Sơ đồ luồng dữ liệu:**
 
@@ -1027,7 +1027,7 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 >
 > **Bước 6:** Kết thúc.
 
-### 7.3.2. Cập nhật trạng thái món (Loại: Cập nhật) {#cập-nhật-trạng-thái-món-loại-cập-nhật}
+### 7.3.2. Cập nhật trạng thái món (Loại: Lưu trữ) {#cập-nhật-trạng-thái-món-loại-lưu-trữ}
 
 **Sơ đồ luồng dữ liệu:**
 
@@ -1359,7 +1359,7 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 >
 > **Bước 8:** Kết thúc.
 
-### 7.5.3. Quản lý tài khoản (Loại: Lưu trữ) {#quản-lý-tài-khoản-loại-lưu-trữ}
+### 7.5.3. Quản lý tài khoản (Loại: Phân quyền) {#quản-lý-tài-khoản-loại-phân-quyền}
 
 **Sơ đồ luồng dữ liệu:**
 
@@ -1401,7 +1401,7 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 >
 > **Bước 9:** Kết thúc.
 
-### 7.5.4. Cấu hình hệ thống (Loại: Lưu trữ) {#cấu-hình-hệ-thống-loại-lưu-trữ}
+### 7.5.4. Cấu hình hệ thống (Loại: Môi trường) {#cấu-hình-hệ-thống-loại-môi-trường}
 
 **Sơ đồ luồng dữ liệu:**
 
@@ -1483,7 +1483,7 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 
 ## 7.6. Sơ đồ luồng dữ liệu các chức năng hệ thống {#sơ-đồ-luồng-dữ-liệu-các-chức-năng-hệ-thống}
 
-### 7.6.1. Đăng nhập / Đăng xuất (Loại: Xử lý) {#đăng-nhập-đăng-xuất-loại-xử-lý}
+### 7.6.1. Đăng nhập / Đăng xuất (Loại: Phân quyền) {#đăng-nhập-đăng-xuất-loại-phân-quyền}
 
 **Sơ đồ luồng dữ liệu:**
 
@@ -1523,7 +1523,7 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 >
 > **Bước 8:** Kết thúc.
 
-### 7.6.2. Sao lưu / Phục hồi dữ liệu (Loại: Xử lý) {#sao-lưu-phục-hồi-dữ-liệu-loại-xử-lý}
+### 7.6.2. Sao lưu / Phục hồi dữ liệu (Loại: Sao lưu) {#sao-lưu-phục-hồi-dữ-liệu-loại-sao-lưu}
 
 **Sơ đồ luồng dữ liệu:**
 
