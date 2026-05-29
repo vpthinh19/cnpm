@@ -1,6 +1,7 @@
 @startuml ERD_QuanLyNhaHang
-' ERD toàn hệ thống — Hệ thống quản lý nhà hàng (đồ án CNPM)
+' ERD toàn hệ thống — Hệ thống quản lý nhà hàng Bò Né Mỹ Cảnh (đồ án CNPM)
 ' Chỉ thể hiện tên bảng + tên thuộc tính + đường kết nối giữa các bảng.
+' Quy ước: PK surrogate = <Bảng>ID (INT); mã nghiệp vụ = Ma...; ChiTiet* dùng PK ghép.
 hide circle
 skinparam linetype ortho
 skinparam shadowing false
@@ -12,178 +13,187 @@ skinparam roundCorner 6
 skinparam classAttributeIconSize 0
 
 entity "Role" as Role {
-  role_id
-  role_name
-  description
+  RoleID
+  RoleName
+  Description
 }
 
 entity "User" as User {
-  user_id
-  username
-  password_hash
-  full_name
-  role_id
-  status
-  failed_login_count
-  last_login_at
-  created_at
-  updated_at
+  UserID
+  Username
+  PasswordHash
+  FullName
+  RoleID
+  Status
+  FailedLoginCount
+  LastLoginAt
+  CreatedAt
+  UpdatedAt
 }
 
 entity "Ban" as Ban {
-  ma_ban
-  so_ban
-  khu_vuc
-  suc_chua
-  trang_thai
-  ghi_chu
-  dang_su_dung
+  BanID
+  MaBan
+  KhuVuc
+  SucChua
+  TrangThai
+  GhiChu
+  DangSuDung
 }
 
 entity "MonAn" as MonAn {
-  ma_mon
-  ma_san_pham
-  ten_mon
-  loai_mon
-  don_gia
-  trang_thai
-  mo_ta
-  dang_su_dung
+  MonAnID
+  MaSanPham
+  TenMon
+  LoaiMon
+  DonGia
+  TrangThai
+  MoTa
+  DangSuDung
 }
 
 entity "PhieuDatBan" as PhieuDatBan {
-  ma_dat_ban
-  ma_ban
-  nv_tiep_nhan
-  ten_khach
-  so_dien_thoai
-  so_nguoi
-  thoi_gian_dat
-  hinh_thuc_dat
-  ghi_chu
-  trang_thai
-  thoi_gian_tao
-  thoi_gian_nhan_ban
-  thoi_gian_huy
+  PhieuDatBanID
+  BanID
+  NhanVienTiepNhanID
+  TenKhach
+  SoDienThoai
+  SoNguoi
+  ThoiGianDat
+  HinhThucDat
+  GhiChu
+  TrangThai
+  ThoiGianTao
+  ThoiGianNhanBan
+  ThoiGianHuy
 }
 
 entity "PhieuOrder" as PhieuOrder {
-  ma_order
-  ma_ban
-  nv_phuc_vu
-  thoi_gian_tao
-  trang_thai
-  tong_tam_tinh
+  PhieuOrderID
+  BanID
+  NhanVienPhucVuID
+  ThoiGianTao
+  TrangThai
+  TongTamTinh
 }
 
 entity "ChiTietOrder" as ChiTietOrder {
-  ma_chi_tiet
-  ma_order
-  ma_mon
-  nv_phuc_vu_xac_nhan
-  so_luong
-  don_gia
-  thanh_tien
-  ghi_chu
-  trang_thai
-  thoi_gian_tao
-  thoi_gian_chot
-  thoi_gian_xong
-  thoi_gian_phuc_vu
+  PhieuOrderID
+  SoDong
+  MonAnID
+  NhanVienXacNhanID
+  SoLuong
+  DonGia
+  ThanhTien
+  GhiChu
+  TrangThai
+  ThoiGianTao
+  ThoiGianChot
+  ThoiGianXong
+  ThoiGianPhucVu
 }
 
 entity "HoaDon" as HoaDon {
-  ma_hoa_don
-  ma_order
-  nv_thu_ngan
-  so_hoa_don
-  so_ban_snapshot
-  tong_tien_mon
-  ty_le_vat
-  tien_vat
-  tong_thanh_toan
-  hinh_thuc_tt
-  tien_khach_dua
-  tien_thua
-  ma_giao_dich
-  thoi_gian_tao
-  so_lan_in
+  HoaDonID
+  MaHoaDon
+  PhieuOrderID
+  NhanVienThuNganID
+  MaBanSnapshot
+  TongTienMon
+  TyLeVat
+  TienVat
+  TongThanhToan
+  HinhThucTT
+  TienKhachDua
+  TienThua
+  MaGiaoDich
+  ThoiGianTao
+  SoLanIn
+}
+
+entity "ChiTietHoaDon" as ChiTietHoaDon {
+  HoaDonID
+  MonAnID
+  TenMon
+  SoLuong
+  DonGia
+  ThanhTien
 }
 
 entity "NhaCungCap" as NhaCungCap {
-  ma_ncc
-  ten_ncc
-  so_dien_thoai
-  dia_chi
-  dang_su_dung
+  NhaCungCapID
+  TenNCC
+  SoDienThoai
+  DiaChi
+  DangSuDung
 }
 
 entity "NguyenLieu" as NguyenLieu {
-  ma_nvl
-  ten_nvl
-  don_vi_tinh
-  ton_hien_tai
-  dinh_muc_toi_thieu
-  thoi_gian_cap_nhat_ton
-  dang_su_dung
+  NguyenLieuID
+  TenNVL
+  DonViTinh
+  TonHienTai
+  DinhMucToiThieu
+  ThoiGianCapNhatTon
+  DangSuDung
 }
 
 entity "PhieuNhapKho" as PhieuNhapKho {
-  ma_phieu_nhap
-  ma_ncc
-  nv_lap
-  so_phieu
-  ngay_nhap
-  tong_gia_tri
-  ghi_chu
-  thoi_gian_tao
+  PhieuNhapKhoID
+  MaPhieuNhap
+  NhaCungCapID
+  NhanVienLapID
+  NgayNhap
+  TongGiaTri
+  GhiChu
+  ThoiGianTao
 }
 
 entity "ChiTietNhapKho" as ChiTietNhapKho {
-  ma_chi_tiet
-  ma_phieu_nhap
-  ma_nvl
-  so_luong
-  don_gia
-  thanh_tien
-  ghi_chu
+  PhieuNhapKhoID
+  NguyenLieuID
+  SoLuong
+  DonGia
+  ThanhTien
+  GhiChu
 }
 
 entity "PhieuXuatKho" as PhieuXuatKho {
-  ma_phieu_xuat
-  nv_lap
-  so_phieu
-  ngay_xuat
-  tong_gia_tri
-  ghi_chu
-  thoi_gian_tao
+  PhieuXuatKhoID
+  MaPhieuXuat
+  NhanVienLapID
+  NgayXuat
+  TongGiaTri
+  GhiChu
+  ThoiGianTao
 }
 
 entity "ChiTietXuatKho" as ChiTietXuatKho {
-  ma_chi_tiet
-  ma_phieu_xuat
-  ma_nvl
-  so_luong
-  don_gia
-  thanh_tien
-  ghi_chu
+  PhieuXuatKhoID
+  NguyenLieuID
+  SoLuong
+  DonGia
+  ThanhTien
+  GhiChu
 }
 
-Role         -- User
-User         -- PhieuDatBan
-User         -- PhieuOrder
-User         -- ChiTietOrder
-User         -- HoaDon
-User         -- PhieuNhapKho
-User         -- PhieuXuatKho
-Ban          -- PhieuDatBan
-Ban          -- PhieuOrder
-MonAn        -- ChiTietOrder
-PhieuOrder   -- ChiTietOrder
-PhieuOrder   -- HoaDon
-NhaCungCap   -- PhieuNhapKho
-PhieuNhapKho -- ChiTietNhapKho
-NguyenLieu   -- ChiTietNhapKho
-PhieuXuatKho -- ChiTietXuatKho
-NguyenLieu   -- ChiTietXuatKho
+Role          -- User
+User          -- PhieuDatBan
+User          -- PhieuOrder
+User          -- ChiTietOrder
+User          -- HoaDon
+User          -- PhieuNhapKho
+User          -- PhieuXuatKho
+Ban           -- PhieuDatBan
+Ban           -- PhieuOrder
+MonAn         -- ChiTietOrder
+MonAn         -- ChiTietHoaDon
+PhieuOrder    -- ChiTietOrder
+PhieuOrder    -- HoaDon
+HoaDon        -- ChiTietHoaDon
+NhaCungCap    -- PhieuNhapKho
+PhieuNhapKho  -- ChiTietNhapKho
+NguyenLieu    -- ChiTietNhapKho
+PhieuXuatKho  -- ChiTietXuatKho
+NguyenLieu    -- ChiTietXuatKho
 @enduml
