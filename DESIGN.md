@@ -616,7 +616,7 @@ Mỗi màn ánh xạ 1 biểu mẫu (BM) + DFD + endpoint API tương ứng (ghi
 | QL_BM3 | Quản lý tài khoản | [`ql-tai-khoan.html`](design/ui/ql-tai-khoan.html) | §7.5.3 |
 | QL_BM4 | Báo cáo tổng hợp (Dashboard) | [`ql-dashboard.html`](design/ui/ql-dashboard.html) | §7.5.4 |
 
-<div style="display:flex; align-items:center;">
+<div style="display:flex; align-items:center; height: 400px;">
     <img src="design/images/ql-thuc-don-1.png" width="70%">
     <img src="design/images/ql-thuc-don-2.png" width="25%">
 </div>
@@ -632,6 +632,10 @@ Mỗi màn ánh xạ 1 biểu mẫu (BM) + DFD + endpoint API tương ứng (ghi
     <img src="design/images/ql-dashboard-1.png" width="70%">
     <img src="design/images/ql-dashboard-2.png" width="25%">
 </div>
+
+|  |  |
+|--|--|
+|![test](design/images/ql-dashboard-1.png)|![test](design/images/ql-dashboard-2.png)|
 
 # 4. THIẾT KẾ API {#thiết-kế-api}
 
