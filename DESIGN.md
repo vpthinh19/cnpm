@@ -68,9 +68,8 @@
 | **Hình thức thanh toán** (`HoaDon.hinh_thuc_tt`) | `TienMat` / `ChuyenKhoan` | — |
 | **Tài khoản** (`User.status`) | `HoatDong` / `DaKhoa` | — |
 | **Vai trò** (`Role.role_id`) | `Admin` / `PhucVu` / `Bep` / `ThuNgan` / `Kho` | — |
-| **Loại món** (`MonAn.loai_mon`) | `MonAn` / `DoUong` | Cũng chính là bộ phận xử lý (Món ăn → Bếp; Đồ uống → Quầy pha chế) |
+| **Loại món** (`MonAn.loai_mon`) | `MonAn` / `DoUong` | Phân loại menu + báo cáo. Món ăn → chế biến ở Bếp; Đồ uống → phục vụ trực tiếp (không qua Bếp). Quán nhỏ chỉ có **1 bộ phận chế biến: Bếp** |
 | **Trạng thái món** (`MonAn.trang_thai`) | `ConHang` / `HetHang` | — |
-| **Bộ phận nhận xuất kho** (`PhieuXuatKho.bo_phan_nhan`) | `Bep` / `QuayPhaChe` | — |
 
 ## 1.4. Phân chia module (chia việc theo nhóm)
 
@@ -100,28 +99,9 @@ Hệ thống chia thành **8 module gần như độc lập**. Mỗi module có 
 
 ## 2.1. Sơ đồ ERD
 
-```mermaid
-erDiagram
-    Role         ||--o{ User           : "co"
-    User         ||--o{ PhieuDatBan    : "tiep_nhan"
-    User         ||--o{ PhieuOrder     : "phuc_vu"
-    User         ||--o{ ChiTietOrder   : "xac_nhan_phuc_vu"
-    User         ||--o{ HoaDon         : "thu_ngan"
-    User         ||--o{ PhieuNhapKho   : "lap"
-    User         ||--o{ PhieuXuatKho   : "lap"
+Sơ đồ ERD **toàn hệ thống** (14 bảng), thể hiện tên bảng + các thuộc tính + đường kết nối. Mã PlantUML đặt ở **tệp riêng** để kết xuất ảnh chèn báo cáo: [`design/erd/erd.puml`](design/erd/erd.puml).
 
-    Ban          ||--o{ PhieuDatBan    : "duoc_dat"
-    Ban          ||--o{ PhieuOrder     : "co_order"
-    PhieuOrder   ||--o{ ChiTietOrder   : "gom"
-    PhieuOrder   ||--o| HoaDon         : "tao_ra"
-    MonAn        ||--o{ ChiTietOrder   : "duoc_chon"
-
-    NhaCungCap   ||--o{ PhieuNhapKho     : "cung_cap"
-    PhieuNhapKho ||--o{ ChiTietNhapKho   : "gom"
-    NguyenLieu   ||--o{ ChiTietNhapKho   : "nhap"
-    PhieuXuatKho ||--o{ ChiTietXuatKho   : "gom"
-    NguyenLieu   ||--o{ ChiTietXuatKho   : "xuat"
-```
+> 📷 **\[CHÈN ẢNH ERD TẠI ĐÂY]** — render `design/erd/erd.puml` (VS Code PlantUML / plantuml.com) rồi chèn PNG/SVG.
 
 ## 2.2. Danh sách bảng (tổng quan)
 
@@ -191,9 +171,10 @@ Bảng tĩnh, 5 dòng, seed sẵn.
 
 | Tên trường | Kiểu dữ liệu | Ràng buộc | Mô tả |
 |---|---|---|---|
-| `ma_mon` | INT IDENTITY(1,1) | **PK** | |
+| `ma_mon` | INT IDENTITY(1,1) | **PK** | Mã kỹ thuật tự sinh |
+| `ma_san_pham` | NVARCHAR(20) | UNIQUE, NOT NULL | Mã món theo sổ sách nhà hàng (vd `SP000221`) |
 | `ten_mon` | NVARCHAR(100) | UNIQUE, NOT NULL | |
-| `loai_mon` | NVARCHAR(10) | NOT NULL, CHECK IN (`'MonAn'`,`'DoUong'`) | Đồng thời là phân luồng Bếp/Pha chế |
+| `loai_mon` | NVARCHAR(10) | NOT NULL, CHECK IN (`'MonAn'`,`'DoUong'`) | Phân loại menu. Món ăn → qua Bếp; Đồ uống → phục vụ trực tiếp (không qua Bếp) |
 | `don_gia` | DECIMAL(15,0) | NOT NULL, CHECK (`don_gia >= 0`) | VND (không phần thập phân) |
 | `trang_thai` | NVARCHAR(10) | NOT NULL, CHECK IN (`'ConHang'`,`'HetHang'`), DEFAULT `'ConHang'` | |
 | `mo_ta` | NVARCHAR(500) | NULL | |
@@ -254,11 +235,11 @@ Bảng tĩnh, 5 dòng, seed sẵn.
 - `IX_ChiTietOrder_order (ma_order)`
 - `IX_ChiTietOrder_trangthai_chot (trang_thai, thoi_gian_chot)` — FIFO Bếp
 
-**Ghi chú:** Không có bảng `PhieuChuyenBep` riêng. "Phiếu chuyển bếp" PV_BM3 là document sinh trên-bay từ:
+**Ghi chú:** Không có bảng `PhieuChuyenBep` riêng. "Phiếu chuyển bếp" PV_BM3 là document sinh trên-bay từ (chỉ món ăn — đồ uống không qua Bếp):
 ```sql
 SELECT * FROM ChiTietOrder ct JOIN MonAn m ON ct.ma_mon = m.ma_mon
 WHERE ct.ma_order = @order AND ct.trang_thai = 'ChoCheBien'
-  AND m.loai_mon = @bo_phan  -- 'MonAn' → Bếp; 'DoUong' → Quầy pha chế
+  AND m.loai_mon = 'MonAn'
 ORDER BY ct.thoi_gian_chot;
 ```
 
@@ -339,7 +320,6 @@ ORDER BY ct.thoi_gian_chot;
 |---|---|---|---|
 | `ma_phieu_xuat` | INT IDENTITY(1,1) | **PK** | |
 | `so_phieu` | NVARCHAR(20) | UNIQUE, NOT NULL | Vd `PX20260529-001` |
-| `bo_phan_nhan` | NVARCHAR(20) | NOT NULL, CHECK IN (`'Bep'`,`'QuayPhaChe'`) | |
 | `nv_lap` | INT | FK → `User.user_id`, NOT NULL | |
 | `ngay_xuat` | DATE | NOT NULL | |
 | `tong_gia_tri` | DECIMAL(15,0) | NOT NULL | |
@@ -401,28 +381,52 @@ INSERT INTO Ban (so_ban, khu_vuc, suc_chua) VALUES
 (N'SV01',  N'Sân vườn',   8),
 (N'VIP01', N'Phòng VIP', 10);
 
--- 4. MonAn
-INSERT INTO MonAn (ten_mon, loai_mon, don_gia, mo_ta) VALUES
-(N'Phở bò',          'MonAn',  60000, N'Phở bò tái nạm'),
-(N'Bún chả',         'MonAn',  55000, N'Bún chả Hà Nội'),
-(N'Cơm gà xối mỡ',   'MonAn',  50000, N''),
-(N'Lẩu thái',        'MonAn', 250000, N'Phục vụ 4 người'),
-(N'Trà đá',          'DoUong',  5000, N''),
-(N'Cà phê đen đá',   'DoUong', 25000, N''),
-(N'Nước cam tươi',   'DoUong', 30000, N''),
-(N'Bia Heineken',    'DoUong', 35000, N'Chai 330ml');
+-- 4. MonAn — menu thật của Bò Né Mỹ Cảnh
+INSERT INTO MonAn (ma_san_pham, ten_mon, loai_mon, don_gia) VALUES
+-- Món ăn (→ Bếp)
+('SP000221', N'NÉ MC',                    'MonAn',  95000),
+('SP000205', N'BÍT TẾT MC',               'MonAn', 140000),
+('SP000251', N'CƠM BLL',                  'MonAn', 160000),
+('SP000211', N'BÍT TẾT ĐẶC BIỆT',         'MonAn', 228000),
+('SP000230', N'NÉ SỐT PATE',              'MonAn', 100000),
+('SP000237', N'NÉ TRỨNG',                 'MonAn',  93000),
+('SP000219', N'BÍT TẾT + TRỨNG',          'MonAn', 155000),
+('SP000231', N'NÉ + PATE',                'MonAn', 119000),
+('SP000269', N'MÌ Ý',                     'MonAn', 105000),
+('SP000229', N'NÉ SỐT PATE KHÔNG TRỨNG',  'MonAn',  98000),
+('SP000290', N'BÒ KHO',                   'MonAn',  95000),
+('SP000391', N'NÉ NHỎ + X.XÍCH',          'MonAn',  94000),
+('SP000234', N'NÉ KHÔNG XÍU MẠI',         'MonAn',  90000),
+('SP000297', N'PHỞ MC',                   'MonAn',  65000),
+('SP000303', N'KHOAI TÂY',                'MonAn',  45000),
+('SP000352', N'BÁNH MÌ',                  'MonAn',   6000),
+('SP000353', N'TRỨNG',                    'MonAn',  15000),
+-- Đồ uống (phục vụ trực tiếp, không qua Bếp)
+('SP000324', N'RAU MÁ',                   'DoUong',  20000),
+('SP000325', N'ĐẬU NÀNH',                 'DoUong',  20000),
+('SP000337', N'CAM LON',                  'DoUong',  17000),
+('SP000335', N'KHOÁNG LẠT',               'DoUong',  17000),
+('SP000330', N'SUỐI',                     'DoUong',  11000),
+('SP000342', N'TRÀ ĐÁ',                   'DoUong',   3000);
 
--- 5. NhaCungCap & NguyenLieu (chỉ phục vụ cho M7 demo)
+-- 5. NhaCungCap & NguyenLieu (NVL thật của Bò Né Mỹ Cảnh — chọn nhóm tiêu biểu cho M7 demo)
 INSERT INTO NhaCungCap (ten_ncc, so_dien_thoai, dia_chi) VALUES
-(N'Cty Thực phẩm An Bình',  N'0901234567', N'Quận 1, TP.HCM'),
-(N'Đồ uống Sài Gòn',         N'0907654321', N'Quận 3, TP.HCM');
+(N'Cơ sở cung cấp thịt bò',  N'0901234567', N'TP.HCM'),
+(N'Đại lý thực phẩm - đồ khô', N'0907654321', N'TP.HCM');
 
 INSERT INTO NguyenLieu (ten_nvl, don_vi_tinh, ton_hien_tai, dinh_muc_toi_thieu) VALUES
-(N'Thịt bò',      N'kg',    20.0,  5.0),
-(N'Bún tươi',     N'kg',    15.0,  5.0),
-(N'Gạo tẻ',       N'kg',   100.0, 20.0),
-(N'Cà phê hạt',   N'kg',    10.0,  3.0),
-(N'Bia Heineken', N'thùng',  5.0,  2.0);
+(N'Miếng bò né',     N'kg',    30.0,  5.0),
+(N'Miếng bò bít tết', N'kg',   25.0,  5.0),
+(N'Pa tê',           N'kg',    10.0,  2.0),
+(N'Xíu mại',         N'phần', 100.0, 20.0),
+(N'Xúc xích',        N'kg',     8.0,  2.0),
+(N'Bò kho',          N'kg',    12.0,  3.0),
+(N'Trứng',           N'quả',  200.0, 30.0),
+(N'Bánh mì',         N'ổ',    100.0, 20.0),
+(N'Bánh phở',        N'kg',    10.0,  2.0),
+(N'Khoai tây',       N'kg',    15.0,  3.0),
+(N'Cà chua',         N'kg',    10.0,  2.0),
+(N'Hành phi',        N'kg',     3.0,  0.5);
 ```
 
 ## 2.6. Hằng số hệ thống (tệp `config/constants.js`)
@@ -433,10 +437,10 @@ Thay cho bảng `CauHinh` đã loại bỏ:
 module.exports = {
   // Thông tin nhà hàng (in trên hóa đơn TN_BM3 — thay cho bảng CauHinh đã cắt)
   NHA_HANG: {
-    ten: 'Nhà hàng ABC',
-    dia_chi: '123 Đường XYZ, Quận 1, TP.HCM',
-    so_dien_thoai: '028 1234 5678',
-    ma_so_thue: '0312345678',
+    ten: 'Bò Né Mỹ Cảnh',
+    dia_chi: '... (điền địa chỉ thật)',
+    so_dien_thoai: '... (điền SĐT thật)',
+    ma_so_thue: '... (nếu có)',
   },
 
   // Thanh toán
@@ -458,6 +462,75 @@ module.exports = {
 ---
 
 > **Kết thúc Đợt D1.** Schema 13 thực thể (14 bảng) chia 8 module gần như độc lập.
+
+# 3. THIẾT KẾ GIAO DIỆN {#thiết-kế-giao-diện}
+
+Giao diện phác họa bằng **HTML/CSS thuần** — mỗi màn 1 tệp trong `design/ui/`, dùng chung [`design/ui/style.css`](design/ui/style.css). Vừa là mockup cho báo cáo (render trình duyệt → chụp ảnh chèn vào), vừa tái dùng khi triển khai (bố cục khớp thiết kế). Đặc điểm: tối giản, **responsive cho điện thoại** (nhân viên phục vụ dùng mobile — sidebar thu thành thanh tab cố định đáy, bố cục về 1 cột).
+
+Mỗi màn ánh xạ 1 biểu mẫu (BM) + DFD + endpoint API tương ứng (ghi trong comment đầu tệp HTML). Bao gồm **toàn bộ màn hình**: chung, Phục vụ, Bếp, Thu ngân (D3a) và Kho, Quản lý (D3b).
+
+> 📷 **Cách chèn báo cáo:** mở từng tệp `.html` bằng trình duyệt (thu hẹp cửa sổ để xem bản mobile), chụp màn hình rồi chèn vào vị trí 📷 tương ứng bên dưới.
+
+## 3.1. Màn dùng chung
+
+| BM | Màn hình | Tệp | DFD |
+|---|---|---|---|
+| SYS_BM1 | Đăng nhập | [`dang-nhap.html`](design/ui/dang-nhap.html) | §7.6.1 |
+
+> 📷 **\[CHÈN ẢNH: Đăng nhập]**
+
+## 3.2. Bộ phận Phục vụ
+
+| BM | Màn hình | Tệp | DFD |
+|---|---|---|---|
+| PV_BM1 | Tiếp nhận đặt bàn | [`pv-dat-ban.html`](design/ui/pv-dat-ban.html) | §7.1.1 |
+| PV_BM2 | Ghi nhận gọi món / Order | [`pv-goi-mon.html`](design/ui/pv-goi-mon.html) | §7.1.2, §7.1.3 |
+| PV_BM4 | Phục vụ món ra bàn | [`pv-phuc-vu.html`](design/ui/pv-phuc-vu.html) | §7.1.4 |
+| PV_BM3 | Phiếu chuyển bếp | [`pv-phieu-bep.html`](design/ui/pv-phieu-bep.html) | §7.1.3 |
+
+> 📷 **\[CHÈN ẢNH: 4 màn Phục vụ]**
+
+## 3.3. Bộ phận Bếp
+
+| BM | Màn hình | Tệp | DFD |
+|---|---|---|---|
+| B_BM2 | Màn hình bếp (cập nhật trạng thái món) | [`bep-kitchen-display.html`](design/ui/bep-kitchen-display.html) | §7.3.2 |
+| B_BM1 | Phiếu order bếp (in) | [`bep-phieu-order.html`](design/ui/bep-phieu-order.html) | §7.3.1 |
+
+> 📷 **\[CHÈN ẢNH: 2 màn Bếp]**
+
+## 3.4. Bộ phận Thu ngân
+
+| BM | Màn hình | Tệp | DFD |
+|---|---|---|---|
+| TN_BM2 | Màn hình thanh toán | [`tn-thanh-toan.html`](design/ui/tn-thanh-toan.html) | §7.2.1 |
+| TN_BM3 | Hóa đơn (in / in lại) | [`tn-hoa-don.html`](design/ui/tn-hoa-don.html) | §7.2.3 |
+| TN_BM1 | Báo cáo doanh thu | [`tn-bao-cao-doanh-thu.html`](design/ui/tn-bao-cao-doanh-thu.html) | §7.2.2 |
+
+> 📷 **\[CHÈN ẢNH: 3 màn Thu ngân]**
+
+## 3.5. Bộ phận Kho
+
+| BM | Màn hình | Tệp | DFD |
+|---|---|---|---|
+| K_BM1 | Lập phiếu nhập kho | [`kho-nhap.html`](design/ui/kho-nhap.html) | §7.4.1 |
+| K_BM2 | Lập phiếu xuất kho | [`kho-xuat.html`](design/ui/kho-xuat.html) | §7.4.3 |
+| K_BM3 | Báo cáo tồn kho | [`kho-bc-ton.html`](design/ui/kho-bc-ton.html) | §7.4.2 |
+| K_BM4 | Báo cáo nhập kho | [`kho-bc-nhap.html`](design/ui/kho-bc-nhap.html) | §7.4.4 |
+| K_BM5 | Báo cáo xuất kho | [`kho-bc-xuat.html`](design/ui/kho-bc-xuat.html) | §7.4.5 |
+
+> 📷 **\[CHÈN ẢNH: 5 màn Kho]**
+
+## 3.6. Quản lý (Admin)
+
+| BM | Màn hình | Tệp | DFD |
+|---|---|---|---|
+| QL_BM1 | Quản lý thực đơn | [`ql-thuc-don.html`](design/ui/ql-thuc-don.html) | §7.5.1 |
+| QL_BM2 | Quản lý bàn | [`ql-ban.html`](design/ui/ql-ban.html) | §7.5.2 |
+| QL_BM3 | Quản lý tài khoản | [`ql-tai-khoan.html`](design/ui/ql-tai-khoan.html) | §7.5.3 |
+| QL_BM4 | Báo cáo tổng hợp (Dashboard) | [`ql-dashboard.html`](design/ui/ql-dashboard.html) | §7.5.4 |
+
+> 📷 **\[CHÈN ẢNH: 4 màn Quản lý]**
 
 # 4. THIẾT KẾ API {#thiết-kế-api}
 
@@ -596,7 +669,7 @@ Base: `/mon-an/*`. Bảng: `MonAn` (R/W). DFD: §7.5.1 (QL_BM1). CRUD do **Admin
 | PATCH | `/mon-an/:id/trang-thai` | Admin | Đổi `ConHang`↔`HetHang` |
 | DELETE | `/mon-an/:id` | Admin | Xóa mềm (`dang_su_dung=0`) |
 
-**`POST /mon-an`** — Request `{ "ten_mon": "Gỏi cuốn", "loai_mon": "MonAn", "don_gia": 40000, "mo_ta": "" }`. Kiểm tra (§7.5.1 Bước 4): `ten_mon` không trùng (→ `409`); `don_gia >= 0`; `loai_mon ∈ ('MonAn','DoUong')`. Trạng thái khởi tạo `'ConHang'`.
+**`POST /mon-an`** — Request `{ "ma_san_pham": "SP000400", "ten_mon": "Gỏi cuốn", "loai_mon": "MonAn", "don_gia": 40000, "mo_ta": "" }`. Kiểm tra (§7.5.1 Bước 4): `ma_san_pham` và `ten_mon` không trùng (→ `409 DUPLICATE`); `don_gia >= 0`; `loai_mon ∈ ('MonAn','DoUong')`. Trạng thái khởi tạo `'ConHang'`.
 
 **`PATCH /mon-an/:id/trang-thai`** — Request `{ "trang_thai": "HetHang" }`. Phục vụ khi gọi món chỉ thấy món `ConHang` (lọc ở M5).
 
@@ -637,7 +710,12 @@ Kiểm tra (PV_QĐ1): bàn tồn tại & `trang_thai='Trong'` (→ `409 CONFLICT
 
 Base: `/order/*`. Bảng: `PhieuOrder` (R/W), `ChiTietOrder` (R/W); đọc `MonAn` (snapshot đơn giá), đổi trạng thái `Ban`. DFD: §7.1.2 (gọi món), §7.1.3 (chốt bếp), §7.1.4 (phục vụ), §7.3.1 (Bếp nhận phiếu), §7.3.2 (cập nhật trạng thái món).
 
-**Vòng đời dòng món** (ràng buộc §2.4 #5, B_QĐ1): `ChuaChot` → `ChoCheBien` → `DangCheBien` → `DaXong` → `DaPhucVu`; nhánh phụ → `DaHuy`. `tong_tam_tinh` của order = `SUM(thanh_tien)` các dòng `trang_thai <> 'DaHuy'`, tính lại sau mỗi lần thêm/sửa/xóa/hủy dòng.
+**Vòng đời dòng món** (ràng buộc §2.4 #5, B_QĐ1):
+- **Món ăn** (`loai_mon='MonAn'`): `ChuaChot` → `ChoCheBien` → `DangCheBien` → `DaXong` → `DaPhucVu`.
+- **Đồ uống** (`loai_mon='DoUong'`): **bỏ qua Bếp** — khi chốt nhảy thẳng `ChuaChot` → `DaPhucVu` (quán nhỏ không có quầy pha chế, phục vụ tự lấy).
+- Nhánh phụ (mọi loại): → `DaHuy`.
+
+`tong_tam_tinh` của order = `SUM(thanh_tien)` các dòng `trang_thai <> 'DaHuy'`, tính lại sau mỗi lần thêm/sửa/xóa/hủy dòng.
 
 ### 4.5.1. Ghi nhận gọi món — PhucVu (DFD §7.1.2, PV_BM2)
 
@@ -661,25 +739,29 @@ Xử lý (§7.1.2 Bước 4–9): kiểm `Ban.trang_thai ∈ ('Trong','CoKhach')
 
 > Sửa/xóa dòng chỉ cho phép khi `ChuaChot` (chưa chuyển bếp). Dòng đã chốt muốn bỏ → dùng "hủy món" §4.5.4.
 
-### 4.5.2. Chốt order xuống bếp / pha chế — PhucVu (DFD §7.1.3, PV_BM3)
+### 4.5.2. Chốt order xuống bếp — PhucVu (DFD §7.1.3, PV_BM3)
 
 | Method | Endpoint | Vai trò | Mô tả |
 |---|---|---|---|
-| POST | `/order/:id/chot` | PhucVu | Chốt: mọi dòng `ChuaChot` → `ChoCheBien` |
-| GET | `/order/:id/phieu-bep` | PhucVu | Phiếu chuyển bếp/pha chế (PV_BM3) sinh trên-bay. Query `?bo_phan=Bep\|QuayPhaChe` |
+| POST | `/order/:id/chot` | PhucVu | Chốt: món ăn → `ChoCheBien`; đồ uống → `DaPhucVu` |
+| GET | `/order/:id/phieu-bep` | PhucVu | Phiếu chuyển bếp (PV_BM3) sinh trên-bay |
 
-**`POST /order/:id/chot`** (§7.1.3 Bước 2–5): lấy các dòng `ChuaChot` của order; nếu không có → `409`. **Transaction**: mỗi dòng `trang_thai='ChoCheBien'` + `thoi_gian_chot=now`. Bộ phận xử lý **derive** từ `MonAn.loai_mon` (`MonAn`→Bếp, `DoUong`→Quầy pha chế), không lưu cột riêng. Trả số dòng đã chuyển theo từng bộ phận.
+**`POST /order/:id/chot`** (§7.1.3 Bước 2–5): lấy các dòng `ChuaChot` của order; nếu không có → `409`. **Transaction**, phân theo `MonAn.loai_mon`:
+- `MonAn` → `trang_thai='ChoCheBien'` + `thoi_gian_chot=now` (vào hàng chờ Bếp).
+- `DoUong` → `trang_thai='DaPhucVu'` + `thoi_gian_chot=now` + `thoi_gian_phuc_vu=now` + `nv_phuc_vu_xac_nhan`=token (bỏ qua Bếp; phục vụ tự lấy).
 
-**`GET /order/:id/phieu-bep?bo_phan=Bep`** — trả data PV_BM3 (lọc `ChiTietOrder` của order, `trang_thai='ChoCheBien'`, JOIN `MonAn` theo `loai_mon` khớp `bo_phan`, ORDER BY `thoi_gian_chot`). Client tự gửi lệnh in (D5 tùy chọn). Đây là **tra cứu thuần** — không ghi CSDL.
+Trả số dòng vào Bếp + số đồ uống đã phục vụ.
+
+**`GET /order/:id/phieu-bep`** — trả data PV_BM3 (lọc `ChiTietOrder` của order, `trang_thai='ChoCheBien'` — chỉ món ăn, ORDER BY `thoi_gian_chot`). Client tự gửi lệnh in (D5 tùy chọn). Đây là **tra cứu thuần** — không ghi CSDL.
 
 ### 4.5.3. Bếp nhận phiếu & cập nhật trạng thái món — Bep (DFD §7.3.1, §7.3.2; B_BM1, B_BM2)
 
 | Method | Endpoint | Vai trò | Mô tả |
 |---|---|---|---|
-| GET | `/order/bep/hang-cho` | Bep | DS dòng món `ChoCheBien`/`DangCheBien` theo FIFO `thoi_gian_chot`. Query `?bo_phan=Bep\|QuayPhaChe` (B_BM2) |
+| GET | `/order/bep/hang-cho` | Bep | DS dòng món ăn `ChoCheBien`/`DangCheBien` theo FIFO `thoi_gian_chot` (B_BM2) |
 | PATCH | `/order/mon/:ma_chi_tiet/trang-thai` | Bep | Chuyển trạng thái chế biến tuần tự |
 
-**`GET /order/bep/hang-cho`** (§7.3.1) — tra cứu thuần (D4 = không có). Trả các dòng kèm bàn (`so_ban`), tên món, SL, ghi chú, `thoi_gian_chot`, `trang_thai`. Lọc theo `bo_phan` qua `loai_mon`. Là nguồn cho cả màn "nhận phiếu" (B_BM1) lẫn kitchen display (B_BM2). Client poll mỗi 5–10s.
+**`GET /order/bep/hang-cho`** (§7.3.1) — tra cứu thuần (D4 = không có). Trả các dòng kèm bàn (`so_ban`), tên món, SL, ghi chú, `thoi_gian_chot`, `trang_thai`. Chỉ gồm món ăn (`loai_mon='MonAn'`) vì đồ uống không qua Bếp. Là nguồn cho cả màn "nhận phiếu" (B_BM1) lẫn kitchen display (B_BM2). Client poll mỗi 5–10s.
 
 **`PATCH /order/mon/:ma_chi_tiet/trang-thai`** (§7.3.2, B_QĐ1) — Request `{ "trang_thai": "DangCheBien" }` hoặc `{ "trang_thai": "DaXong" }`. Kiểm **state machine tuần tự**: chỉ cho `ChoCheBien→DangCheBien` hoặc `DangCheBien→DaXong` (bỏ bước → `409 CONFLICT_STATE`). Khi `DaXong` → ghi `thoi_gian_xong=now` (Phục vụ thấy ở §4.5.4 nhờ polling — "thông báo tự động" theo cơ chế poll, không Socket.IO).
 
@@ -781,16 +863,16 @@ Kiểm (K_QĐ1, §7.4.1 Bước 4): `ma_ncc` tồn tại; mỗi dòng `ma_nvl` t
 
 | Method | Endpoint | Vai trò | Mô tả |
 |---|---|---|---|
-| GET | `/kho/xuat` | Kho, Admin | DS phiếu xuất. Query `?tu_ngay=&den_ngay=&bo_phan_nhan=` |
+| GET | `/kho/xuat` | Kho, Admin | DS phiếu xuất. Query `?tu_ngay=&den_ngay=` |
 | GET | `/kho/xuat/:id` | Kho, Admin | Chi tiết phiếu xuất (K_BM2) |
 | POST | `/kho/xuat` | Kho | Lập phiếu xuất (transaction) |
 
 **`POST /kho/xuat`** — Request:
 ```json
-{ "bo_phan_nhan": "Bep", "ngay_xuat": "2026-05-29", "ghi_chu": "",
+{ "ngay_xuat": "2026-05-29", "ghi_chu": "Xuất cho bếp",
   "chi_tiet": [ { "ma_nvl": 1, "so_luong": 3, "don_gia": 250000, "ghi_chu": "" } ] }
 ```
-Kiểm (K_QĐ1, §7.4.3 Bước 4): `bo_phan_nhan ∈ ('Bep','QuayPhaChe')`; mỗi dòng `so_luong>0`, `don_gia>0`, và **`so_luong ≤ ton_hien_tai`** (ràng buộc §2.4 #3 — vượt tồn → `409 CONFLICT_STATE`). **Transaction**: INSERT phiếu + chi tiết + `UPDATE NguyenLieu SET ton_hien_tai = ton_hien_tai - so_luong WHERE ma_nvl=? AND ton_hien_tai >= so_luong` (kiểm tra lại trong UPDATE chống tranh chấp; nếu `@@ROWCOUNT=0` → rollback). Trả `201` kèm cờ cảnh báo NVL có `ton_hien_tai ≤ dinh_muc_toi_thieu` (§7.4.3 Bước 8).
+Kiểm (K_QĐ1, §7.4.3 Bước 4): mỗi dòng `so_luong>0`, `don_gia>0`, và **`so_luong ≤ ton_hien_tai`** (ràng buộc §2.4 #3 — vượt tồn → `409 CONFLICT_STATE`). *(Quán 1 bếp nên bỏ trường "bộ phận nhận"; nơi nhận ghi ở `ghi_chu` nếu cần.)* **Transaction**: INSERT phiếu + chi tiết + `UPDATE NguyenLieu SET ton_hien_tai = ton_hien_tai - so_luong WHERE ma_nvl=? AND ton_hien_tai >= so_luong` (kiểm tra lại trong UPDATE chống tranh chấp; nếu `@@ROWCOUNT=0` → rollback). Trả `201` kèm cờ cảnh báo NVL có `ton_hien_tai ≤ dinh_muc_toi_thieu` (§7.4.3 Bước 8).
 
 ### 4.7.4. Báo cáo tồn / nhập / xuất (DFD §7.4.2/§7.4.4/§7.4.5; K_BM3/4/5)
 
@@ -798,14 +880,14 @@ Kiểm (K_QĐ1, §7.4.3 Bước 4): `bo_phan_nhan ∈ ('Bep','QuayPhaChe')`; m�
 |---|---|---|---|
 | GET | `/kho/bao-cao/ton` | Kho, Admin | K_BM3. Query `?tu_ngay=&den_ngay=` |
 | GET | `/kho/bao-cao/nhap` | Kho, Admin | K_BM4. Query `?tu_ngay=&den_ngay=&ma_ncc=` |
-| GET | `/kho/bao-cao/xuat` | Kho, Admin | K_BM5. Query `?tu_ngay=&den_ngay=&bo_phan_nhan=` |
+| GET | `/kho/bao-cao/xuat` | Kho, Admin | K_BM5. Query `?tu_ngay=&den_ngay=` |
 
 **Báo cáo tồn (K_BM3)** — không lưu lịch sử tồn, nên suy ra từ `ton_hien_tai` + lịch sử phiếu (§7.4.2 Bước 3–4):
 - `nhap_trong_ky` = ∑ `ChiTietNhapKho.so_luong` (phiếu `ngay_nhap ∈ [tu,den]`); `xuat_trong_ky` tương tự.
 - `ton_cuoi` (cuối kỳ) = `ton_hien_tai − ∑nhập(ngay>den) + ∑xuất(ngay>den)`.
 - `ton_dau` (đầu kỳ) = `ton_cuoi − nhap_trong_ky + xuat_trong_ky`.
 
-**Báo cáo nhập (K_BM4)** / **xuất (K_BM5)**: tổng hợp theo NVL trong kỳ (tổng SL, tổng giá trị, NCC/bộ phận nhận), kèm tổng giá trị kỳ. Tất cả chỉ đọc; kiểm `tu_ngay ≤ den_ngay`.
+**Báo cáo nhập (K_BM4)** / **xuất (K_BM5)**: tổng hợp theo NVL trong kỳ (tổng SL, tổng giá trị; K_BM4 kèm NCC), kèm tổng giá trị kỳ. Tất cả chỉ đọc; kiểm `tu_ngay ≤ den_ngay`.
 
 ---
 
@@ -838,4 +920,323 @@ Kiểm `tu_ngay ≤ den_ngay`. Trả 3 phần đúng QL_BM4 (§7.5.4 Bước 3�
 
 ---
 
-> **Kết thúc Đợt D2 (API).** §4.0 quy ước + 8 module (M1–M8), mỗi endpoint gắn vai trò + DFD tham chiếu; cột `nv_*` trỏ `User.user_id` theo ngoại lệ đặt tên đã chốt. Lưu ý phát sinh trong D2b: (1) đã thêm cột `NguyenLieu.dinh_muc_toi_thieu` (spec K_QĐ1/§7.5.4 yêu cầu nhưng D1 thiếu); (2) endpoint hủy dòng món `PATCH /order/mon/:id/huy` thêm tối thiểu để thực thi TN_QĐ1 (đánh dấu rõ không từ DFD riêng). Sau khi review, đợt kế là **D3 (UI mockup, §3)** rồi **D4 (pseudocode, §5)**.
+> **Kết thúc Đợt D2 (API).** §4.0 quy ước + 8 module (M1–M8), mỗi endpoint gắn vai trò + DFD tham chiếu; cột `nv_*` trỏ `User.user_id` theo ngoại lệ đặt tên đã chốt. Lưu ý phát sinh trong D2b: (1) đã thêm cột `NguyenLieu.dinh_muc_toi_thieu` (spec K_QĐ1/§7.5.4 yêu cầu nhưng D1 thiếu); (2) endpoint hủy dòng món `PATCH /order/mon/:id/huy` thêm tối thiểu để thực thi TN_QĐ1 (đánh dấu rõ không từ DFD riêng).
+
+# 5. PSEUDOCODE NGHIỆP VỤ {#pseudocode-nghiệp-vụ}
+
+Giả mã cho các **hàm nghiệp vụ lõi** (tầng service) — những hàm có giao dịch, máy trạng thái, hoặc quy định cần kiểm tra. Các thao tác CRUD đơn giản (thêm/sửa/xóa món, bàn, NCC, NVL, tài khoản) chỉ là *validate → repo.Insert/Update* nên không liệt kê. Mỗi hàm ghi DFD/quy định tham chiếu.
+
+## 5.0. Quy ước giả mã
+
+- Hàm **PascalCase tiếng Việt**, biến **camelCase tiếng Việt** (§1.2).
+- `repo.X(...)` = tầng repository (truy vấn SQL); `nguoiDung` = thông tin lấy từ JWT (`user_id`, `role_id`).
+- `Hằng.X` = hằng số trong `config/constants.js`.
+- `NÉM_LỖI(<mã_HTTP>, '<CODE>', '<thông điệp>')` → controller bắt và trả envelope lỗi (§4.0). Sau khi ném, hàm dừng.
+- `GIAO_DỊCH { ... }` = `BEGIN TRAN … COMMIT`; nếu có lỗi/`NÉM_LỖI` bên trong → tự `ROLLBACK` (atomic, yêu cầu chất lượng §6.9).
+- `Bây_giờ()` = thời điểm hiện tại; `LàmTròn(x)` = làm tròn 0 chữ số thập phân.
+
+## 5.1. Hàm dùng chung — Cập nhật trạng thái bàn
+
+```
+HÀM CapNhatTrangThaiBan(maBan, trangThaiMoi):
+    // Gọi BÊN TRONG giao dịch của module gọi (M4/M5/M6) — ràng buộc §2.4 #8
+    repo.CapNhat('Ban', maBan, { trang_thai: trangThaiMoi })
+```
+
+## 5.2. M1 — Đăng nhập (DFD §7.6.1, QL_QĐ1)
+
+```
+HÀM DangNhap(tenDangNhap, matKhau):
+    u ← repo.TimUserTheoUsername(tenDangNhap)
+    NẾU u = null HOẶC u.status = 'DaKhoa' THÌ
+        NÉM_LỖI(401, 'UNAUTHORIZED', 'Tài khoản không tồn tại / đã bị khóa')
+    HẾT_NẾU
+
+    NẾU KHÔNG Bcrypt.So(matKhau, u.password_hash) THÌ          // sai mật khẩu
+        u.failed_login_count ← u.failed_login_count + 1
+        NẾU u.failed_login_count ≥ Hằng.SO_LAN_SAI_TOI_DA THÌ
+            u.status ← 'DaKhoa'
+        HẾT_NẾU
+        repo.Luu(u)
+        NÉM_LỖI(401, 'UNAUTHORIZED', 'Tên đăng nhập hoặc mật khẩu không đúng')
+    HẾT_NẾU
+
+    // đúng mật khẩu
+    u.failed_login_count ← 0
+    u.last_login_at ← Bây_giờ()
+    repo.Luu(u)
+    token ← KýJWT({ user_id: u.user_id, role_id: u.role_id },
+                  hetHan = Bây_giờ() + Hằng.PHIEN_DANG_NHAP_PHUT phút)
+    TRẢ_VỀ { token, user: { user_id, full_name, username, role_id } }
+```
+
+## 5.3. M4 — Đặt bàn (DFD §7.1.1, PV_QĐ1)
+
+```
+HÀM XuLyDatBan(dl):   // dl: ma_ban, ten_khach, so_dien_thoai, so_nguoi, thoi_gian_dat, hinh_thuc_dat, ghi_chu
+    ban ← repo.LayBan(dl.ma_ban)
+    NẾU ban = null THÌ NÉM_LỖI(404, 'NOT_FOUND', 'Không tìm thấy bàn') HẾT_NẾU
+    NẾU ban.trang_thai ≠ 'Trong' THÌ
+        NÉM_LỖI(409, 'CONFLICT_STATE', 'Bàn không ở trạng thái Trống')      // PV_QĐ1
+    HẾT_NẾU
+    NẾU dl.so_nguoi ≤ 0 HOẶC dl.so_nguoi > ban.suc_chua THÌ
+        NÉM_LỖI(400, 'RULE_VIOLATION', 'Số người vượt sức chứa')
+    HẾT_NẾU
+    NẾU KHÔNG TrongGioHoatDong(dl.thoi_gian_dat) THÌ                        // [GIO_MO, GIO_DONG]
+        NÉM_LỖI(400, 'RULE_VIOLATION', 'Thời gian đặt ngoài giờ hoạt động')
+    HẾT_NẾU
+
+    GIAO_DỊCH {
+        phieu ← repo.Them('PhieuDatBan', { …dl, nv_tiep_nhan: nguoiDung.user_id, trang_thai: 'DaDat' })
+        CapNhatTrangThaiBan(dl.ma_ban, 'DaDat')                            // §2.4 #8
+    }
+    TRẢ_VỀ phieu
+
+HÀM NhanBan(maDatBan):      // khách đến (check-in thủ công, §7.1.1 ghi chú)
+    phieu ← repo.LayPhieuDatBan(maDatBan)
+    NẾU phieu = null THÌ NÉM_LỖI(404, 'NOT_FOUND', '...') HẾT_NẾU
+    NẾU phieu.trang_thai ≠ 'DaDat' THÌ NÉM_LỖI(409, 'CONFLICT_STATE', '...') HẾT_NẾU
+    GIAO_DỊCH {
+        repo.CapNhat('PhieuDatBan', maDatBan, { trang_thai: 'DaNhanBan', thoi_gian_nhan_ban: Bây_giờ() })
+        CapNhatTrangThaiBan(phieu.ma_ban, 'CoKhach')
+    }
+
+HÀM HuyDatBan(maDatBan):
+    phieu ← repo.LayPhieuDatBan(maDatBan)
+    NẾU phieu = null THÌ NÉM_LỖI(404, 'NOT_FOUND', '...') HẾT_NẾU
+    NẾU phieu.trang_thai ≠ 'DaDat' THÌ NÉM_LỖI(409, 'CONFLICT_STATE', 'Chỉ hủy phiếu Đã đặt') HẾT_NẾU
+    GIAO_DỊCH {
+        repo.CapNhat('PhieuDatBan', maDatBan, { trang_thai: 'DaHuy', thoi_gian_huy: Bây_giờ() })
+        CapNhatTrangThaiBan(phieu.ma_ban, 'Trong')
+    }
+```
+
+## 5.4. M5 — Order + Bếp
+
+```
+HÀM TinhTongTamTinh(maOrder):
+    TRẢ_VỀ repo.Tong('ChiTietOrder.thanh_tien', maOrder, trang_thai ≠ 'DaHuy')
+
+// Ghi nhận gọi món — mở order mới (DFD §7.1.2)
+HÀM MoOrder(maBan, danhSachMon):   // mỗi phần tử: { ma_mon, so_luong, ghi_chu }
+    ban ← repo.LayBan(maBan)
+    NẾU ban = null THÌ NÉM_LỖI(404, 'NOT_FOUND', 'Không tìm thấy bàn') HẾT_NẾU
+    NẾU ban.trang_thai KHÔNG_THUỘC ('Trong', 'CoKhach') THÌ
+        NÉM_LỖI(409, 'CONFLICT_STATE', 'Bàn đang giữ chỗ — vui lòng nhận bàn trước')   // §7.1.2 B4
+    HẾT_NẾU
+    NẾU repo.CoOrderDangPhucVu(maBan) THÌ
+        NÉM_LỖI(409, 'CONFLICT_STATE', 'Bàn đã có order — dùng Thêm món')
+    HẾT_NẾU
+    KiemTraDanhSachMon(danhSachMon)        // mỗi món tồn tại, trạng thái 'ConHang', so_luong > 0; sai → 400 RULE_VIOLATION
+
+    GIAO_DỊCH {
+        order ← repo.Them('PhieuOrder', { ma_ban: maBan, nv_phuc_vu: nguoiDung.user_id,
+                                          trang_thai: 'DangPhucVu', tong_tam_tinh: 0 })
+        VỚI MỖI m TRONG danhSachMon LÀM
+            mon ← repo.LayMon(m.ma_mon)
+            repo.Them('ChiTietOrder', { ma_order: order.ma_order, ma_mon: m.ma_mon,
+                                        so_luong: m.so_luong, don_gia: mon.don_gia,   // SNAPSHOT đơn giá
+                                        ghi_chu: m.ghi_chu, trang_thai: 'ChuaChot' })
+        HẾT_VỚI
+        NẾU ban.trang_thai = 'Trong' THÌ CapNhatTrangThaiBan(maBan, 'CoKhach') HẾT_NẾU   // walk-in
+        repo.CapNhat('PhieuOrder', order.ma_order, { tong_tam_tinh: TinhTongTamTinh(order.ma_order) })
+    }
+    TRẢ_VỀ order
+    // ThemDongMon(maOrder, danhSachMon): tương tự nhưng bỏ bước tạo PhieuOrder.
+
+// Chốt order xuống bếp (DFD §7.1.3) — đồ uống bỏ qua Bếp
+HÀM ChotOrder(maOrder):
+    order ← repo.LayOrder(maOrder)
+    NẾU order = null THÌ NÉM_LỖI(404, 'NOT_FOUND', '...') HẾT_NẾU
+    NẾU order.trang_thai ≠ 'DangPhucVu' THÌ NÉM_LỖI(409, 'CONFLICT_STATE', '...') HẾT_NẾU
+    dsChuaChot ← repo.LayChiTiet(maOrder, trang_thai = 'ChuaChot')
+    NẾU dsChuaChot rỗng THÌ NÉM_LỖI(409, 'CONFLICT_STATE', 'Không có món để chốt') HẾT_NẾU
+
+    soBep ← 0 ; soDoUong ← 0
+    GIAO_DỊCH {
+        VỚI MỖI d TRONG dsChuaChot LÀM
+            mon ← repo.LayMon(d.ma_mon)
+            NẾU mon.loai_mon = 'MonAn' THÌ                                  // → Bếp
+                repo.CapNhat('ChiTietOrder', d.ma_chi_tiet, { trang_thai: 'ChoCheBien', thoi_gian_chot: Bây_giờ() })
+                soBep ← soBep + 1
+            NGƯỢC_LẠI                                                       // 'DoUong' → phục vụ trực tiếp
+                repo.CapNhat('ChiTietOrder', d.ma_chi_tiet, { trang_thai: 'DaPhucVu',
+                             thoi_gian_chot: Bây_giờ(), thoi_gian_phuc_vu: Bây_giờ(),
+                             nv_phuc_vu_xac_nhan: nguoiDung.user_id })
+                soDoUong ← soDoUong + 1
+            HẾT_NẾU
+        HẾT_VỚI
+    }
+    TRẢ_VỀ { so_mon_vao_bep: soBep, so_do_uong_da_phuc_vu: soDoUong }
+
+// Bếp cập nhật trạng thái món (DFD §7.3.2, B_QĐ1 — tuần tự, không bỏ bước)
+HÀM CapNhatTrangThaiMon(maChiTiet, trangThaiMoi):
+    d ← repo.LayChiTiet(maChiTiet)
+    NẾU d = null THÌ NÉM_LỖI(404, 'NOT_FOUND', '...') HẾT_NẾU
+    chuyenHopLe ← (d.trang_thai = 'ChoCheBien'  VÀ trangThaiMoi = 'DangCheBien') HOẶC
+                  (d.trang_thai = 'DangCheBien' VÀ trangThaiMoi = 'DaXong')
+    NẾU KHÔNG chuyenHopLe THÌ
+        NÉM_LỖI(409, 'CONFLICT_STATE', 'Sai thứ tự trạng thái món')        // B_QĐ1
+    HẾT_NẾU
+    thayDoi ← { trang_thai: trangThaiMoi }
+    NẾU trangThaiMoi = 'DaXong' THÌ thayDoi.thoi_gian_xong ← Bây_giờ() HẾT_NẾU
+    repo.CapNhat('ChiTietOrder', maChiTiet, thayDoi)
+    // Phục vụ nhận biết qua polling GET /order/phuc-vu/san-sang (không Socket.IO)
+
+// Phục vụ món ra bàn (DFD §7.1.4)
+HÀM PhucVuMon(maChiTiet):
+    d ← repo.LayChiTiet(maChiTiet)
+    NẾU d = null THÌ NÉM_LỖI(404, 'NOT_FOUND', '...') HẾT_NẾU
+    NẾU d.trang_thai ≠ 'DaXong' THÌ NÉM_LỖI(409, 'CONFLICT_STATE', 'Món chưa xong / đã phục vụ') HẾT_NẾU
+    repo.CapNhat('ChiTietOrder', maChiTiet, { trang_thai: 'DaPhucVu',
+                 thoi_gian_phuc_vu: Bây_giờ(), nv_phuc_vu_xac_nhan: nguoiDung.user_id })
+
+// Hủy dòng món (phục vụ TN_QĐ1) — không hủy món đã ra bàn
+HÀM HuyDongMon(maChiTiet):
+    d ← repo.LayChiTiet(maChiTiet)
+    NẾU d = null THÌ NÉM_LỖI(404, 'NOT_FOUND', '...') HẾT_NẾU
+    NẾU d.trang_thai = 'DaPhucVu' THÌ NÉM_LỖI(409, 'CONFLICT_STATE', 'Món đã phục vụ, không thể hủy') HẾT_NẾU
+    GIAO_DỊCH {
+        repo.CapNhat('ChiTietOrder', maChiTiet, { trang_thai: 'DaHuy' })
+        repo.CapNhat('PhieuOrder', d.ma_order, { tong_tam_tinh: TinhTongTamTinh(d.ma_order) })
+    }
+```
+
+## 5.5. M6 — Thanh toán (DFD §7.2.1, TN_QĐ1)
+
+```
+HÀM XuLyThanhToan(dl):   // dl: ma_order, hinh_thuc_tt, tien_khach_dua, ma_giao_dich
+    order ← repo.LayOrder(dl.ma_order)
+    NẾU order = null THÌ NÉM_LỖI(404, 'NOT_FOUND', 'Không tìm thấy order') HẾT_NẾU
+    NẾU order.trang_thai ≠ 'DangPhucVu' THÌ
+        NÉM_LỖI(409, 'CONFLICT_STATE', 'Order đã thanh toán / đã hủy')      // chống thanh toán 2 lần
+    HẾT_NẾU
+
+    dong ← repo.LayChiTiet(dl.ma_order)
+    NẾU TỒN_TẠI d TRONG dong SAO_CHO d.trang_thai KHÔNG_THUỘC ('DaPhucVu', 'DaHuy') THÌ
+        NÉM_LỖI(409, 'RULE_VIOLATION', 'Còn món chưa phục vụ xong')         // TN_QĐ1
+    HẾT_NẾU
+
+    tongTienMon  ← repo.Tong('ChiTietOrder.thanh_tien', dl.ma_order, trang_thai ≠ 'DaHuy')
+    tyLeVat      ← Hằng.VAT_TY_LE                                           // snapshot 0.1
+    tienVat      ← LàmTròn(tongTienMon × tyLeVat)
+    tongThanhToan ← tongTienMon + tienVat
+
+    NẾU dl.hinh_thuc_tt = 'TienMat' THÌ
+        NẾU dl.tien_khach_dua < tongThanhToan THÌ
+            NÉM_LỖI(400, 'RULE_VIOLATION', 'Tiền khách đưa không đủ')
+        HẾT_NẾU
+        tienKhachDua ← dl.tien_khach_dua
+        tienThua     ← dl.tien_khach_dua − tongThanhToan
+    NGƯỢC_LẠI            // 'ChuyenKhoan'
+        tienKhachDua ← null
+        tienThua     ← 0
+    HẾT_NẾU
+
+    soHoaDon ← SinhSoHoaDon(Bây_giờ())          // 'HD' + yyyymmdd + '-' + STT5_theo_ngày
+    ban ← repo.LayBan(order.ma_ban)
+    GIAO_DỊCH {
+        hd ← repo.Them('HoaDon', {
+                ma_order: dl.ma_order, so_hoa_don: soHoaDon, so_ban_snapshot: ban.so_ban,
+                nv_thu_ngan: nguoiDung.user_id, tong_tien_mon: tongTienMon, ty_le_vat: tyLeVat,
+                tien_vat: tienVat, tong_thanh_toan: tongThanhToan, hinh_thuc_tt: dl.hinh_thuc_tt,
+                tien_khach_dua: tienKhachDua, tien_thua: tienThua, ma_giao_dich: dl.ma_giao_dich,
+                so_lan_in: 0 })
+        repo.CapNhat('PhieuOrder', dl.ma_order, { trang_thai: 'DaThanhToan' })
+        CapNhatTrangThaiBan(order.ma_ban, 'Trong')
+    }
+    TRẢ_VỀ hd
+
+// In / in lại hóa đơn (DFD §7.2.3) — đánh dấu BẢN SAO khi in lại
+HÀM InHoaDon(maHoaDon):
+    hd ← repo.LayHoaDon(maHoaDon)
+    NẾU hd = null THÌ NÉM_LỖI(404, 'NOT_FOUND', '...') HẾT_NẾU
+    repo.CapNhat('HoaDon', maHoaDon, { so_lan_in: hd.so_lan_in + 1 })
+    TRẢ_VỀ { hoa_don: hd, chi_tiet: repo.LayChiTiet(hd.ma_order),
+             nha_hang: Hằng.NHA_HANG, ban_sao: (hd.so_lan_in + 1 ≥ 2) }
+```
+
+## 5.6. M7 — Kho
+
+```
+// Lập phiếu nhập kho (DFD §7.4.1) — tăng tồn trong cùng giao dịch (§2.4 #6)
+HÀM LapPhieuNhapKho(dl):   // dl: ma_ncc, ngay_nhap, ghi_chu, chi_tiet[{ ma_nvl, so_luong, don_gia, ghi_chu }]
+    NẾU KHÔNG repo.NccTonTai(dl.ma_ncc) THÌ NÉM_LỖI(404, 'NOT_FOUND', 'NCC không tồn tại') HẾT_NẾU
+    VỚI MỖI ct TRONG dl.chi_tiet LÀM
+        NẾU KHÔNG repo.NvlTonTai(ct.ma_nvl) THÌ NÉM_LỖI(404, 'NOT_FOUND', 'NVL không tồn tại') HẾT_NẾU
+        NẾU ct.so_luong ≤ 0 HOẶC ct.don_gia ≤ 0 THÌ NÉM_LỖI(400, 'RULE_VIOLATION', 'SL/đơn giá phải > 0') HẾT_NẾU
+    HẾT_VỚI
+    tongGiaTri ← TỔNG(ct.so_luong × ct.don_gia)
+    soPhieu ← SinhSoPhieu('PN', dl.ngay_nhap)
+
+    GIAO_DỊCH {
+        phieu ← repo.Them('PhieuNhapKho', { so_phieu: soPhieu, ma_ncc: dl.ma_ncc,
+                          nv_lap: nguoiDung.user_id, ngay_nhap: dl.ngay_nhap,
+                          tong_gia_tri: tongGiaTri, ghi_chu: dl.ghi_chu })
+        VỚI MỖI ct TRONG dl.chi_tiet LÀM
+            repo.Them('ChiTietNhapKho', { ma_phieu_nhap: phieu.ma_phieu_nhap, …ct })
+            repo.CongTonKho(ct.ma_nvl, ct.so_luong)     // ton_hien_tai += so_luong; thoi_gian_cap_nhat_ton = now
+        HẾT_VỚI
+    }
+    TRẢ_VỀ phieu
+
+// Lập phiếu xuất kho (DFD §7.4.3) — không xuất quá tồn (§2.4 #3), cảnh báo tồn thấp
+HÀM LapPhieuXuatKho(dl):   // dl: ngay_xuat, ghi_chu, chi_tiet[{ ma_nvl, so_luong, don_gia, ghi_chu }]
+    VỚI MỖI ct TRONG dl.chi_tiet LÀM
+        NẾU KHÔNG repo.NvlTonTai(ct.ma_nvl) THÌ NÉM_LỖI(404, 'NOT_FOUND', 'NVL không tồn tại') HẾT_NẾU
+        NẾU ct.so_luong ≤ 0 HOẶC ct.don_gia ≤ 0 THÌ NÉM_LỖI(400, 'RULE_VIOLATION', 'SL/đơn giá phải > 0') HẾT_NẾU
+    HẾT_VỚI
+    tongGiaTri ← TỔNG(ct.so_luong × ct.don_gia)
+    soPhieu ← SinhSoPhieu('PX', dl.ngay_xuat)
+
+    GIAO_DỊCH {
+        phieu ← repo.Them('PhieuXuatKho', { so_phieu: soPhieu, nv_lap: nguoiDung.user_id,
+                          ngay_xuat: dl.ngay_xuat, tong_gia_tri: tongGiaTri, ghi_chu: dl.ghi_chu })
+        VỚI MỖI ct TRONG dl.chi_tiet LÀM
+            repo.Them('ChiTietXuatKho', { ma_phieu_xuat: phieu.ma_phieu_xuat, …ct })
+            soDong ← repo.TruTonKhoCoKiemTra(ct.ma_nvl, ct.so_luong)
+                     // UPDATE NguyenLieu SET ton_hien_tai -= so_luong, thoi_gian_cap_nhat_ton = now
+                     //   WHERE ma_nvl = ? AND ton_hien_tai >= so_luong ;  trả @@ROWCOUNT
+            NẾU soDong = 0 THÌ
+                NÉM_LỖI(409, 'CONFLICT_STATE', 'Xuất quá tồn kho')      // tự ROLLBACK
+            HẾT_NẾU
+        HẾT_VỚI
+    }
+    canhBao ← repo.LayNvlDuoiDinhMuc(dl.chi_tiet.map(ma_nvl))           // ton_hien_tai ≤ dinh_muc_toi_thieu
+    TRẢ_VỀ { phieu, canh_bao: canhBao }
+
+// Báo cáo tồn kho (DFD §7.4.2) — suy tồn đầu/cuối từ ton_hien_tai + lịch sử phiếu
+HÀM BaoCaoTonKho(tuNgay, denNgay):
+    NẾU tuNgay > denNgay THÌ NÉM_LỖI(400, 'VALIDATION', 'Khoảng ngày không hợp lệ') HẾT_NẾU
+    ketQua ← []
+    VỚI MỖI nvl TRONG repo.LayTatCaNvl(dang_su_dung = 1) LÀM
+        nhapKy   ← repo.TongNhap(nvl.ma_nvl, tuNgay, denNgay)
+        xuatKy   ← repo.TongXuat(nvl.ma_nvl, tuNgay, denNgay)
+        nhapSau  ← repo.TongNhap(nvl.ma_nvl, SauNgay(denNgay), ∞)
+        xuatSau  ← repo.TongXuat(nvl.ma_nvl, SauNgay(denNgay), ∞)
+        tonCuoi  ← nvl.ton_hien_tai − nhapSau + xuatSau
+        tonDau   ← tonCuoi − nhapKy + xuatKy
+        ketQua.Thêm({ ten_nvl: nvl.ten_nvl, don_vi_tinh: nvl.don_vi_tinh,
+                      ton_dau: tonDau, nhap: nhapKy, xuat: xuatKy, ton_cuoi: tonCuoi })
+    HẾT_VỚI
+    TRẢ_VỀ ketQua
+```
+
+## 5.7. M8 — Báo cáo tổng hợp (DFD §7.5.4)
+
+```
+HÀM BaoCaoTongHop(tuNgay, denNgay):
+    NẾU tuNgay > denNgay THÌ NÉM_LỖI(400, 'VALIDATION', 'Khoảng ngày không hợp lệ') HẾT_NẾU
+    // A. Doanh thu theo ngày (gộp HoaDon trong kỳ theo ngày + hình thức TT)
+    doanhThu ← repo.DoanhThuTheoNgay(tuNgay, denNgay)
+    // B. Top món bán chạy: JOIN HoaDon→PhieuOrder→ChiTietOrder→MonAn,
+    //    order 'DaThanhToan' trong kỳ, dòng ≠ 'DaHuy', SUM theo món, giảm dần, lấy TOP_N
+    topMon ← repo.TopMonBanChay(tuNgay, denNgay, Hằng.TOP_N_BAO_CAO)
+    // C. Cảnh báo tồn: NVL dang_su_dung và ton_hien_tai ≤ dinh_muc_toi_thieu
+    canhBaoTon ← repo.LayNvlDuoiDinhMuc()
+    TRẢ_VỀ { doanh_thu: doanhThu, top_mon: topMon, canh_bao_ton: canhBaoTon }
+```
+
+---
+
+> **Kết thúc Đợt D4 (Pseudocode).** Giả mã các hàm nghiệp vụ lõi (giao dịch + máy trạng thái), bám sát DFD §7 và các quy định PV_QĐ1/TN_QĐ1/B_QĐ1/K_QĐ1/QL_QĐ1. **Hoàn tất 4 đợt thiết kế D1–D4** — `DESIGN.md` đã đủ: §1 kiến trúc · §2 CSDL · §3 giao diện (link HTML) · §4 API · §5 pseudocode; kèm ERD (`design/erd/erd.puml`) và 19 mockup (`design/ui/`).

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phục vụ món ra bàn — Phục vụ (PV_BM4)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- PV_BM4 — Phục vụ món ra bàn (DFD §7.1.4).
+     Chỉ hiển thị dòng món "Đã xong" chưa phục vụ. Poll 5–10s.
+     API: GET /order/phuc-vu/san-sang, PATCH /order/mon/:id/phuc-vu -->
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">🥩</span> Bò Né Mỹ Cảnh</div>
+    <nav>
+      <a href="pv-dat-ban.html">📋 Đặt bàn</a>
+      <a href="pv-goi-mon.html">🍜 Gọi món / Order</a>
+      <a href="pv-phuc-vu.html" class="active">🛎️ Phục vụ ra bàn</a>
+      <a href="pv-phieu-bep.html">🧾 Phiếu chuyển bếp</a>
+    </nav>
+    <div class="foot">Phục vụ · ca chiều</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="page-title">Món sẵn sàng phục vụ</div>
+      <div class="user"><div class="avatar">A</div><div><div>Nguyễn Văn A</div><div class="role">Phục vụ</div></div></div>
+    </header>
+
+    <div class="content">
+      <div class="card">
+        <div class="card-head">
+          <h2>Món "Đã xong" — chờ đem ra bàn</h2>
+          <span class="muted">Tự cập nhật mỗi 5 giây</span>
+        </div>
+        <div class="card-body">
+          <div class="table-scroll">
+          <table class="tbl">
+            <thead><tr><th>Bàn</th><th>Món</th><th class="center">SL</th><th>Ghi chú</th><th>Xong lúc</th><th class="center">Hành động</th></tr></thead>
+            <tbody>
+              <tr><td><b>B02</b></td><td>NÉ MC</td><td class="center">2</td><td class="muted">ốp la</td><td>18:42</td><td class="center"><button class="btn btn-sm btn-success">Đã phục vụ</button></td></tr>
+              <tr><td><b>B05</b></td><td>BÍT TẾT ĐẶC BIỆT</td><td class="center">1</td><td class="muted">—</td><td>18:45</td><td class="center"><button class="btn btn-sm btn-success">Đã phục vụ</button></td></tr>
+              <tr><td><b>SV01</b></td><td>PHỞ MC</td><td class="center">3</td><td class="muted">ít hành</td><td>18:46</td><td class="center"><button class="btn btn-sm btn-success">Đã phục vụ</button></td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

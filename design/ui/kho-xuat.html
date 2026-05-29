@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xuất kho — Bộ phận Kho (K_BM2)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- K_BM2 — Lập phiếu xuất kho (DFD §7.4.3, K_QĐ1).
+     Không xuất quá tồn. Transaction: lưu phiếu + giảm tồn. Cảnh báo tồn ≤ định mức.
+     Quán 1 bếp → KHÔNG có "bộ phận nhận".
+     API: GET /kho/xuat, GET /kho/xuat/:id, POST /kho/xuat -->
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">🥩</span> Bò Né Mỹ Cảnh</div>
+    <nav>
+      <a href="kho-nhap.html">📥 Nhập kho</a>
+      <a href="kho-xuat.html" class="active">📤 Xuất kho</a>
+      <a href="kho-bc-ton.html">📦 Báo cáo tồn</a>
+      <a href="kho-bc-nhap.html">📈 Báo cáo nhập</a>
+      <a href="kho-bc-xuat.html">📉 Báo cáo xuất</a>
+    </nav>
+    <div class="foot">Kho · ca sáng</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="page-title">Lập phiếu xuất kho</div>
+      <div class="user"><div class="avatar">D</div><div><div>Phạm Thị D</div><div class="role">Kho</div></div></div>
+    </header>
+
+    <div class="content">
+      <div class="card">
+        <div class="card-head"><h2>Thông tin phiếu xuất</h2></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="field"><label>Ngày xuất</label><input type="date" value="2026-05-29"></div>
+            <div class="field"><label>Ghi chú</label><input type="text" placeholder="vd: xuất cho bếp ca sáng"></div>
+          </div>
+
+          <div class="table-scroll" style="margin-top:16px">
+          <table class="tbl">
+            <thead><tr><th>Nguyên liệu</th><th>ĐVT</th><th class="num">Tồn hiện tại</th><th class="center">SL xuất</th><th class="num">Đơn giá</th><th class="num">Thành tiền</th><th></th></tr></thead>
+            <tbody>
+              <tr>
+                <td><select><option>Miếng bò né</option><option>Pa tê</option></select></td>
+                <td class="muted">kg</td>
+                <td class="num">30,000</td>
+                <td class="center"><input type="number" value="5" style="width:70px;text-align:center"></td>
+                <td class="num"><input type="number" value="250000" style="width:110px;text-align:right"></td>
+                <td class="num money">1.250.000</td>
+                <td class="center"><button class="btn btn-sm btn-danger">✕</button></td>
+              </tr>
+              <tr>
+                <td><select><option>Cà phê hạt</option><option>Hành phi</option></select></td>
+                <td class="muted">kg</td>
+                <td class="num" style="color:var(--c-danger)">2,000 ⚠</td>
+                <td class="center"><input type="number" value="1" style="width:70px;text-align:center"></td>
+                <td class="num"><input type="number" value="120000" style="width:110px;text-align:right"></td>
+                <td class="num money">120.000</td>
+                <td class="center"><button class="btn btn-sm btn-danger">✕</button></td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr><td colspan="5" class="right"><b>Tổng giá trị xuất</b></td><td class="num money"><b>1.370.000</b></td><td></td></tr>
+            </tfoot>
+          </table>
+          </div>
+
+          <p class="muted" style="font-size:12.5px;margin:10px 0 0">⚠ Cảnh báo: nguyên liệu sắp chạm định mức tối thiểu sau khi xuất.</p>
+
+          <div class="btn-row" style="margin-top:14px">
+            <button class="btn">+ Thêm dòng</button>
+            <div class="spacer" style="flex:1"></div>
+            <button class="btn btn-primary">Lưu phiếu xuất</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

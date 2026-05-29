@@ -11,7 +11,7 @@ Khách hàng có thể yêu cầu đặt bàn trực tiếp tại nhà hàng ho�
 
 ### Quy trình xử lý bếp và phục vụ:
 
-Hệ thống tự động trích xuất các chi tiết món cần làm từ CSDL Phiếu Order để gửi lệnh in phiếu order xuống cho Bộ phận Bếp. Đối với đồ uống, hệ thống phân loại và gửi phiếu riêng đến Quầy pha chế. Sau khi chế biến xong, Bộ phận Bếp/Quầy pha chế cập nhật trạng thái món (Đang chế biến → Đã xong). Hệ thống ghi nhận thay đổi vào CSDL Phiếu Order và phát thông báo cho Phục vụ.
+Hệ thống tự động trích xuất các chi tiết món ăn cần làm từ CSDL Phiếu Order để gửi lệnh in phiếu order xuống cho Bộ phận Bếp. Quán quy mô nhỏ nên chỉ có một bộ phận chế biến là Bếp (không có quầy pha chế riêng); đồ uống do nhân viên Phục vụ tự lấy và phục vụ trực tiếp, không qua Bếp. Sau khi chế biến xong, Bộ phận Bếp cập nhật trạng thái món (Đang chế biến → Đã xong). Hệ thống ghi nhận thay đổi vào CSDL Phiếu Order và phát thông báo cho Phục vụ.
 
 ### Quy trình thanh toán:
 
@@ -49,7 +49,7 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 |----|----|----|----|----|----|
 | 1 | Tiếp nhận đặt bàn trực tiếp/qua điện thoại | Lưu trữ | PV_QĐ1 | PV_BM1 | Xem bảng quy định |
 | 2 | Ghi nhận gọi món | Lưu trữ | Món phải có trong thực đơn, trạng thái "Còn hàng". SL > 0. | PV_BM2 |  |
-| 3 | Bàn giao cho bếp / quầy pha chế | Lưu trữ | Tự động phân loại: Món ăn → Bếp, Đồ uống → Quầy pha chế. Kích hoạt khi Phục vụ chốt order. | PV_BM3 |  |
+| 3 | Bàn giao cho bếp | Lưu trữ | Khi Phục vụ chốt order: món ăn chuyển xuống Bếp; đồ uống phục vụ trực tiếp (không qua Bếp). | PV_BM3 |  |
 | 4 | Phục vụ món ra bàn | Lưu trữ | Nhận thông báo khi món "Đã xong". Xác nhận đã phục vụ → trạng thái món chuyển "Đã phục vụ". | PV_BM4 |  |
 
 *Ghi chú:* Khi khách đặt bàn đến, Phục vụ mở màn hình "Tiếp nhận đặt bàn" để đánh dấu phiếu đặt "Đã nhận bàn" (cập nhật trạng thái thủ công, không tách thành chức năng riêng) rồi vào màn ghi nhận gọi món bình thường.
@@ -136,7 +136,7 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 <td>K_QĐ1</td>
 <td>Quy định nhập/xuất kho</td>
 <td><p>- Phiếu nhập: NVL phải có trong danh mục; SL > 0; đơn giá > 0; phải gán nhà cung cấp.</p>
-<p>- Phiếu xuất: SL xuất ≤ tồn kho hiện tại; phải gán bộ phận nhận (Bếp/Quầy pha chế).</p>
+<p>- Phiếu xuất: SL xuất ≤ tồn kho hiện tại.</p>
 <p>- Mỗi phiếu phải có người lập; phiếu đã lưu không sửa, chỉ tạo phiếu điều chỉnh.</p>
 <p>- Tồn kho cập nhật tức thời sau khi lưu phiếu: Tồn mới = Tồn cũ + Nhập − Xuất.</p>
 <p>- Cảnh báo khi tồn ≤ định mức tối thiểu của NVL (cấu hình theo từng NVL).</p></td>
@@ -281,13 +281,13 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 
 ### PV_BM3:
 
-**PHIẾU CHUYỂN BẾP / QUẦY PHA CHẾ**
+**PHIẾU CHUYỂN BẾP**
 
 **Bàn số:** \...\...\...\...\...\...\...\...\...\...\...\...\...\...\...\.....
 
 **Số phiếu order:** \...\...\...\...\...\...\...\...\...\...\...\...\...\...\...\.....
 
-**Chuyển đến:** \[ \] Bếp \[ \] Quầy pha chế
+*(Chỉ gồm món ăn — đồ uống phục vụ trực tiếp, không qua Bếp.)*
 
 | **STT** | **Tên món** | **SL** | **Ghi chú** | **Trạng thái** |
 |---------|-------------|--------|-------------|----------------|
@@ -313,7 +313,7 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 
 **MÀN HÌNH CẬP NHẬT TRẠNG THÁI MÓN (KITCHEN DISPLAY)**
 
-**Bộ phận:** \[ \] Bếp \[ \] Quầy pha chế
+**Bộ phận:** Bếp
 
 **Nhân viên:** \...\...\...\...\...\...\...\...\...\...\...\...\...\...\...\.....
 
@@ -370,8 +370,6 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 **Số phiếu:** \...\...\...\...\...\...\...\...\...\...\...\...\...\...\...\.....
 
 **Ngày xuất:** \...\...\...\...\...\...\...\...\...\...\...\...\...\...\...\.....
-
-**Bộ phận nhận:** \...\...\...\...\...\...\...\...\...\...\...\...\...\...\...\.....
 
 | **STT** | **Tên NVL** | **ĐVT** | **SL** | **Đơn giá** | **Thành tiền** | **Ghi chú** |
 |---------|-------------|---------|--------|-------------|----------------|-------------|
@@ -431,10 +429,10 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 
 **Đến ngày:** \...\...\...\...\...\...\...\...\...\...\...\...\...\...\...\.....
 
-| **STT** | **Tên NVL** | **ĐVT** | **Tổng SL xuất** | **Tổng giá trị** | **BP nhận** |
-|---------|-------------|---------|------------------|------------------|-------------|
-| 1       |             |         |                  |                  |             |
-| 2       |             |         |                  |                  |             |
+| **STT** | **Tên NVL** | **ĐVT** | **Tổng SL xuất** | **Tổng giá trị** |
+|---------|-------------|---------|------------------|------------------|
+| 1       |             |         |                  |                  |
+| 2       |             |         |                  |                  |
 
 **Tổng giá trị xuất kỳ:** \...\...\...\...\.....
 
@@ -684,14 +682,14 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 >
 > **Bước 10:** Kết thúc.
 
-### 7.1.3. Bàn giao cho bếp / quầy pha chế (Loại: Lưu trữ) {#bàn-giao-cho-bếp-quầy-pha-chế-loại-lưu-trữ}
+### 7.1.3. Bàn giao cho bếp (Loại: Lưu trữ) {#bàn-giao-cho-bếp-loại-lưu-trữ}
 
 **Sơ đồ luồng dữ liệu:**
 
 |  | **Nhân viên Phục vụ** |  |
 |:--:|:--:|:--:|
 |  | ↓ D1 ↑ D6 |  |
-| **Thiết bị nhập** → D2 → | **Xử lý Bàn giao bếp / pha chế** | → D5 → **Thiết bị xuất** |
+| **Thiết bị nhập** → D2 → | **Xử lý Bàn giao bếp** | → D5 → **Thiết bị xuất** |
 |  | ↑ D3 ↓ D4 |  |
 |  | **══ Bộ nhớ phụ (CSDL) ══** |  |
 
@@ -699,11 +697,11 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 
 | **Ký hiệu** | **Mô tả chi tiết** |
 |----|----|
-| D1 | Thông tin do Phục vụ thao tác: lệnh "Chốt order" (xác nhận chuyển order xuống bếp/pha chế) cho một bàn cụ thể. |
+| D1 | Thông tin do Phục vụ thao tác: lệnh "Chốt order" cho một bàn cụ thể. |
 | D2 | Không có. |
 | D3 | Đọc từ CSDL: Chi tiết phiếu order chưa chuyển (món, loại Món ăn/Đồ uống, SL, ghi chú). |
-| D4 | Ghi vào CSDL: Cập nhật trạng thái từng dòng món chưa chuyển → "Chờ chế biến" và ghi thời gian chốt. Bộ phận xử lý mỗi dòng được **derive** từ loại món (Món ăn → Bếp; Đồ uống → Quầy pha chế) — không lưu thành bảng riêng. |
-| D5 | Xuất ra máy in (tùy chọn): Phiếu chuyển bếp / phiếu chuyển pha chế (PV_BM3) — sinh trên-bay từ data ChiTietOrder lọc theo loại món. |
+| D4 | Ghi vào CSDL: Cập nhật trạng thái từng dòng món chưa chuyển và ghi thời gian chốt. Phân theo loại món: **Món ăn → "Chờ chế biến"** (vào hàng chờ Bếp); **Đồ uống → "Đã phục vụ"** ngay (phục vụ tự lấy, không qua Bếp). |
+| D5 | Xuất ra máy in (tùy chọn): Phiếu chuyển bếp (PV_BM3) — sinh trên-bay từ data ChiTietOrder các món ăn "Chờ chế biến". |
 | D6 | Hiển thị cho Phục vụ: Kết quả chốt order, danh sách món vừa chuyển. |
 
 **Thuật toán xử lý:**
@@ -712,11 +710,11 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 >
 > **Bước 2:** Đọc D3: lấy các dòng món trạng thái "Chưa chốt" của order.
 >
-> **Bước 3:** Với mỗi dòng món: cập nhật trạng thái → "Chờ chế biến" và ghi thời gian chốt (ghi D4).
+> **Bước 3:** Ghi thời gian chốt và cập nhật trạng thái từng dòng (ghi D4): món ăn → "Chờ chế biến"; đồ uống → "Đã phục vụ" ngay.
 >
-> **Bước 4:** Xuất D5: in 2 phiếu chuyển (Bếp + Pha chế) lọc theo loại món, ra máy in khu vực tương ứng nếu yêu cầu in.
+> **Bước 4:** Xuất D5: in phiếu chuyển bếp (PV_BM3) gồm các món ăn, ra máy in Bếp nếu yêu cầu in.
 >
-> **Bước 5:** Hiển thị D6: thông báo chuyển thành công, số dòng món đã chuyển cho Bếp / Quầy pha chế.
+> **Bước 5:** Hiển thị D6: thông báo chuyển thành công, số món ăn đã chuyển Bếp và số đồ uống đã phục vụ.
 >
 > **Bước 6:** Kết thúc.
 
@@ -1067,20 +1065,20 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 
 | **Ký hiệu** | **Mô tả chi tiết** |
 |----|----|
-| D1 | Thông tin do NV Kho nhập: Ngày xuất, bộ phận nhận (Bếp/Quầy pha chế), danh sách NVL (tên, ĐVT, SL, đơn giá), ghi chú (dựa vào K_BM2). |
+| D1 | Thông tin do NV Kho nhập: Ngày xuất, danh sách NVL (tên, ĐVT, SL, đơn giá), ghi chú (dựa vào K_BM2). |
 | D2 | Không có. |
-| D3 | Đọc từ CSDL: Danh mục NVL, tồn kho hiện tại của từng NVL, danh sách bộ phận nhận. |
+| D3 | Đọc từ CSDL: Danh mục NVL, tồn kho hiện tại của từng NVL. |
 | D4 | Ghi vào CSDL: Phiếu xuất kho (mã phiếu tự phát sinh + D1 + tổng giá trị xuất). Cập nhật tồn kho: Tồn mới = Tồn cũ − SL xuất. |
 | D5 | Xuất ra máy in: Phiếu xuất kho (K_BM2). |
 | D6 | Hiển thị cho NV Kho: Danh mục NVL kèm tồn hiện tại để chọn. Kết quả lưu thành công, tổng giá trị xuất. |
 
 **Thuật toán xử lý:**
 
-> **Bước 1:** Đọc D3: lấy danh mục NVL + tồn hiện tại, danh sách bộ phận nhận.
+> **Bước 1:** Đọc D3: lấy danh mục NVL + tồn hiện tại.
 >
 > **Bước 2:** Hiển thị D6: danh mục NVL + tồn cho NV Kho chọn.
 >
-> **Bước 3:** Nhận D1: NV Kho nhập ngày, chọn bộ phận nhận, chọn NVL, nhập SL, đơn giá.
+> **Bước 3:** Nhận D1: NV Kho nhập ngày, chọn NVL, nhập SL, đơn giá.
 >
 > **Bước 4:** Kiểm tra quy định K_QĐ1: SL > 0; đơn giá > 0; SL xuất ≤ tồn hiện tại.
 >
@@ -1153,22 +1151,22 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 
 | **Ký hiệu** | **Mô tả chi tiết** |
 |----|----|
-| D1 | Thông tin do NV Kho nhập: Ngày bắt đầu, ngày kết thúc kỳ báo cáo. Tùy chọn lọc theo bộ phận nhận. |
+| D1 | Thông tin do NV Kho nhập: Ngày bắt đầu, ngày kết thúc kỳ báo cáo. |
 | D2 | Không có. |
 | D3 | Đọc từ CSDL: Tất cả phiếu xuất kho trong khoảng thời gian, chi tiết NVL từng phiếu. |
 | D4 | Không có (báo cáo chỉ đọc). |
 | D5 | Xuất ra máy in: Báo cáo xuất kho (K_BM5). |
-| D6 | Hiển thị cho NV Kho: Bảng báo cáo K_BM5 (NVL, tổng SL xuất, tổng giá trị, BP nhận). |
+| D6 | Hiển thị cho NV Kho: Bảng báo cáo K_BM5 (NVL, tổng SL xuất, tổng giá trị). |
 
 **Thuật toán xử lý:**
 
-> **Bước 1:** Nhận D1: NV Kho nhập khoảng thời gian (và bộ phận nhận nếu có).
+> **Bước 1:** Nhận D1: NV Kho nhập khoảng thời gian.
 >
 > **Bước 2:** Kiểm tra: ngày bắt đầu ≤ ngày kết thúc.
 >
-> **Bước 3:** Đọc D3: truy vấn phiếu xuất trong khoảng [BĐ, KT] (lọc bộ phận nếu có).
+> **Bước 3:** Đọc D3: truy vấn phiếu xuất trong khoảng [BĐ, KT].
 >
-> **Bước 4:** Tổng hợp theo NVL: tổng SL xuất, tổng giá trị xuất, bộ phận nhận.
+> **Bước 4:** Tổng hợp theo NVL: tổng SL xuất, tổng giá trị xuất.
 >
 > **Bước 5:** Tính tổng giá trị xuất kỳ = ∑ (tổng giá trị từng NVL).
 >

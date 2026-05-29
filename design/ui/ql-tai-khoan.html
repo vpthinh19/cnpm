@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý tài khoản — Quản lý (QL_BM3)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- QL_BM3 — Quản lý tài khoản (DFD §7.5.3, QL_QĐ1). Thêm/sửa/khóa/mở khóa/đặt lại MK.
+     Thực thể hệ thống → API tiếng Anh.
+     API: GET/POST /users, PUT /users/:id, PATCH /users/:id/{lock,unlock,reset-password} -->
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">🥩</span> Bò Né Mỹ Cảnh</div>
+    <nav>
+      <a href="ql-thuc-don.html">🍽️ Thực đơn</a>
+      <a href="ql-ban.html">🪑 Bàn</a>
+      <a href="ql-tai-khoan.html" class="active">👤 Tài khoản</a>
+      <a href="ql-dashboard.html">📊 Dashboard</a>
+    </nav>
+    <div class="foot">Quản lý</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="page-title">Quản lý tài khoản</div>
+      <div class="user"><div class="avatar">Q</div><div><div>Quản trị viên</div><div class="role">Quản lý</div></div></div>
+    </header>
+
+    <div class="content">
+      <div class="card">
+        <div class="card-head"><h2>Danh sách tài khoản</h2><button class="btn btn-primary btn-sm">+ Thêm tài khoản</button></div>
+        <div class="card-body">
+          <div class="toolbar">
+            <div class="search"><input type="text" placeholder="Tìm theo họ tên / tên đăng nhập..."></div>
+            <select style="width:auto"><option>Mọi vai trò</option><option>Admin</option><option>Phục vụ</option><option>Bếp</option><option>Thu ngân</option><option>Kho</option></select>
+          </div>
+          <div class="table-scroll">
+          <table class="tbl">
+            <thead><tr><th>Mã NV</th><th>Họ tên</th><th>Tên đăng nhập</th><th>Vai trò</th><th class="center">Trạng thái</th><th class="center">Thao tác</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Quản trị viên</td><td>admin</td><td>Admin</td><td class="center"><span class="badge green">Hoạt động</span></td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm">Đặt lại MK</button></div></td></tr>
+              <tr><td>2</td><td>Nguyễn Văn A</td><td>phucvu1</td><td>Phục vụ</td><td class="center"><span class="badge green">Hoạt động</span></td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm btn-danger">Khóa</button></div></td></tr>
+              <tr><td>4</td><td>Lê Văn C</td><td>thungan1</td><td>Thu ngân</td><td class="center"><span class="badge red">Đã khóa</span></td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm btn-success">Mở khóa</button></div></td></tr>
+              <tr><td>5</td><td>Phạm Thị D</td><td>kho1</td><td>Kho</td><td class="center"><span class="badge green">Hoạt động</span></td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm btn-danger">Khóa</button></div></td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thanh toán — Thu ngân (TN_BM2)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- TN_BM2 — Xử lý thanh toán (DFD §7.2.1, TN_QĐ1).
+     Chỉ thanh toán khi mọi món "Đã phục vụ"/"Đã hủy". VAT lấy từ hằng số (10%).
+     API: GET /thanh-toan/xem-truoc/:ma_order, POST /thanh-toan -->
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">🥩</span> Bò Né Mỹ Cảnh</div>
+    <nav>
+      <a href="tn-thanh-toan.html" class="active">💵 Thanh toán</a>
+      <a href="tn-hoa-don.html">🧾 Hóa đơn</a>
+      <a href="tn-bao-cao-doanh-thu.html">📊 Báo cáo doanh thu</a>
+    </nav>
+    <div class="foot">Thu ngân · ca chiều</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="page-title">Thanh toán</div>
+      <div class="user"><div class="avatar">C</div><div><div>Lê Văn C</div><div class="role">Thu ngân</div></div></div>
+    </header>
+
+    <div class="content">
+      <div class="split">
+
+        <!-- Chi tiết món của bàn -->
+        <section class="card">
+          <div class="card-head"><h2>Bàn B02 — Order #10</h2><span class="badge green">Đủ điều kiện thanh toán</span></div>
+          <div class="card-body">
+            <div class="table-scroll">
+            <table class="tbl">
+              <thead><tr><th>Món</th><th class="center">SL</th><th class="num">Đơn giá</th><th class="num">Thành tiền</th></tr></thead>
+              <tbody>
+                <tr><td>NÉ MC</td><td class="center">2</td><td class="num money">95.000</td><td class="num money">190.000</td></tr>
+                <tr><td>BÍT TẾT MC</td><td class="center">1</td><td class="num money">140.000</td><td class="num money">140.000</td></tr>
+                <tr><td>TRÀ ĐÁ</td><td class="center">2</td><td class="num money">3.000</td><td class="num money">6.000</td></tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Bảng tính tiền -->
+        <section class="card">
+          <div class="card-head"><h2>Thông tin thanh toán</h2></div>
+          <div class="card-body">
+            <div class="r-line" style="display:flex;justify-content:space-between;margin-bottom:8px"><span>Tổng tiền món</span><b class="money">336.000</b></div>
+            <div class="r-line" style="display:flex;justify-content:space-between;margin-bottom:8px"><span>Thuế VAT (10%)</span><b class="money">33.600</b></div>
+            <div class="r-line" style="display:flex;justify-content:space-between;font-size:17px;padding:10px 0;border-top:1px dashed #ccc;border-bottom:1px dashed #ccc;margin-bottom:14px"><span><b>Tổng thanh toán</b></span><b class="money">369.600</b></div>
+
+            <div class="field" style="margin-bottom:12px">
+              <label>Hình thức thanh toán</label>
+              <div class="radio-row">
+                <label><input type="radio" name="httt" checked> Tiền mặt</label>
+                <label><input type="radio" name="httt"> Chuyển khoản</label>
+              </div>
+            </div>
+            <div class="form-grid">
+              <div class="field"><label>Tiền khách đưa</label><input type="number" value="400000"></div>
+              <div class="field"><label>Tiền thừa</label><input type="number" value="30400" readonly></div>
+            </div>
+            <button class="btn btn-success btn-block btn-lg" style="margin-top:16px">Xác nhận thanh toán</button>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

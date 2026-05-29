@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Màn hình bếp — Bộ phận Bếp (B_BM2)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- B_BM2 — Kitchen display, cập nhật trạng thái món (DFD §7.3.2, B_QĐ1).
+     Trạng thái tuần tự: Chờ chế biến → Đang chế biến → Đã xong. FIFO theo giờ chốt. Poll 5–10s.
+     API: GET /order/bep/hang-cho?bo_phan=, PATCH /order/mon/:id/trang-thai -->
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">🥩</span> Bò Né Mỹ Cảnh</div>
+    <nav>
+      <a href="bep-kitchen-display.html" class="active">🔥 Hàng chờ chế biến</a>
+      <a href="bep-phieu-order.html">🧾 Phiếu order (in)</a>
+    </nav>
+    <div class="foot">Bếp · ca chiều</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="page-title">Màn hình bếp</div>
+      <div class="user"><div class="avatar">B</div><div><div>Trần Thị B</div><div class="role">Bếp</div></div></div>
+    </header>
+
+    <div class="content">
+      <div class="toolbar">
+        <div class="tabs" style="margin:0">
+          <span class="tab active">Tất cả</span>
+          <span class="tab">Chờ</span>
+          <span class="tab">Đang chế biến</span>
+        </div>
+      </div>
+
+      <div class="kds-grid">
+        <div class="kds-card cho">
+          <div class="kds-head"><span class="ban">Bàn B02</span><span class="time">⏱ 18:31</span></div>
+          <div class="kds-body">
+            <div class="kds-mon">NÉ MC × 2</div>
+            <div class="kds-meta">Ghi chú: ốp la</div>
+            <button class="btn btn-primary btn-block">Bắt đầu chế biến</button>
+          </div>
+        </div>
+        <div class="kds-card cho">
+          <div class="kds-head"><span class="ban">Bàn SV01</span><span class="time">⏱ 18:33</span></div>
+          <div class="kds-body">
+            <div class="kds-mon">PHỞ MC × 3</div>
+            <div class="kds-meta">Ghi chú: ít hành</div>
+            <button class="btn btn-primary btn-block">Bắt đầu chế biến</button>
+          </div>
+        </div>
+        <div class="kds-card dang">
+          <div class="kds-head"><span class="ban">Bàn B05</span><span class="time">⏱ 18:28</span></div>
+          <div class="kds-body">
+            <div class="kds-mon">BÍT TẾT ĐẶC BIỆT × 1</div>
+            <div class="kds-meta"><span class="badge amber">Đang chế biến</span></div>
+            <button class="btn btn-success btn-block">Hoàn thành (Đã xong)</button>
+          </div>
+        </div>
+        <div class="kds-card dang">
+          <div class="kds-head"><span class="ban">Bàn B02</span><span class="time">⏱ 18:31</span></div>
+          <div class="kds-body">
+            <div class="kds-mon">BÍT TẾT MC × 1</div>
+            <div class="kds-meta"><span class="badge amber">Đang chế biến</span></div>
+            <button class="btn btn-success btn-block">Hoàn thành (Đã xong)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

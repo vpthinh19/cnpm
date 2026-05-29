@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý thực đơn — Quản lý (QL_BM1)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- QL_BM1 — Quản lý thực đơn (DFD §7.5.1). Thêm/sửa/xóa món, đổi trạng thái, đơn giá.
+     API: GET/POST /mon-an, PUT /mon-an/:id, PATCH /mon-an/:id/trang-thai, DELETE /mon-an/:id -->
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">🥩</span> Bò Né Mỹ Cảnh</div>
+    <nav>
+      <a href="ql-thuc-don.html" class="active">🍽️ Thực đơn</a>
+      <a href="ql-ban.html">🪑 Bàn</a>
+      <a href="ql-tai-khoan.html">👤 Tài khoản</a>
+      <a href="ql-dashboard.html">📊 Dashboard</a>
+    </nav>
+    <div class="foot">Quản lý</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="page-title">Quản lý thực đơn</div>
+      <div class="user"><div class="avatar">Q</div><div><div>Quản trị viên</div><div class="role">Quản lý</div></div></div>
+    </header>
+
+    <div class="content">
+      <div class="card">
+        <div class="card-head"><h2>Danh sách món</h2><button class="btn btn-primary btn-sm">+ Thêm món</button></div>
+        <div class="card-body">
+          <div class="toolbar">
+            <div class="search"><input type="text" placeholder="Tìm theo tên / mã SP..."></div>
+            <select style="width:auto"><option>Tất cả loại</option><option>Món ăn</option><option>Đồ uống</option></select>
+            <select style="width:auto"><option>Mọi trạng thái</option><option>Còn hàng</option><option>Hết hàng</option></select>
+          </div>
+          <div class="table-scroll">
+          <table class="tbl">
+            <thead><tr><th>Mã SP</th><th>Tên món</th><th>Loại</th><th class="num">Đơn giá</th><th class="center">Trạng thái</th><th class="center">Thao tác</th></tr></thead>
+            <tbody>
+              <tr><td>SP000221</td><td>NÉ MC</td><td><span class="tag-loai">Món ăn</span></td><td class="num money">95.000</td><td class="center"><span class="badge green">Còn hàng</span></td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm btn-danger">Xóa</button></div></td></tr>
+              <tr><td>SP000205</td><td>BÍT TẾT MC</td><td><span class="tag-loai">Món ăn</span></td><td class="num money">140.000</td><td class="center"><span class="badge green">Còn hàng</span></td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm btn-danger">Xóa</button></div></td></tr>
+              <tr><td>SP000211</td><td>BÍT TẾT ĐẶC BIỆT</td><td><span class="tag-loai">Món ăn</span></td><td class="num money">228.000</td><td class="center"><span class="badge red">Hết hàng</span></td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm btn-danger">Xóa</button></div></td></tr>
+              <tr><td>SP000342</td><td>TRÀ ĐÁ</td><td><span class="tag-loai">Đồ uống</span></td><td class="num money">3.000</td><td class="center"><span class="badge green">Còn hàng</span></td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm btn-danger">Xóa</button></div></td></tr>
+              <tr><td>SP000325</td><td>ĐẬU NÀNH</td><td><span class="tag-loai">Đồ uống</span></td><td class="num money">20.000</td><td class="center"><span class="badge green">Còn hàng</span></td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm btn-danger">Xóa</button></div></td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

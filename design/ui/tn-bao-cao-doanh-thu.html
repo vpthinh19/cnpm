@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Báo cáo doanh thu — Thu ngân (TN_BM1)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- TN_BM1 — Lập báo cáo doanh thu (DFD §7.2.2). Chỉ đọc.
+     Tổng doanh thu = ∑ tổng thanh toán các HĐ trong kỳ.
+     API: GET /bao-cao/doanh-thu?tu_ngay=&den_ngay= -->
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">🥩</span> Bò Né Mỹ Cảnh</div>
+    <nav>
+      <a href="tn-thanh-toan.html">💵 Thanh toán</a>
+      <a href="tn-hoa-don.html">🧾 Hóa đơn</a>
+      <a href="tn-bao-cao-doanh-thu.html" class="active">📊 Báo cáo doanh thu</a>
+    </nav>
+    <div class="foot">Thu ngân · ca chiều</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="page-title">Báo cáo doanh thu</div>
+      <div class="user"><div class="avatar">C</div><div><div>Lê Văn C</div><div class="role">Thu ngân</div></div></div>
+    </header>
+
+    <div class="content">
+      <div class="card">
+        <div class="card-body">
+          <div class="toolbar">
+            <div class="field"><label>Từ ngày</label><input type="date" value="2026-05-01"></div>
+            <div class="field"><label>Đến ngày</label><input type="date" value="2026-05-29"></div>
+            <div class="spacer"></div>
+            <button class="btn btn-primary" style="align-self:end">Xem báo cáo</button>
+            <button class="btn" style="align-self:end">🖨️ In</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Kết quả — 01/05/2026 đến 29/05/2026</h2></div>
+        <div class="card-body">
+          <div class="table-scroll">
+          <table class="tbl">
+            <thead><tr><th>STT</th><th>Số hóa đơn</th><th>Ngày</th><th>Bàn</th><th class="num">Tổng tiền</th><th>Hình thức</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>HD20260529-00012</td><td>29/05/2026</td><td>B02</td><td class="num money">369.600</td><td>Tiền mặt</td></tr>
+              <tr><td>2</td><td>HD20260529-00011</td><td>29/05/2026</td><td>SV01</td><td class="num money">214.500</td><td>Chuyển khoản</td></tr>
+              <tr><td>3</td><td>HD20260529-00010</td><td>29/05/2026</td><td>B05</td><td class="num money">250.800</td><td>Tiền mặt</td></tr>
+            </tbody>
+            <tfoot>
+              <tr><td colspan="4" class="right"><b>Tổng doanh thu kỳ</b></td><td class="num money"><b>834.900</b></td><td></td></tr>
+            </tfoot>
+          </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

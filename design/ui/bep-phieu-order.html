@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phiếu order bếp — Bộ phận Bếp (B_BM1)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- B_BM1 — Nhận / in phiếu order bếp (DFD §7.3.1, tra cứu thuần - không ghi CSDL).
+     Danh sách phiếu "Chờ chế biến" theo FIFO; chọn để xem/in.
+     API: GET /order/bep/hang-cho (xem), GET /order/:id (chi tiết để in) -->
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">🥩</span> Bò Né Mỹ Cảnh</div>
+    <nav>
+      <a href="bep-kitchen-display.html">🔥 Hàng chờ chế biến</a>
+      <a href="bep-phieu-order.html" class="active">🧾 Phiếu order (in)</a>
+    </nav>
+    <div class="foot">Bếp · ca chiều</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="page-title">Phiếu order bếp</div>
+      <div class="user"><div class="avatar">B</div><div><div>Trần Thị B</div><div class="role">Bếp</div></div></div>
+    </header>
+
+    <div class="content">
+      <div class="split">
+        <!-- Danh sách phiếu chờ (FIFO) -->
+        <section class="card">
+          <div class="card-head"><h2>Phiếu đang chờ (FIFO)</h2></div>
+          <div class="card-body">
+            <div class="table-scroll">
+            <table class="tbl">
+              <thead><tr><th>Bàn</th><th>Order</th><th>Giờ chốt</th><th class="center">SL món</th><th></th></tr></thead>
+              <tbody>
+                <tr><td><b>B02</b></td><td>#10</td><td>18:31</td><td class="center">3</td><td><button class="btn btn-sm">Xem / In</button></td></tr>
+                <tr><td><b>SV01</b></td><td>#11</td><td>18:33</td><td class="center">2</td><td><button class="btn btn-sm">Xem / In</button></td></tr>
+                <tr><td><b>B05</b></td><td>#09</td><td>18:28</td><td class="center">1</td><td><button class="btn btn-sm">Xem / In</button></td></tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Xem trước phiếu để in -->
+        <section class="card">
+          <div class="card-head"><h2>Xem trước phiếu</h2><button class="btn btn-primary btn-sm">🖨️ In phiếu</button></div>
+          <div class="card-body">
+            <div class="print-stage">
+              <div class="receipt">
+                <div class="r-center"><h3>PHIẾU ORDER BẾP</h3><div class="r-sub">Bò Né Mỹ Cảnh</div></div>
+                <hr>
+                <div class="r-line"><span>Bàn:</span><b>B02</b></div>
+                <div class="r-line"><span>Giờ nhận:</span><span>18:31 29/05/2026</span></div>
+                <hr>
+                <table>
+                  <thead><tr><th>Món</th><th style="text-align:right">SL</th></tr></thead>
+                  <tbody>
+                    <tr><td>NÉ MC<br><span class="r-sub">ốp la</span></td><td class="num">2</td></tr>
+                    <tr><td>BÍT TẾT MC</td><td class="num">1</td></tr>
+                    <tr><td>CƠM BLL</td><td class="num">1</td></tr>
+                  </tbody>
+                </table>
+                <hr>
+                <div class="r-foot">Trạng thái: Chờ chế biến</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

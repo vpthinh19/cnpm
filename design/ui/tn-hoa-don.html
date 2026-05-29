@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hóa đơn — Thu ngân (TN_BM3)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- TN_BM3 — Xuất / in lại hóa đơn (DFD §7.2.3).
+     In lại tăng so_lan_in; lần ≥ 2 đánh dấu "BẢN SAO". Không sửa nội dung HĐ gốc.
+     Thông tin nhà hàng lấy từ constants.NHA_HANG.
+     API: GET /hoa-don, GET /hoa-don/:id, POST /hoa-don/:id/in -->
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">🥩</span> Bò Né Mỹ Cảnh</div>
+    <nav>
+      <a href="tn-thanh-toan.html">💵 Thanh toán</a>
+      <a href="tn-hoa-don.html" class="active">🧾 Hóa đơn</a>
+      <a href="tn-bao-cao-doanh-thu.html">📊 Báo cáo doanh thu</a>
+    </nav>
+    <div class="foot">Thu ngân · ca chiều</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="page-title">Hóa đơn</div>
+      <div class="user"><div class="avatar">C</div><div><div>Lê Văn C</div><div class="role">Thu ngân</div></div></div>
+    </header>
+
+    <div class="content">
+      <div class="split">
+
+        <!-- Danh sách hóa đơn -->
+        <section class="card">
+          <div class="card-head"><h2>Danh sách hóa đơn</h2></div>
+          <div class="card-body">
+            <div class="toolbar"><div class="search"><input type="text" placeholder="Tìm số HĐ / bàn..."></div></div>
+            <div class="table-scroll">
+            <table class="tbl">
+              <thead><tr><th>Số HĐ</th><th>Bàn</th><th>Giờ</th><th class="num">Tổng TT</th><th></th></tr></thead>
+              <tbody>
+                <tr><td>HD20260529-00012</td><td>B02</td><td>18:55</td><td class="num money">369.600</td><td><button class="btn btn-sm">Xem</button></td></tr>
+                <tr><td>HD20260529-00011</td><td>SV01</td><td>18:40</td><td class="num money">214.500</td><td><button class="btn btn-sm">Xem</button></td></tr>
+                <tr><td>HD20260529-00010</td><td>B05</td><td>18:20</td><td class="num money">250.800</td><td><button class="btn btn-sm">Xem</button></td></tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Xem trước hóa đơn -->
+        <section class="card">
+          <div class="card-head"><h2>Xem trước</h2><button class="btn btn-primary btn-sm">🖨️ In lại</button></div>
+          <div class="card-body">
+            <div class="print-stage">
+              <div class="receipt">
+                <div class="r-copy">— BẢN SAO —</div>
+                <div class="r-center"><h3>BÒ NÉ MỸ CẢNH</h3><div class="r-sub">... địa chỉ ...<br>ĐT: ... · MST: ...</div></div>
+                <hr>
+                <div class="r-center" style="font-weight:700;margin-bottom:6px">HÓA ĐƠN THANH TOÁN</div>
+                <div class="r-line"><span>Số HĐ:</span><span>HD20260529-00012</span></div>
+                <div class="r-line"><span>Bàn:</span><span>B02</span></div>
+                <div class="r-line"><span>Ngày:</span><span>18:55 29/05/2026</span></div>
+                <div class="r-line"><span>Thu ngân:</span><span>Lê Văn C</span></div>
+                <hr>
+                <table>
+                  <thead><tr><th>Món</th><th style="text-align:center">SL</th><th style="text-align:right">T.tiền</th></tr></thead>
+                  <tbody>
+                    <tr><td>NÉ MC</td><td style="text-align:center">2</td><td class="num">190.000</td></tr>
+                    <tr><td>BÍT TẾT MC</td><td style="text-align:center">1</td><td class="num">140.000</td></tr>
+                    <tr><td>TRÀ ĐÁ</td><td style="text-align:center">2</td><td class="num">6.000</td></tr>
+                  </tbody>
+                </table>
+                <hr>
+                <div class="r-line"><span>Tổng tiền món</span><span class="num">336.000</span></div>
+                <div class="r-line"><span>Thuế VAT (10%)</span><span class="num">33.600</span></div>
+                <div class="r-line r-total"><span>TỔNG TT</span><span class="num">369.600</span></div>
+                <div class="r-foot">Cảm ơn Quý khách! Hẹn gặp lại!</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

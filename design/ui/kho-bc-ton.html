@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Báo cáo tồn kho — Bộ phận Kho (K_BM3)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- K_BM3 — Báo cáo tồn kho (DFD §7.4.2). Chỉ đọc.
+     Tồn cuối = Tồn đầu + Nhập − Xuất.
+     API: GET /kho/bao-cao/ton?tu_ngay=&den_ngay= -->
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">🥩</span> Bò Né Mỹ Cảnh</div>
+    <nav>
+      <a href="kho-nhap.html">📥 Nhập kho</a>
+      <a href="kho-xuat.html">📤 Xuất kho</a>
+      <a href="kho-bc-ton.html" class="active">📦 Báo cáo tồn</a>
+      <a href="kho-bc-nhap.html">📈 Báo cáo nhập</a>
+      <a href="kho-bc-xuat.html">📉 Báo cáo xuất</a>
+    </nav>
+    <div class="foot">Kho · ca sáng</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="page-title">Báo cáo tồn kho</div>
+      <div class="user"><div class="avatar">D</div><div><div>Phạm Thị D</div><div class="role">Kho</div></div></div>
+    </header>
+
+    <div class="content">
+      <div class="card"><div class="card-body">
+        <div class="toolbar">
+          <div class="field"><label>Từ ngày</label><input type="date" value="2026-05-01"></div>
+          <div class="field"><label>Đến ngày</label><input type="date" value="2026-05-29"></div>
+          <div class="spacer"></div>
+          <button class="btn btn-primary" style="align-self:end">Xem báo cáo</button>
+          <button class="btn" style="align-self:end">🖨️ In</button>
+        </div>
+      </div></div>
+
+      <div class="card">
+        <div class="card-head"><h2>Tồn kho — 01/05 đến 29/05/2026</h2></div>
+        <div class="card-body">
+          <div class="table-scroll">
+          <table class="tbl">
+            <thead><tr><th>STT</th><th>Nguyên liệu</th><th>ĐVT</th><th class="num">Tồn đầu</th><th class="num">Nhập</th><th class="num">Xuất</th><th class="num">Tồn cuối</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Miếng bò né</td><td>kg</td><td class="num">25,000</td><td class="num">20,000</td><td class="num">15,000</td><td class="num">30,000</td></tr>
+              <tr><td>2</td><td>Pa tê</td><td>kg</td><td class="num">8,000</td><td class="num">10,000</td><td class="num">8,000</td><td class="num">10,000</td></tr>
+              <tr><td>3</td><td>Trứng</td><td>quả</td><td class="num">150,000</td><td class="num">200,000</td><td class="num">150,000</td><td class="num">200,000</td></tr>
+              <tr><td>4</td><td>Cà phê hạt</td><td>kg</td><td class="num">5,000</td><td class="num">2,000</td><td class="num">5,000</td><td class="num" style="color:var(--c-danger)">2,000</td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

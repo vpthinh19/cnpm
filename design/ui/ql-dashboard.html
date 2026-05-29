@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Quản lý (QL_BM4)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- QL_BM4 — Báo cáo tổng hợp / Dashboard (DFD §7.5.4). Chỉ đọc, cross-module.
+     3 phần: A doanh thu theo ngày, B top món bán chạy, C cảnh báo tồn ≤ định mức.
+     API: GET /bao-cao/tong-hop?tu_ngay=&den_ngay= -->
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">🥩</span> Bò Né Mỹ Cảnh</div>
+    <nav>
+      <a href="ql-thuc-don.html">🍽️ Thực đơn</a>
+      <a href="ql-ban.html">🪑 Bàn</a>
+      <a href="ql-tai-khoan.html">👤 Tài khoản</a>
+      <a href="ql-dashboard.html" class="active">📊 Dashboard</a>
+    </nav>
+    <div class="foot">Quản lý</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="page-title">Báo cáo tổng hợp</div>
+      <div class="user"><div class="avatar">Q</div><div><div>Quản trị viên</div><div class="role">Quản lý</div></div></div>
+    </header>
+
+    <div class="content">
+      <div class="card"><div class="card-body">
+        <div class="toolbar">
+          <div class="field"><label>Từ ngày</label><input type="date" value="2026-05-01"></div>
+          <div class="field"><label>Đến ngày</label><input type="date" value="2026-05-29"></div>
+          <div class="spacer"></div>
+          <button class="btn btn-primary" style="align-self:end">Xem</button>
+          <button class="btn" style="align-self:end">🖨️ In</button>
+        </div>
+      </div></div>
+
+      <!-- A. Doanh thu -->
+      <div class="card">
+        <div class="card-head"><h2>A. Doanh thu theo ngày</h2><b class="money">Tổng kỳ: 18.450.000 đ</b></div>
+        <div class="card-body">
+          <div class="table-scroll">
+          <table class="tbl">
+            <thead><tr><th>Ngày</th><th class="num">Số HĐ</th><th class="num">Tổng doanh thu</th><th class="num">Tiền mặt</th><th class="num">Chuyển khoản</th></tr></thead>
+            <tbody>
+              <tr><td>29/05/2026</td><td class="num">42</td><td class="num money">6.150.000</td><td class="num money">4.000.000</td><td class="num money">2.150.000</td></tr>
+              <tr><td>28/05/2026</td><td class="num">38</td><td class="num money">5.800.000</td><td class="num money">3.900.000</td><td class="num money">1.900.000</td></tr>
+              <tr><td>27/05/2026</td><td class="num">41</td><td class="num money">6.500.000</td><td class="num money">4.300.000</td><td class="num money">2.200.000</td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- B. Top món -->
+        <div class="card">
+          <div class="card-head"><h2>B. Top món bán chạy</h2></div>
+          <div class="card-body">
+            <div class="table-scroll">
+            <table class="tbl">
+              <thead><tr><th>#</th><th>Tên món</th><th class="num">SL bán</th><th class="num">Doanh thu</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>NÉ MC</td><td class="num">320</td><td class="num money">30.400.000</td></tr>
+                <tr><td>2</td><td>BÍT TẾT MC</td><td class="num">145</td><td class="num money">20.300.000</td></tr>
+                <tr><td>3</td><td>NÉ + PATE</td><td class="num">98</td><td class="num money">11.662.000</td></tr>
+                <tr><td>4</td><td>PHỞ MC</td><td class="num">76</td><td class="num money">4.940.000</td></tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- C. Cảnh báo tồn -->
+        <div class="card">
+          <div class="card-head"><h2>C. Cảnh báo tồn kho</h2></div>
+          <div class="card-body">
+            <div class="table-scroll">
+            <table class="tbl">
+              <thead><tr><th>Nguyên liệu</th><th>ĐVT</th><th class="num">Tồn</th><th class="num">Định mức</th></tr></thead>
+              <tbody>
+                <tr><td>Cà phê hạt</td><td>kg</td><td class="num" style="color:var(--c-danger)">2,000</td><td class="num">3,000</td></tr>
+                <tr><td>Hành phi</td><td>kg</td><td class="num" style="color:var(--c-danger)">0,400</td><td class="num">0,500</td></tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

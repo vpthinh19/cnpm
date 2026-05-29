@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý bàn — Quản lý (QL_BM2)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- QL_BM2 — Quản lý bàn (DFD §7.5.2). Thêm/sửa/xóa bàn; xóa khi bàn "Trống".
+     API: GET/POST /ban, PUT /ban/:id, DELETE /ban/:id -->
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">🥩</span> Bò Né Mỹ Cảnh</div>
+    <nav>
+      <a href="ql-thuc-don.html">🍽️ Thực đơn</a>
+      <a href="ql-ban.html" class="active">🪑 Bàn</a>
+      <a href="ql-tai-khoan.html">👤 Tài khoản</a>
+      <a href="ql-dashboard.html">📊 Dashboard</a>
+    </nav>
+    <div class="foot">Quản lý</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="page-title">Quản lý bàn</div>
+      <div class="user"><div class="avatar">Q</div><div><div>Quản trị viên</div><div class="role">Quản lý</div></div></div>
+    </header>
+
+    <div class="content">
+      <div class="card">
+        <div class="card-head"><h2>Danh sách bàn</h2><button class="btn btn-primary btn-sm">+ Thêm bàn</button></div>
+        <div class="card-body">
+          <div class="toolbar">
+            <select style="width:auto"><option>Tất cả khu vực</option><option>Tầng 1</option><option>Tầng 2</option><option>Sân vườn</option></select>
+            <select style="width:auto"><option>Mọi trạng thái</option><option>Trống</option><option>Có khách</option><option>Đã đặt</option></select>
+          </div>
+          <div class="table-scroll">
+          <table class="tbl">
+            <thead><tr><th>Số bàn</th><th>Khu vực</th><th class="center">Sức chứa</th><th class="center">Trạng thái</th><th>Ghi chú</th><th class="center">Thao tác</th></tr></thead>
+            <tbody>
+              <tr><td>B01</td><td>Tầng 1</td><td class="center">4</td><td class="center"><span class="badge gray">Trống</span></td><td class="muted">—</td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm btn-danger">Xóa</button></div></td></tr>
+              <tr><td>B02</td><td>Tầng 1</td><td class="center">6</td><td class="center"><span class="badge green">Có khách</span></td><td class="muted">—</td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm btn-danger" disabled>Xóa</button></div></td></tr>
+              <tr><td>SV01</td><td>Sân vườn</td><td class="center">8</td><td class="center"><span class="badge blue">Đã đặt</span></td><td class="muted">Gần cây</td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm btn-danger" disabled>Xóa</button></div></td></tr>
+              <tr><td>VIP01</td><td>Phòng VIP</td><td class="center">10</td><td class="center"><span class="badge gray">Trống</span></td><td class="muted">—</td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm btn-danger">Xóa</button></div></td></tr>
+            </tbody>
+          </table>
+          </div>
+          <p class="muted" style="font-size:12.5px;margin:10px 0 0">Chỉ xóa được bàn đang "Trống". Bàn có khách / đã đặt → nút Xóa bị khóa.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
