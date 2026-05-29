@@ -1,4 +1,4 @@
-**HỆ THỐNG QUẢN LÝ NHÀ HÀNG**
+**HỆ THỐNG QUẢN LÝ NHÀ HÀNG BÒ NÉ MỸ CẢNH**
 **ĐẶC TẢ VÀ PHÂN TÍCH YÊU CẦU**
 
 # 1. ĐẶC TẢ VÀ PHÂN TÍCH YÊU CẦU {#đặc-tả-và-phân-tích-yêu-cầu}
