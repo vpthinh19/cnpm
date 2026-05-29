@@ -40,9 +40,9 @@
 
 | Hạng mục | Quy ước | Ví dụ |
 |---|---|---|
-| Bảng CSDL | PascalCase tiếng Việt không dấu | `NguoiDung`, `PhieuDatBan`, `ChiTietOrder` |
-| Cột CSDL | snake_case tiếng Việt không dấu | `ten_dang_nhap`, `tong_thanh_toan` |
-| Khóa chính | `ma_<viết_tắt_thực_thể>` | `ma_nguoi_dung`, `ma_dat_ban`, `ma_order` |
+| Bảng CSDL | PascalCase tiếng Việt không dấu | `Ban`, `PhieuDatBan`, `ChiTietOrder` |
+| Cột CSDL | snake_case tiếng Việt không dấu | `ten_khach`, `tong_thanh_toan` |
+| Khóa chính | `ma_<viết_tắt_thực_thể>` | `ma_ban`, `ma_dat_ban`, `ma_order` |
 | Khóa ngoại | Cùng tên với khóa chính được tham chiếu | `ma_ban` ở `PhieuDatBan` trỏ về `Ban.ma_ban` |
 | Trường thời gian | `thoi_gian_<sự_kiện>` | `thoi_gian_tao`, `thoi_gian_xong` |
 | Trường boolean | `dang_<trạng_thái>` | `dang_su_dung` |
@@ -51,6 +51,11 @@
 | Trường JSON request/response | snake_case TV không dấu, đồng nhất cột DB | `{"ten_khach": "Nguyen Van A"}` |
 | Hàm xử lý (pseudocode) | PascalCase TV không dấu | `XuLyDatBan(...)`, `XuLyThanhToan(...)` |
 | Biến cục bộ (pseudocode) | camelCase TV không dấu | `danhSachBanTrong`, `tongTienMon` |
+
+**Ngoại lệ — thực thể hệ thống dùng tiếng Anh:** Hai thực thể thuần hệ thống (không phải nghiệp vụ nhà hàng) là **`User`** (tài khoản) và **`Role`** (phân quyền) dùng **tiếng Anh** cho bảng, cột, endpoint và trường JSON, vì rõ nghĩa hơn (vd `/auth/login`, `/users`, `user_id`, `password_hash`). Mọi thực thể nghiệp vụ còn lại giữ tiếng Việt như bảng trên.
+
+- **Giá trị enum** của `User`/`Role` vẫn giữ tiếng Việt để đồng nhất dữ liệu (vai trò `Admin`/`PhucVu`/`Bep`/`ThuNgan`/`Kho`; trạng thái `HoatDong`/`DaKhoa`).
+- **Ngoại lệ FK giáp ranh:** 6 cột khóa ngoại nằm trong bảng nghiệp vụ (TV) nhưng trỏ tới `User.user_id` giữ tên tiếng Việt (`nv_tiep_nhan`, `nv_phuc_vu`, `nv_phuc_vu_xac_nhan`, `nv_thu_ngan`, `nv_lap`) — chúng là trường của bảng nghiệp vụ. Đây là ngoại lệ có chủ đích của quy tắc "khóa ngoại cùng tên với khóa chính".
 
 ## 1.3. Quy ước trạng thái và mã liệt kê
 
@@ -61,8 +66,8 @@
 | **Dòng món** (`ChiTietOrder.trang_thai`) | `ChuaChot` / `ChoCheBien` / `DangCheBien` / `DaXong` / `DaPhucVu` / `DaHuy` | — |
 | **Phiếu order** (`PhieuOrder.trang_thai`) | `DangPhucVu` / `DaThanhToan` / `DaHuy` | — |
 | **Hình thức thanh toán** (`HoaDon.hinh_thuc_tt`) | `TienMat` / `ChuyenKhoan` | — |
-| **Tài khoản** (`NguoiDung.trang_thai`) | `HoatDong` / `DaKhoa` | — |
-| **Vai trò** (`VaiTro.ma_vai_tro`) | `Admin` / `PhucVu` / `Bep` / `ThuNgan` / `Kho` | — |
+| **Tài khoản** (`User.status`) | `HoatDong` / `DaKhoa` | — |
+| **Vai trò** (`Role.role_id`) | `Admin` / `PhucVu` / `Bep` / `ThuNgan` / `Kho` | — |
 | **Loại món** (`MonAn.loai_mon`) | `MonAn` / `DoUong` | Cũng chính là bộ phận xử lý (Món ăn → Bếp; Đồ uống → Quầy pha chế) |
 | **Trạng thái món** (`MonAn.trang_thai`) | `ConHang` / `HetHang` | — |
 | **Bộ phận nhận xuất kho** (`PhieuXuatKho.bo_phan_nhan`) | `Bep` / `QuayPhaChe` | — |
@@ -73,7 +78,7 @@ Hệ thống chia thành **8 module gần như độc lập**. Mỗi module có 
 
 | Module | Vai trò chính | Bảng sở hữu (R/W) | Bảng đọc từ module khác | Endpoint prefix |
 |---|---|---|---|---|
-| **M1. Xác thực + Tài khoản** | Đăng nhập/đăng xuất, quản lý tài khoản, middleware kiểm tra quyền | `VaiTro` (R), `NguoiDung` (R/W) | (không) | `/auth/*`, `/nguoi-dung/*` |
+| **M1. Xác thực + Tài khoản** | Đăng nhập/đăng xuất, quản lý tài khoản, middleware kiểm tra quyền | `Role` (R), `User` (R/W) | (không) | `/auth/*`, `/users/*` |
 | **M2. Quản lý bàn** | CRUD bàn | `Ban` (R/W) | (không) | `/ban/*` |
 | **M3. Thực đơn** | CRUD món | `MonAn` (R/W) | (không) | `/mon-an/*` |
 | **M4. Đặt bàn** | Tạo, hủy, đánh dấu nhận bàn | `PhieuDatBan` (R/W) | `Ban` (R/W trạng thái) | `/dat-ban/*` |
@@ -97,13 +102,13 @@ Hệ thống chia thành **8 module gần như độc lập**. Mỗi module có 
 
 ```mermaid
 erDiagram
-    VaiTro       ||--o{ NguoiDung      : "co"
-    NguoiDung    ||--o{ PhieuDatBan    : "tiep_nhan"
-    NguoiDung    ||--o{ PhieuOrder     : "phuc_vu"
-    NguoiDung    ||--o{ ChiTietOrder   : "xac_nhan_phuc_vu"
-    NguoiDung    ||--o{ HoaDon         : "thu_ngan"
-    NguoiDung    ||--o{ PhieuNhapKho   : "lap"
-    NguoiDung    ||--o{ PhieuXuatKho   : "lap"
+    Role         ||--o{ User           : "co"
+    User         ||--o{ PhieuDatBan    : "tiep_nhan"
+    User         ||--o{ PhieuOrder     : "phuc_vu"
+    User         ||--o{ ChiTietOrder   : "xac_nhan_phuc_vu"
+    User         ||--o{ HoaDon         : "thu_ngan"
+    User         ||--o{ PhieuNhapKho   : "lap"
+    User         ||--o{ PhieuXuatKho   : "lap"
 
     Ban          ||--o{ PhieuDatBan    : "duoc_dat"
     Ban          ||--o{ PhieuOrder     : "co_order"
@@ -122,8 +127,8 @@ erDiagram
 
 | # | Tên bảng | Module | Vai trò chính | DFD tham chiếu |
 |---|---|---|---|---|
-| 1 | `VaiTro` | M1 | Danh mục 5 vai trò người dùng | §7.5.3, §7.6.1 |
-| 2 | `NguoiDung` | M1 | Tài khoản nhân viên | §7.5.3, §7.6.1 |
+| 1 | `Role` | M1 | Danh mục 5 vai trò người dùng | §7.5.3, §7.6.1 |
+| 2 | `User` | M1 | Tài khoản nhân viên | §7.5.3, §7.6.1 |
 | 3 | `Ban` | M2 | Danh sách bàn ăn | §7.1.x, §7.5.2 |
 | 4 | `MonAn` | M3 | Thực đơn | §7.1.2, §7.5.1 |
 | 5 | `PhieuDatBan` | M4 | Phiếu đặt bàn | §7.1.1 |
@@ -141,32 +146,34 @@ erDiagram
 
 ## 2.3. Chi tiết từng bảng
 
-### 2.3.1. `VaiTro`
+### 2.3.1. `Role` (thực thể hệ thống — tên tiếng Anh)
 
 | Tên trường | Kiểu dữ liệu | Ràng buộc | Mô tả |
 |---|---|---|---|
-| `ma_vai_tro` | NVARCHAR(10) | **PK** | `Admin` / `PhucVu` / `Bep` / `ThuNgan` / `Kho` |
-| `ten_vai_tro` | NVARCHAR(50) | NOT NULL | Tên hiển thị (Vd "Quản lý") |
-| `mo_ta` | NVARCHAR(200) | NULL | Mô tả vai trò |
+| `role_id` | NVARCHAR(10) | **PK** | `Admin` / `PhucVu` / `Bep` / `ThuNgan` / `Kho` (giá trị giữ TV) |
+| `role_name` | NVARCHAR(50) | NOT NULL | Tên hiển thị (Vd "Quản lý") |
+| `description` | NVARCHAR(200) | NULL | Mô tả vai trò |
 
 Bảng tĩnh, 5 dòng, seed sẵn.
 
-### 2.3.2. `NguoiDung`
+### 2.3.2. `User` (thực thể hệ thống — tên tiếng Anh)
 
 | Tên trường | Kiểu dữ liệu | Ràng buộc | Mô tả |
 |---|---|---|---|
-| `ma_nguoi_dung` | INT IDENTITY(1,1) | **PK** | Mã NV tự sinh |
-| `ten_dang_nhap` | NVARCHAR(50) | UNIQUE, NOT NULL | Tên đăng nhập (không dấu, không khoảng trắng) |
-| `mat_khau_hash` | NVARCHAR(255) | NOT NULL | Hash bcrypt mật khẩu |
-| `ho_ten` | NVARCHAR(100) | NOT NULL | Họ và tên NV |
-| `ma_vai_tro` | NVARCHAR(10) | FK → `VaiTro.ma_vai_tro`, NOT NULL | Vai trò gắn |
-| `trang_thai` | NVARCHAR(20) | NOT NULL, CHECK IN (`'HoatDong'`,`'DaKhoa'`), DEFAULT `'HoatDong'` | |
-| `so_lan_sai_lien_tiep` | TINYINT | NOT NULL, DEFAULT 0 | Tăng khi sai; reset khi đúng; ≥ 5 → khóa |
-| `thoi_gian_dang_nhap_cuoi` | DATETIME2 | NULL | Lúc đăng nhập thành công gần nhất |
-| `thoi_gian_tao` | DATETIME2 | NOT NULL, DEFAULT SYSDATETIME() | |
-| `thoi_gian_cap_nhat` | DATETIME2 | NULL | |
+| `user_id` | INT IDENTITY(1,1) | **PK** | Mã NV tự sinh |
+| `username` | NVARCHAR(50) | UNIQUE, NOT NULL | Tên đăng nhập (không dấu, không khoảng trắng) |
+| `password_hash` | NVARCHAR(255) | NOT NULL | Hash bcrypt mật khẩu |
+| `full_name` | NVARCHAR(100) | NOT NULL | Họ và tên NV |
+| `role_id` | NVARCHAR(10) | FK → `Role.role_id`, NOT NULL | Vai trò gắn |
+| `status` | NVARCHAR(20) | NOT NULL, CHECK IN (`'HoatDong'`,`'DaKhoa'`), DEFAULT `'HoatDong'` | Giá trị giữ TV |
+| `failed_login_count` | TINYINT | NOT NULL, DEFAULT 0 | Tăng khi sai; reset khi đúng; ≥ 5 → khóa |
+| `last_login_at` | DATETIME2 | NULL | Lúc đăng nhập thành công gần nhất |
+| `created_at` | DATETIME2 | NOT NULL, DEFAULT SYSDATETIME() | |
+| `updated_at` | DATETIME2 | NULL | |
 
-**Index:** `IX_NguoiDung_vaitro (ma_vai_tro)`.
+**Index:** `IX_User_role (role_id)`.
+
+> `User` là từ khóa SQL Server → trong câu lệnh SQL phải bao `[User]` (xem seed §2.5).
 
 ### 2.3.3. `Ban`
 
@@ -204,7 +211,7 @@ Bảng tĩnh, 5 dòng, seed sẵn.
 | `thoi_gian_dat` | DATETIME2 | NOT NULL | Khung giờ khách hẹn |
 | `hinh_thuc_dat` | NVARCHAR(20) | NOT NULL, CHECK IN (`'TrucTiep'`,`'QuaDienThoai'`) | |
 | `ghi_chu` | NVARCHAR(500) | NULL | |
-| `nv_tiep_nhan` | INT | FK → `NguoiDung.ma_nguoi_dung`, NOT NULL | |
+| `nv_tiep_nhan` | INT | FK → `User.user_id`, NOT NULL | |
 | `trang_thai` | NVARCHAR(20) | NOT NULL, CHECK IN (`'DaDat'`,`'DaNhanBan'`,`'DaHuy'`), DEFAULT `'DaDat'` | |
 | `thoi_gian_tao` | DATETIME2 | NOT NULL, DEFAULT SYSDATETIME() | |
 | `thoi_gian_nhan_ban` | DATETIME2 | NULL | Lúc Phục vụ bấm "Đã nhận bàn" |
@@ -218,7 +225,7 @@ Bảng tĩnh, 5 dòng, seed sẵn.
 |---|---|---|---|
 | `ma_order` | INT IDENTITY(1,1) | **PK** | |
 | `ma_ban` | INT | FK → `Ban.ma_ban`, NOT NULL | |
-| `nv_phuc_vu` | INT | FK → `NguoiDung.ma_nguoi_dung`, NOT NULL | NV mở order |
+| `nv_phuc_vu` | INT | FK → `User.user_id`, NOT NULL | NV mở order |
 | `thoi_gian_tao` | DATETIME2 | NOT NULL, DEFAULT SYSDATETIME() | |
 | `trang_thai` | NVARCHAR(20) | NOT NULL, CHECK IN (`'DangPhucVu'`,`'DaThanhToan'`,`'DaHuy'`), DEFAULT `'DangPhucVu'` | |
 | `tong_tam_tinh` | DECIMAL(15,0) | NOT NULL, DEFAULT 0 | Cập nhật khi thêm/sửa/hủy dòng |
@@ -241,7 +248,7 @@ Bảng tĩnh, 5 dòng, seed sẵn.
 | `thoi_gian_chot` | DATETIME2 | NULL | Lúc chuyển `ChuaChot` → `ChoCheBien` (chốt sang bếp) |
 | `thoi_gian_xong` | DATETIME2 | NULL | Lúc chuyển → `DaXong` |
 | `thoi_gian_phuc_vu` | DATETIME2 | NULL | Lúc chuyển → `DaPhucVu` |
-| `nv_phuc_vu_xac_nhan` | INT | FK → `NguoiDung.ma_nguoi_dung`, NULL | NV xác nhận đã đem ra bàn |
+| `nv_phuc_vu_xac_nhan` | INT | FK → `User.user_id`, NULL | NV xác nhận đã đem ra bàn |
 
 **Index:**
 - `IX_ChiTietOrder_order (ma_order)`
@@ -263,7 +270,7 @@ ORDER BY ct.thoi_gian_chot;
 | `so_hoa_don` | NVARCHAR(20) | UNIQUE, NOT NULL | Vd `HD20260529-00001` (sinh ở service) |
 | `ma_order` | INT | FK → `PhieuOrder.ma_order`, UNIQUE, NOT NULL | 1 order ↔ 1 hóa đơn |
 | `so_ban_snapshot` | NVARCHAR(10) | NOT NULL | Snapshot `Ban.so_ban` |
-| `nv_thu_ngan` | INT | FK → `NguoiDung.ma_nguoi_dung`, NOT NULL | |
+| `nv_thu_ngan` | INT | FK → `User.user_id`, NOT NULL | |
 | `tong_tien_mon` | DECIMAL(15,0) | NOT NULL | ∑(SL × đơn giá) |
 | `ty_le_vat` | DECIMAL(5,4) | NOT NULL, DEFAULT 0.1 | Snapshot (mặc định 0.1 = 10%) |
 | `tien_vat` | DECIMAL(15,0) | NOT NULL, DEFAULT 0 | ROUND(`tong_tien_mon * ty_le_vat`, 0) |
@@ -305,7 +312,7 @@ ORDER BY ct.thoi_gian_chot;
 | `ma_phieu_nhap` | INT IDENTITY(1,1) | **PK** | |
 | `so_phieu` | NVARCHAR(20) | UNIQUE, NOT NULL | Vd `PN20260529-001` |
 | `ma_ncc` | INT | FK → `NhaCungCap.ma_ncc`, NOT NULL | |
-| `nv_lap` | INT | FK → `NguoiDung.ma_nguoi_dung`, NOT NULL | |
+| `nv_lap` | INT | FK → `User.user_id`, NOT NULL | |
 | `ngay_nhap` | DATE | NOT NULL | |
 | `tong_gia_tri` | DECIMAL(15,0) | NOT NULL | ∑(SL × đơn giá) |
 | `ghi_chu` | NVARCHAR(500) | NULL | |
@@ -332,7 +339,7 @@ ORDER BY ct.thoi_gian_chot;
 | `ma_phieu_xuat` | INT IDENTITY(1,1) | **PK** | |
 | `so_phieu` | NVARCHAR(20) | UNIQUE, NOT NULL | Vd `PX20260529-001` |
 | `bo_phan_nhan` | NVARCHAR(20) | NOT NULL, CHECK IN (`'Bep'`,`'QuayPhaChe'`) | |
-| `nv_lap` | INT | FK → `NguoiDung.ma_nguoi_dung`, NOT NULL | |
+| `nv_lap` | INT | FK → `User.user_id`, NOT NULL | |
 | `ngay_xuat` | DATE | NOT NULL | |
 | `tong_gia_tri` | DECIMAL(15,0) | NOT NULL | |
 | `ghi_chu` | NVARCHAR(500) | NULL | |
@@ -362,22 +369,22 @@ ORDER BY ct.thoi_gian_chot;
 | 4 | Chỉ cho thanh toán `PhieuOrder` khi mọi `ChiTietOrder.trang_thai IN ('DaPhucVu','DaHuy')` | M6 | SQL check trước INSERT `HoaDon` |
 | 5 | Chuyển trạng thái `ChiTietOrder` tuần tự (`ChoCheBien → DangCheBien → DaXong → DaPhucVu`), không bỏ bước | M5 | State machine ở tầng service |
 | 6 | Cập nhật `NguyenLieu.ton_hien_tai` và INSERT phiếu kho trong CÙNG transaction | M7 | `BEGIN TRAN` … `COMMIT` |
-| 7 | Khóa tài khoản khi `so_lan_sai_lien_tiep ≥ 5` | M1 | Sau mỗi lần sai |
+| 7 | Khóa tài khoản khi `User.failed_login_count ≥ 5` | M1 | Sau mỗi lần sai |
 | 8 | Đặt bàn / nhận bàn / thanh toán: đồng bộ `Ban.trang_thai` trong cùng transaction với phiếu | M2 (cross-call) | Hàm dùng chung |
 
 ## 2.5. Dữ liệu seed mẫu
 
 ```sql
--- 1. VaiTro (cố định)
-INSERT INTO VaiTro (ma_vai_tro, ten_vai_tro, mo_ta) VALUES
+-- 1. Role (cố định)
+INSERT INTO Role (role_id, role_name, description) VALUES
 ('Admin',   N'Quản lý',       N'Quản lý toàn hệ thống'),
 ('PhucVu',  N'Phục vụ',       N'Tiếp nhận đặt bàn, gọi món, phục vụ'),
 ('Bep',     N'Bộ phận Bếp',   N'Chế biến món ăn / đồ uống'),
 ('ThuNgan', N'Thu ngân',      N'Thanh toán, xuất hóa đơn'),
 ('Kho',     N'Bộ phận Kho',   N'Nhập / xuất / báo cáo kho');
 
--- 2. NguoiDung (mật khẩu mặc định = 'matkhau123', đã hash bcrypt cost 10)
-INSERT INTO NguoiDung (ten_dang_nhap, mat_khau_hash, ho_ten, ma_vai_tro) VALUES
+-- 2. User (mật khẩu mặc định = 'matkhau123', đã hash bcrypt cost 10)
+INSERT INTO [User] (username, password_hash, full_name, role_id) VALUES
 ('admin',    '$2b$10$EXAMPLEHASHADMIN........................', N'Quản trị viên', 'Admin'),
 ('phucvu1',  '$2b$10$EXAMPLEHASHPHUCVU.......................', N'Nguyễn Văn A',   'PhucVu'),
 ('bep1',     '$2b$10$EXAMPLEHASHBEP..........................', N'Trần Thị B',     'Bep'),
@@ -459,9 +466,9 @@ module.exports = {
 
 ## 4.0. Quy ước chung cho mọi API
 
-**Prefix:** mọi endpoint nằm dưới `/api/v1`. Ví dụ `/api/v1/auth/dang-nhap`. Bên dưới viết tắt bỏ prefix.
+**Prefix:** mọi endpoint nằm dưới `/api/v1`. Ví dụ `/api/v1/auth/login`. Bên dưới viết tắt bỏ prefix.
 
-**Xác thực:** trừ `POST /auth/dang-nhap`, mọi endpoint yêu cầu header `Authorization: Bearer <JWT>`. Middleware `xacThuc` giải mã token, kiểm tra `NguoiDung.trang_thai = 'HoatDong'` mỗi request (cơ chế thu hồi sớm, xem §7.6.1 ghi chú). Middleware `phanQuyen(...vaiTro)` chặn vai trò không hợp lệ.
+**Xác thực:** trừ `POST /auth/login`, mọi endpoint yêu cầu header `Authorization: Bearer <JWT>`. Middleware `authenticate` giải mã token, kiểm tra `User.status = 'HoatDong'` mỗi request (cơ chế thu hồi sớm, xem §7.6.1 ghi chú). Middleware `authorize(...roles)` chặn vai trò không hợp lệ. (Hai middleware này thuộc thực thể hệ thống nên đặt tên tiếng Anh; các hàm nghiệp vụ vẫn PascalCase TV như `CapNhatTrangThaiBan`.)
 
 **Định dạng response (envelope thống nhất):**
 ```jsonc
@@ -502,27 +509,27 @@ module.exports = {
 
 ## 4.1. Module M1 — Xác thực + Tài khoản
 
-Base: `/auth/*`, `/nguoi-dung/*`. Bảng: `NguoiDung` (R/W), `VaiTro` (R). DFD: §7.6.1 (đăng nhập), §7.5.3 (quản lý tài khoản).
+Base: `/auth/*`, `/users/*`. Bảng: `User` (R/W), `Role` (R). DFD: §7.6.1 (đăng nhập), §7.5.3 (quản lý tài khoản). Đây là thực thể hệ thống → endpoint, trường JSON dùng **tiếng Anh** (giá trị enum vai trò/trạng thái giữ TV).
 
 ### 4.1.1. Đăng nhập / Đăng xuất (DFD §7.6.1)
 
 | Method | Endpoint | Vai trò | Mô tả |
 |---|---|---|---|
-| POST | `/auth/dang-nhap` | Công khai | Đăng nhập, trả JWT |
-| GET | `/auth/toi` | Mọi vai trò | Lấy thông tin user hiện tại từ token |
-| POST | `/auth/dang-xuat` | Mọi vai trò | Vô hiệu phía client (xóa token). Server stateless, chỉ trả 200 |
+| POST | `/auth/login` | Công khai | Đăng nhập, trả JWT |
+| GET | `/auth/me` | Mọi vai trò | Lấy thông tin user hiện tại từ token |
+| POST | `/auth/logout` | Mọi vai trò | Vô hiệu phía client (xóa token). Server stateless, chỉ trả 200 |
 
-**`POST /auth/dang-nhap`** — Request:
+**`POST /auth/login`** — Request:
 ```json
-{ "ten_dang_nhap": "phucvu1", "mat_khau": "matkhau123" }
+{ "username": "phucvu1", "password": "matkhau123" }
 ```
-Xử lý (theo §7.6.1 Bước 2–6): tìm user theo `ten_dang_nhap`; nếu không tồn tại / `trang_thai='DaKhoa'` → `401`. So khớp bcrypt; sai → `so_lan_sai_lien_tiep++`, nếu ≥ `SO_LAN_SAI_TOI_DA` thì khóa, trả `401`. Đúng → reset số lần sai, cập nhật `thoi_gian_dang_nhap_cuoi`, ký JWT (payload `ma_nguoi_dung`, `ma_vai_tro`; hạn `now + PHIEN_DANG_NHAP_PHUT` phút).
+Xử lý (theo §7.6.1 Bước 2–6): tìm user theo `username`; nếu không tồn tại / `status='DaKhoa'` → `401`. So khớp bcrypt; sai → `failed_login_count++`, nếu ≥ `SO_LAN_SAI_TOI_DA` thì khóa, trả `401`. Đúng → reset số lần sai, cập nhật `last_login_at`, ký JWT (payload `user_id`, `role_id`; hạn `now + PHIEN_DANG_NHAP_PHUT` phút).
 
 Response `200`:
 ```json
 { "success": true, "data": {
   "token": "<JWT>",
-  "nguoi_dung": { "ma_nguoi_dung": 2, "ho_ten": "Nguyễn Văn A", "ten_dang_nhap": "phucvu1", "ma_vai_tro": "PhucVu" }
+  "user": { "user_id": 2, "full_name": "Nguyễn Văn A", "username": "phucvu1", "role_id": "PhucVu" }
 }}
 ```
 Lỗi: sai tài khoản/mật khẩu → `401 UNAUTHORIZED` ("Tên đăng nhập hoặc mật khẩu không đúng"); bị khóa → `401 UNAUTHORIZED` ("Tài khoản đã bị khóa, liên hệ Admin").
@@ -533,23 +540,23 @@ Tất cả yêu cầu vai trò **Admin**. Tuân QL_QĐ1.
 
 | Method | Endpoint | Mô tả |
 |---|---|---|
-| GET | `/nguoi-dung` | Danh sách tài khoản. Query lọc: `?vai_tro=&trang_thai=&tu_khoa=` (tìm theo họ tên/tên đăng nhập) |
-| GET | `/nguoi-dung/:id` | Chi tiết 1 tài khoản (không trả `mat_khau_hash`) |
-| POST | `/nguoi-dung` | Tạo tài khoản mới |
-| PUT | `/nguoi-dung/:id` | Sửa họ tên / vai trò |
-| PATCH | `/nguoi-dung/:id/khoa` | Khóa (`trang_thai='DaKhoa'`) |
-| PATCH | `/nguoi-dung/:id/mo-khoa` | Mở khóa (`HoatDong`, reset `so_lan_sai_lien_tiep=0`) |
-| PATCH | `/nguoi-dung/:id/dat-lai-mat-khau` | Đặt lại mật khẩu |
+| GET | `/users` | Danh sách tài khoản. Query lọc: `?role_id=&status=&q=` (`q` tìm theo họ tên/tên đăng nhập) |
+| GET | `/users/:id` | Chi tiết 1 tài khoản (không trả `password_hash`) |
+| POST | `/users` | Tạo tài khoản mới |
+| PUT | `/users/:id` | Sửa họ tên / vai trò |
+| PATCH | `/users/:id/lock` | Khóa (`status='DaKhoa'`) |
+| PATCH | `/users/:id/unlock` | Mở khóa (`status='HoatDong'`, reset `failed_login_count=0`) |
+| PATCH | `/users/:id/reset-password` | Đặt lại mật khẩu |
 
-**`POST /nguoi-dung`** — Request:
+**`POST /users`** — Request:
 ```json
-{ "ten_dang_nhap": "phucvu2", "mat_khau": "matkhau123", "ho_ten": "Trần Văn E", "ma_vai_tro": "PhucVu" }
+{ "username": "phucvu2", "password": "matkhau123", "full_name": "Trần Văn E", "role_id": "PhucVu" }
 ```
-Kiểm tra (QL_QĐ1, §7.5.3 Bước 4): `ten_dang_nhap` không trùng (→ `409 DUPLICATE`); `mat_khau` ≥ 8 ký tự, có cả chữ và số (→ `400 RULE_VIOLATION`); `ma_vai_tro` ∈ 5 vai trò. Băm bcrypt cost 10 trước khi lưu. Trả `201` bản ghi (ẩn hash).
+Kiểm tra (QL_QĐ1, §7.5.3 Bước 4): `username` không trùng (→ `409 DUPLICATE`); `password` ≥ 8 ký tự, có cả chữ và số (→ `400 RULE_VIOLATION`); `role_id` ∈ 5 vai trò. Băm bcrypt cost 10 trước khi lưu. Trả `201` bản ghi (ẩn hash).
 
-**`PATCH /nguoi-dung/:id/khoa`** — chặn Admin tự khóa chính mình (`id === token.ma_nguoi_dung` → `400 RULE_VIOLATION`).
+**`PATCH /users/:id/lock`** — chặn Admin tự khóa chính mình (`id === token.user_id` → `400 RULE_VIOLATION`).
 
-**`PATCH /nguoi-dung/:id/dat-lai-mat-khau`** — Request `{ "mat_khau_moi": "..." }`, cùng quy tắc độ mạnh; băm và lưu, reset `so_lan_sai_lien_tiep=0`.
+**`PATCH /users/:id/reset-password`** — Request `{ "new_password": "..." }`, cùng quy tắc độ mạnh; băm và lưu, reset `failed_login_count=0`.
 
 > Không có endpoint tự đổi mật khẩu cho vai trò khác (ngoài phạm vi — chỉ Admin quản lý theo §7.5.3). Không có chức năng "Quên mật khẩu" tự động (nút trong SYS_BM1 chỉ hiển thị hướng dẫn liên hệ Admin).
 
