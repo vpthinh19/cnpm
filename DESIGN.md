@@ -108,9 +108,9 @@ Hệ thống chia thành **8 module gần như độc lập**. Mỗi module có 
 
 ## 2.1. Sơ đồ ERD
 
-Sơ đồ ERD **toàn hệ thống** (15 bảng), thể hiện tên bảng + các thuộc tính + đường kết nối. Mã PlantUML đặt ở **tệp riêng** để kết xuất ảnh chèn báo cáo: [`design/erd/erd.puml`](design/erd/erd.puml).
+Sơ đồ ERD **toàn hệ thống** (15 bảng): thuộc tính có đánh dấu `<<PK>>`/`<<FK>>`, đường liên kết PK–FK kèm **bản số crow's foot** (`||--o{` = 1 — nhiều; `||--o|` = 1 — 0..1; `|o--o{` = 0..1 — nhiều). Mã PlantUML đặt ở **tệp riêng** để kết xuất ảnh chèn báo cáo: [`design/erd/erd.puml`](design/erd/erd.puml).
 
-> 📷 **\[CHÈN ẢNH ERD TẠI ĐÂY]** — render `design/erd/erd.puml` (VS Code PlantUML / plantuml.com) rồi chèn PNG/SVG.
+![ERD](design/images/erd.png)
 
 ## 2.2. Danh sách bảng (tổng quan)
 
@@ -504,7 +504,8 @@ Mỗi màn ánh xạ 1 biểu mẫu (BM) + DFD + endpoint API tương ứng (ghi
 |---|---|---|---|
 | SYS_BM1 | Đăng nhập | [`dang-nhap.html`](design/ui/dang-nhap.html) | §7.6.1 |
 
-> 📷 **\[CHÈN ẢNH: Đăng nhập]**
+<img src="design/images/dang-nhap-1.png" width="70%">
+<img src="design/images/dang-nhap-2.png" width="30%">
 
 ## 3.2. Bộ phận Phục vụ
 

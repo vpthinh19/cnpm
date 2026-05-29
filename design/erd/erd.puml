@@ -1,199 +1,241 @@
-@startuml ERD_QuanLyNhaHang
-' ERD toàn hệ thống — Hệ thống quản lý nhà hàng Bò Né Mỹ Cảnh (đồ án CNPM)
-' Chỉ thể hiện tên bảng + tên thuộc tính + đường kết nối giữa các bảng.
-' Quy ước: PK surrogate = <Bảng>ID (INT); mã nghiệp vụ = Ma...; ChiTiet* dùng PK ghép.
+@startuml
+' ERD toàn hệ thống — Hệ thống quản lý nhà hàng Bò Né Mỹ Cảnh
 hide circle
-skinparam linetype ortho
 skinparam shadowing false
 skinparam DefaultFontName "Segoe UI"
-skinparam DefaultFontSize 12
-skinparam nodesep 14
-skinparam ranksep 34
-skinparam roundCorner 6
+skinparam DefaultFontSize 11
+' Tăng thêm khoảng cách để nới lỏng không gian
+skinparam nodesep 70
+skinparam ranksep 80
+skinparam roundCorner 5
 skinparam classAttributeIconSize 0
-
-entity "Role" as Role {
-  RoleID
-  RoleName
-  Description
+skinparam linetype ortho 
+skinparam entity {
+  BackgroundColor #FFFFFF
+  BorderColor #5B6472
 }
 
-entity "User" as User {
-  UserID
-  Username
-  PasswordHash
-  FullName
-  RoleID
-  Status
-  FailedLoginCount
-  LastLoginAt
-  CreatedAt
-  UpdatedAt
+' ==========================================
+' MODULE HỆ THỐNG
+' ==========================================
+package "Phân hệ Hệ Thống" <<Rectangle>> {
+  entity "Role" as Role {
+    * RoleID <<PK>>
+    --
+    RoleName
+    Description
+  }
+
+  entity "User" as User {
+    * UserID <<PK>>
+    --
+    Username
+    PasswordHash
+    FullName
+    RoleID <<FK>>
+    Status
+    FailedLoginCount
+    LastLoginAt
+    CreatedAt
+    UpdatedAt
+  }
 }
 
-entity "Ban" as Ban {
-  BanID
-  MaBan
-  KhuVuc
-  SucChua
-  TrangThai
-  GhiChu
-  DangSuDung
+' ==========================================
+' MODULE BÁN HÀNG
+' ==========================================
+package "Phân hệ Bán Hàng & Phục Vụ" <<Rectangle>> {
+  entity "Ban" as Ban {
+    * BanID <<PK>>
+    --
+    MaBan
+    KhuVuc
+    SucChua
+    TrangThai
+    GhiChu
+    DangSuDung
+  }
+
+  entity "PhieuDatBan" as PhieuDatBan {
+    * PhieuDatBanID <<PK>>
+    --
+    BanID <<FK>>
+    NhanVienTiepNhanID <<FK>>
+    TenKhach
+    SoDienThoai
+    SoNguoi
+    ThoiGianDat
+    HinhThucDat
+    GhiChu
+    TrangThai
+    ThoiGianTao
+    ThoiGianNhanBan
+    ThoiGianHuy
+  }
+
+  entity "PhieuOrder" as PhieuOrder {
+    * PhieuOrderID <<PK>>
+    --
+    BanID <<FK>>
+    NhanVienPhucVuID <<FK>>
+    ThoiGianTao
+    TrangThai
+    TongTamTinh
+  }
+
+  entity "ChiTietOrder" as ChiTietOrder {
+    * PhieuOrderID <<PK>> <<FK>>
+    * SoDong <<PK>>
+    --
+    MonAnID <<FK>>
+    NhanVienXacNhanID <<FK>>
+    SoLuong
+    DonGia
+    ThanhTien
+    GhiChu
+    TrangThai
+    ThoiGianTao
+    ThoiGianChot
+    ThoiGianXong
+    ThoiGianPhucVu
+  }
+
+  entity "HoaDon" as HoaDon {
+    * HoaDonID <<PK>>
+    --
+    MaHoaDon
+    PhieuOrderID <<FK>>
+    NhanVienThuNganID <<FK>>
+    MaBanSnapshot
+    TongTienMon
+    TyLeVat
+    TienVat
+    TongThanhToan
+    HinhThucTT
+    TienKhachDua
+    TienThua
+    MaGiaoDich
+    ThoiGianTao
+    SoLanIn
+  }
+
+  entity "ChiTietHoaDon" as ChiTietHoaDon {
+    * HoaDonID <<PK>> <<FK>>
+    * MonAnID <<PK>> <<FK>>
+    --
+    TenMon
+    SoLuong
+    DonGia
+    ThanhTien
+  }
+
+  entity "MonAn" as MonAn {
+    * MonAnID <<PK>>
+    --
+    MaSanPham
+    TenMon
+    LoaiMon
+    DonGia
+    TrangThai
+    MoTa
+    DangSuDung
+  }
 }
 
-entity "MonAn" as MonAn {
-  MonAnID
-  MaSanPham
-  TenMon
-  LoaiMon
-  DonGia
-  TrangThai
-  MoTa
-  DangSuDung
+' ==========================================
+' MODULE KHO
+' ==========================================
+package "Phân hệ Kho & Vật Tư" <<Rectangle>> {
+  entity "NhaCungCap" as NhaCungCap {
+    * NhaCungCapID <<PK>>
+    --
+    TenNCC
+    SoDienThoai
+    DiaChi
+    DangSuDung
+  }
+
+  entity "NguyenLieu" as NguyenLieu {
+    * NguyenLieuID <<PK>>
+    --
+    TenNVL
+    DonViTinh
+    TonHienTai
+    DinhMucToiThieu
+    ThoiGianCapNhatTon
+    DangSuDung
+  }
+
+  entity "PhieuNhapKho" as PhieuNhapKho {
+    * PhieuNhapKhoID <<PK>>
+    --
+    MaPhieuNhap
+    NhaCungCapID <<FK>>
+    NhanVienLapID <<FK>>
+    NgayNhap
+    TongGiaTri
+    GhiChu
+    ThoiGianTao
+  }
+
+  entity "ChiTietNhapKho" as ChiTietNhapKho {
+    * PhieuNhapKhoID <<PK>> <<FK>>
+    * NguyenLieuID <<PK>> <<FK>>
+    --
+    SoLuong
+    DonGia
+    ThanhTien
+    GhiChu
+  }
+
+  entity "PhieuXuatKho" as PhieuXuatKho {
+    * PhieuXuatKhoID <<PK>>
+    --
+    MaPhieuXuat
+    NhanVienLapID <<FK>>
+    NgayXuat
+    TongGiaTri
+    GhiChu
+    ThoiGianTao
+  }
+
+  entity "ChiTietXuatKho" as ChiTietXuatKho {
+    * PhieuXuatKhoID <<PK>> <<FK>>
+    * NguyenLieuID <<PK>> <<FK>>
+    --
+    SoLuong
+    DonGia
+    ThanhTien
+    GhiChu
+  }
 }
 
-entity "PhieuDatBan" as PhieuDatBan {
-  PhieuDatBanID
-  BanID
-  NhanVienTiepNhanID
-  TenKhach
-  SoDienThoai
-  SoNguoi
-  ThoiGianDat
-  HinhThucDat
-  GhiChu
-  TrangThai
-  ThoiGianTao
-  ThoiGianNhanBan
-  ThoiGianHuy
-}
+' ==========================================
+' KẾT NỐI (Đã gỡ bỏ nhãn chữ để tránh đè tuyến)
+' ==========================================
 
-entity "PhieuOrder" as PhieuOrder {
-  PhieuOrderID
-  BanID
-  NhanVienPhucVuID
-  ThoiGianTao
-  TrangThai
-  TongTamTinh
-}
+Role          ||-right-o{ User
 
-entity "ChiTietOrder" as ChiTietOrder {
-  PhieuOrderID
-  SoDong
-  MonAnID
-  NhanVienXacNhanID
-  SoLuong
-  DonGia
-  ThanhTien
-  GhiChu
-  TrangThai
-  ThoiGianTao
-  ThoiGianChot
-  ThoiGianXong
-  ThoiGianPhucVu
-}
+User          ||-down-o{ PhieuDatBan
+User          ||-down-o{ PhieuOrder
+User          |o-down-o{ ChiTietOrder
+User          ||-down-o{ HoaDon
+User          ||-down-o{ PhieuNhapKho
+User          ||-down-o{ PhieuXuatKho
 
-entity "HoaDon" as HoaDon {
-  HoaDonID
-  MaHoaDon
-  PhieuOrderID
-  NhanVienThuNganID
-  MaBanSnapshot
-  TongTienMon
-  TyLeVat
-  TienVat
-  TongThanhToan
-  HinhThucTT
-  TienKhachDua
-  TienThua
-  MaGiaoDich
-  ThoiGianTao
-  SoLanIn
-}
+Ban           ||-right-o{ PhieuDatBan
+Ban           ||-right-o{ PhieuOrder
+PhieuOrder    ||-right-o| HoaDon
+PhieuOrder    ||-down-o{ ChiTietOrder
+HoaDon        ||-down-|{ ChiTietHoaDon
+ChiTietOrder  }o-down-|| MonAn
+ChiTietHoaDon }o-down-|| MonAn
 
-entity "ChiTietHoaDon" as ChiTietHoaDon {
-  HoaDonID
-  MonAnID
-  TenMon
-  SoLuong
-  DonGia
-  ThanhTien
-}
+NhaCungCap    ||-down-o{ PhieuNhapKho
+PhieuNhapKho  ||-down-|{ ChiTietNhapKho
+ChiTietNhapKho }o-down-|| NguyenLieu
 
-entity "NhaCungCap" as NhaCungCap {
-  NhaCungCapID
-  TenNCC
-  SoDienThoai
-  DiaChi
-  DangSuDung
-}
+PhieuXuatKho  ||-down-|{ ChiTietXuatKho
+ChiTietXuatKho }o-up-|| NguyenLieu
 
-entity "NguyenLieu" as NguyenLieu {
-  NguyenLieuID
-  TenNVL
-  DonViTinh
-  TonHienTai
-  DinhMucToiThieu
-  ThoiGianCapNhatTon
-  DangSuDung
-}
-
-entity "PhieuNhapKho" as PhieuNhapKho {
-  PhieuNhapKhoID
-  MaPhieuNhap
-  NhaCungCapID
-  NhanVienLapID
-  NgayNhap
-  TongGiaTri
-  GhiChu
-  ThoiGianTao
-}
-
-entity "ChiTietNhapKho" as ChiTietNhapKho {
-  PhieuNhapKhoID
-  NguyenLieuID
-  SoLuong
-  DonGia
-  ThanhTien
-  GhiChu
-}
-
-entity "PhieuXuatKho" as PhieuXuatKho {
-  PhieuXuatKhoID
-  MaPhieuXuat
-  NhanVienLapID
-  NgayXuat
-  TongGiaTri
-  GhiChu
-  ThoiGianTao
-}
-
-entity "ChiTietXuatKho" as ChiTietXuatKho {
-  PhieuXuatKhoID
-  NguyenLieuID
-  SoLuong
-  DonGia
-  ThanhTien
-  GhiChu
-}
-
-Role          -- User
-User          -- PhieuDatBan
-User          -- PhieuOrder
-User          -- ChiTietOrder
-User          -- HoaDon
-User          -- PhieuNhapKho
-User          -- PhieuXuatKho
-Ban           -- PhieuDatBan
-Ban           -- PhieuOrder
-MonAn         -- ChiTietOrder
-MonAn         -- ChiTietHoaDon
-PhieuOrder    -- ChiTietOrder
-PhieuOrder    -- HoaDon
-HoaDon        -- ChiTietHoaDon
-NhaCungCap    -- PhieuNhapKho
-PhieuNhapKho  -- ChiTietNhapKho
-NguyenLieu    -- ChiTietNhapKho
-PhieuXuatKho  -- ChiTietXuatKho
-NguyenLieu    -- ChiTietXuatKho
 @enduml
