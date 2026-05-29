@@ -423,6 +423,14 @@ Thay cho bảng `CauHinh` đã loại bỏ:
 
 ```javascript
 module.exports = {
+  // Thông tin nhà hàng (in trên hóa đơn TN_BM3 — thay cho bảng CauHinh đã cắt)
+  NHA_HANG: {
+    ten: 'Nhà hàng ABC',
+    dia_chi: '123 Đường XYZ, Quận 1, TP.HCM',
+    so_dien_thoai: '028 1234 5678',
+    ma_so_thue: '0312345678',
+  },
+
   // Thanh toán
   VAT_TY_LE: 0.10,            // 10%
 
@@ -441,4 +449,178 @@ module.exports = {
 
 ---
 
-> **Kết thúc Đợt D1 (đã cắt giảm).** Schema còn 13 thực thể (14 bảng) chia thành 8 module gần như độc lập. Sau khi bạn review xong D1, tôi tiếp tục D2 (API) bám theo cấu trúc module này.
+> **Kết thúc Đợt D1.** Schema 13 thực thể (14 bảng) chia 8 module gần như độc lập.
+
+# 4. THIẾT KẾ API {#thiết-kế-api}
+
+> Đợt D3 (UI mockup) sẽ chèn vào **§3** sau. API đặt ở **§4** để khớp tham chiếu trong sơ đồ kiến trúc §1.1.
+>
+> Mỗi endpoint ghi rõ **vai trò** được phép và **DFD tham chiếu** (§7 trong `DESCRIPTION.md`) để chứng minh không phát sinh chức năng ngoài đặc tả. Phần này là **D2a** (module M1–M4); M5–M8 ở D2b.
+
+## 4.0. Quy ước chung cho mọi API
+
+**Prefix:** mọi endpoint nằm dưới `/api/v1`. Ví dụ `/api/v1/auth/dang-nhap`. Bên dưới viết tắt bỏ prefix.
+
+**Xác thực:** trừ `POST /auth/dang-nhap`, mọi endpoint yêu cầu header `Authorization: Bearer <JWT>`. Middleware `xacThuc` giải mã token, kiểm tra `NguoiDung.trang_thai = 'HoatDong'` mỗi request (cơ chế thu hồi sớm, xem §7.6.1 ghi chú). Middleware `phanQuyen(...vaiTro)` chặn vai trò không hợp lệ.
+
+**Định dạng response (envelope thống nhất):**
+```jsonc
+// Thành công
+{ "success": true, "data": <object | array>, "message": "Mô tả ngắn (tùy chọn)" }
+// Thất bại
+{ "success": false, "error": { "code": "MA_LOI", "message": "Mô tả lỗi cho người dùng" } }
+```
+
+**Mã HTTP dùng trong hệ thống:**
+
+| Mã | Khi nào |
+|---|---|
+| `200 OK` | Đọc / cập nhật thành công |
+| `201 Created` | Tạo mới thành công (trả bản ghi vừa tạo) |
+| `400 Bad Request` | Sai/thiếu dữ liệu đầu vào, vi phạm quy định nghiệp vụ (vd số người > sức chứa) |
+| `401 Unauthorized` | Thiếu/sai/hết hạn JWT |
+| `403 Forbidden` | Vai trò không có quyền với chức năng |
+| `404 Not Found` | Không tìm thấy bản ghi |
+| `409 Conflict` | Trùng dữ liệu duy nhất (vd tên đăng nhập, số bàn) hoặc xung đột trạng thái (vd thanh toán bàn chưa phục vụ xong) |
+
+**Mã lỗi nghiệp vụ (`error.code`)** dùng chung:
+
+| `code` | Ý nghĩa |
+|---|---|
+| `VALIDATION` | Dữ liệu đầu vào không hợp lệ |
+| `NOT_FOUND` | Không tìm thấy |
+| `DUPLICATE` | Trùng trường duy nhất |
+| `CONFLICT_STATE` | Sai trạng thái cho thao tác |
+| `UNAUTHORIZED` / `FORBIDDEN` | Lỗi xác thực / phân quyền |
+| `RULE_VIOLATION` | Vi phạm quy định nghiệp vụ (PV_QĐ1, TN_QĐ1, B_QĐ1, K_QĐ1, QL_QĐ1) |
+
+**Danh sách:** các endpoint `GET` trả danh sách trả thẳng mảng trong `data`, **không phân trang** (quy mô 1 nhà hàng, đủ dùng). Lọc qua query string.
+
+**Trường JSON:** trùng tên cột DB (snake_case TV). Thời gian trả ISO-8601.
+
+---
+
+## 4.1. Module M1 — Xác thực + Tài khoản
+
+Base: `/auth/*`, `/nguoi-dung/*`. Bảng: `NguoiDung` (R/W), `VaiTro` (R). DFD: §7.6.1 (đăng nhập), §7.5.3 (quản lý tài khoản).
+
+### 4.1.1. Đăng nhập / Đăng xuất (DFD §7.6.1)
+
+| Method | Endpoint | Vai trò | Mô tả |
+|---|---|---|---|
+| POST | `/auth/dang-nhap` | Công khai | Đăng nhập, trả JWT |
+| GET | `/auth/toi` | Mọi vai trò | Lấy thông tin user hiện tại từ token |
+| POST | `/auth/dang-xuat` | Mọi vai trò | Vô hiệu phía client (xóa token). Server stateless, chỉ trả 200 |
+
+**`POST /auth/dang-nhap`** — Request:
+```json
+{ "ten_dang_nhap": "phucvu1", "mat_khau": "matkhau123" }
+```
+Xử lý (theo §7.6.1 Bước 2–6): tìm user theo `ten_dang_nhap`; nếu không tồn tại / `trang_thai='DaKhoa'` → `401`. So khớp bcrypt; sai → `so_lan_sai_lien_tiep++`, nếu ≥ `SO_LAN_SAI_TOI_DA` thì khóa, trả `401`. Đúng → reset số lần sai, cập nhật `thoi_gian_dang_nhap_cuoi`, ký JWT (payload `ma_nguoi_dung`, `ma_vai_tro`; hạn `now + PHIEN_DANG_NHAP_PHUT` phút).
+
+Response `200`:
+```json
+{ "success": true, "data": {
+  "token": "<JWT>",
+  "nguoi_dung": { "ma_nguoi_dung": 2, "ho_ten": "Nguyễn Văn A", "ten_dang_nhap": "phucvu1", "ma_vai_tro": "PhucVu" }
+}}
+```
+Lỗi: sai tài khoản/mật khẩu → `401 UNAUTHORIZED` ("Tên đăng nhập hoặc mật khẩu không đúng"); bị khóa → `401 UNAUTHORIZED` ("Tài khoản đã bị khóa, liên hệ Admin").
+
+### 4.1.2. Quản lý tài khoản — Admin (DFD §7.5.3, QL_BM3)
+
+Tất cả yêu cầu vai trò **Admin**. Tuân QL_QĐ1.
+
+| Method | Endpoint | Mô tả |
+|---|---|---|
+| GET | `/nguoi-dung` | Danh sách tài khoản. Query lọc: `?vai_tro=&trang_thai=&tu_khoa=` (tìm theo họ tên/tên đăng nhập) |
+| GET | `/nguoi-dung/:id` | Chi tiết 1 tài khoản (không trả `mat_khau_hash`) |
+| POST | `/nguoi-dung` | Tạo tài khoản mới |
+| PUT | `/nguoi-dung/:id` | Sửa họ tên / vai trò |
+| PATCH | `/nguoi-dung/:id/khoa` | Khóa (`trang_thai='DaKhoa'`) |
+| PATCH | `/nguoi-dung/:id/mo-khoa` | Mở khóa (`HoatDong`, reset `so_lan_sai_lien_tiep=0`) |
+| PATCH | `/nguoi-dung/:id/dat-lai-mat-khau` | Đặt lại mật khẩu |
+
+**`POST /nguoi-dung`** — Request:
+```json
+{ "ten_dang_nhap": "phucvu2", "mat_khau": "matkhau123", "ho_ten": "Trần Văn E", "ma_vai_tro": "PhucVu" }
+```
+Kiểm tra (QL_QĐ1, §7.5.3 Bước 4): `ten_dang_nhap` không trùng (→ `409 DUPLICATE`); `mat_khau` ≥ 8 ký tự, có cả chữ và số (→ `400 RULE_VIOLATION`); `ma_vai_tro` ∈ 5 vai trò. Băm bcrypt cost 10 trước khi lưu. Trả `201` bản ghi (ẩn hash).
+
+**`PATCH /nguoi-dung/:id/khoa`** — chặn Admin tự khóa chính mình (`id === token.ma_nguoi_dung` → `400 RULE_VIOLATION`).
+
+**`PATCH /nguoi-dung/:id/dat-lai-mat-khau`** — Request `{ "mat_khau_moi": "..." }`, cùng quy tắc độ mạnh; băm và lưu, reset `so_lan_sai_lien_tiep=0`.
+
+> Không có endpoint tự đổi mật khẩu cho vai trò khác (ngoài phạm vi — chỉ Admin quản lý theo §7.5.3). Không có chức năng "Quên mật khẩu" tự động (nút trong SYS_BM1 chỉ hiển thị hướng dẫn liên hệ Admin).
+
+---
+
+## 4.2. Module M2 — Quản lý bàn
+
+Base: `/ban/*`. Bảng: `Ban` (R/W). DFD: §7.5.2 (QL_BM2). CRUD do **Admin**; danh sách bàn được **Phục vụ/Thu ngân đọc** (chọn bàn khi đặt/gọi món/thanh toán).
+
+| Method | Endpoint | Vai trò | Mô tả |
+|---|---|---|---|
+| GET | `/ban` | Admin, PhucVu, ThuNgan | Danh sách bàn `dang_su_dung=1`. Query: `?trang_thai=&khu_vuc=` |
+| GET | `/ban/:id` | Admin, PhucVu, ThuNgan | Chi tiết bàn |
+| POST | `/ban` | Admin | Thêm bàn |
+| PUT | `/ban/:id` | Admin | Sửa số bàn / khu vực / sức chứa / ghi chú |
+| DELETE | `/ban/:id` | Admin | Xóa mềm (`dang_su_dung=0`) |
+
+**`POST /ban`** — Request `{ "so_ban": "B07", "khu_vuc": "Tầng 2", "suc_chua": 4, "ghi_chu": "" }`. Kiểm tra (§7.5.2 Bước 4): `so_ban` không trùng (→ `409`); `suc_chua > 0`. Trạng thái khởi tạo `'Trong'`.
+
+**`DELETE /ban/:id`** — chỉ cho xóa khi `trang_thai='Trong'` (§7.5.2 Bước 4: bàn đang `DaDat`/`CoKhach` → `409 CONFLICT_STATE`). Xóa mềm để giữ toàn vẹn FK với phiếu cũ.
+
+> `Ban.trang_thai` **không** đổi qua endpoint M2; nó do M4 (đặt/nhận bàn) và M5/M6 (mở order/thanh toán) đổi qua hàm dùng chung `CapNhatTrangThaiBan` (pseudocode ở D4). M2 chỉ quản trị danh mục bàn.
+
+---
+
+## 4.3. Module M3 — Thực đơn
+
+Base: `/mon-an/*`. Bảng: `MonAn` (R/W). DFD: §7.5.1 (QL_BM1). CRUD do **Admin**; danh sách món được **Phục vụ đọc** (màn gọi món).
+
+| Method | Endpoint | Vai trò | Mô tả |
+|---|---|---|---|
+| GET | `/mon-an` | Admin, PhucVu | Danh sách món `dang_su_dung=1`. Query: `?loai_mon=&trang_thai=&tu_khoa=` |
+| GET | `/mon-an/:id` | Admin, PhucVu | Chi tiết món |
+| POST | `/mon-an` | Admin | Thêm món |
+| PUT | `/mon-an/:id` | Admin | Sửa tên / loại / đơn giá / mô tả |
+| PATCH | `/mon-an/:id/trang-thai` | Admin | Đổi `ConHang`↔`HetHang` |
+| DELETE | `/mon-an/:id` | Admin | Xóa mềm (`dang_su_dung=0`) |
+
+**`POST /mon-an`** — Request `{ "ten_mon": "Gỏi cuốn", "loai_mon": "MonAn", "don_gia": 40000, "mo_ta": "" }`. Kiểm tra (§7.5.1 Bước 4): `ten_mon` không trùng (→ `409`); `don_gia >= 0`; `loai_mon ∈ ('MonAn','DoUong')`. Trạng thái khởi tạo `'ConHang'`.
+
+**`PATCH /mon-an/:id/trang-thai`** — Request `{ "trang_thai": "HetHang" }`. Phục vụ khi gọi món chỉ thấy món `ConHang` (lọc ở M5).
+
+> Đơn giá sửa ở đây **không hồi tố** order cũ — M5 đã snapshot `don_gia` vào `ChiTietOrder` (xem §2 quyết định kỹ thuật). Đổi giá chỉ ảnh hưởng order tạo về sau.
+
+---
+
+## 4.4. Module M4 — Đặt bàn
+
+Base: `/dat-ban/*`. Bảng: `PhieuDatBan` (R/W), `Ban` (R + đổi trạng thái). DFD: §7.1.1 (tiếp nhận đặt bàn, PV_BM1) + ghi chú "nhận bàn" (§7.1.1, §7.1.2). Vai trò **PhucVu** (Admin xem được).
+
+| Method | Endpoint | Vai trò | Mô tả |
+|---|---|---|---|
+| GET | `/dat-ban` | PhucVu, Admin | Danh sách phiếu đặt. Query: `?trang_thai=&ngay=&tu_khoa=` (SĐT/tên/mã đặt) |
+| GET | `/dat-ban/:id` | PhucVu, Admin | Chi tiết phiếu đặt (theo PV_BM1) |
+| POST | `/dat-ban` | PhucVu | Tiếp nhận đặt bàn mới |
+| POST | `/dat-ban/:id/nhan-ban` | PhucVu | Đánh dấu khách đến (check-in thủ công) |
+| POST | `/dat-ban/:id/huy` | PhucVu | Hủy phiếu đặt |
+
+**`POST /dat-ban`** (DFD §7.1.1 Bước 3–7) — Request:
+```json
+{ "ma_ban": 3, "ten_khach": "Nguyễn Văn A", "so_dien_thoai": "0901234567",
+  "so_nguoi": 4, "thoi_gian_dat": "2026-05-29T18:30:00", "hinh_thuc_dat": "QuaDienThoai", "ghi_chu": "" }
+```
+Kiểm tra (PV_QĐ1): bàn tồn tại & `trang_thai='Trong'` (→ `409 CONFLICT_STATE` nếu `DaDat`/`CoKhach`); `so_nguoi > 0` và `≤ Ban.suc_chua` (→ `400 RULE_VIOLATION`); `thoi_gian_dat` trong `[GIO_MO, GIO_DONG]` (→ `400 RULE_VIOLATION`); `hinh_thuc_dat ∈ ('TrucTiep','QuaDienThoai')`. **Transaction**: INSERT `PhieuDatBan` (`trang_thai='DaDat'`, `nv_tiep_nhan` = user token) + `Ban.trang_thai='DaDat'`. Trả `201` kèm `ma_dat_ban` (chính là "Mã đặt bàn" trên PV_BM1).
+
+**`POST /dat-ban/:id/nhan-ban`** (ghi chú §7.1.1 — khách đến) — không cần body. Điều kiện: phiếu `trang_thai='DaDat'` (→ `409` nếu khác). **Transaction**: `PhieuDatBan.trang_thai='DaNhanBan'` + `thoi_gian_nhan_ban=now` + `Ban.trang_thai='CoKhach'`. Sau bước này Phục vụ mới gọi món được (M5 yêu cầu bàn `Trong`/`CoKhach`).
+
+**`POST /dat-ban/:id/huy`** — điều kiện phiếu `trang_thai='DaDat'`. **Transaction**: `PhieuDatBan.trang_thai='DaHuy'` + `thoi_gian_huy=now` + trả `Ban.trang_thai='Trong'`. Không hủy phiếu `DaNhanBan` (khách đã tới — đã chuyển sang luồng order).
+
+> Đồng bộ `Ban.trang_thai` luôn nằm **cùng transaction** với thay đổi phiếu (ràng buộc §2.4 #8), qua hàm dùng chung `CapNhatTrangThaiBan`. Không có hủy tự động sau 15 phút (yêu cầu Tiến hóa §6 — ngoài phạm vi).
+
+---
+
+> **Kết thúc D2a (M1–M4).** Quy ước chung §4.0 + API 4 module quản trị/đầu luồng, mỗi endpoint gắn DFD tham chiếu. Sau khi bạn review, tôi viết **D2b**: M5 (Order+Bếp §7.1.2/7.1.3/7.1.4/7.3), M6 (Thanh toán §7.2), M7 (Kho §7.4), M8 (Báo cáo tổng hợp §7.5.4) — đây là phần nghiệp vụ lõi, nhiều transaction & state machine.
