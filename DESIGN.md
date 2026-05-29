@@ -504,10 +504,9 @@ Mỗi màn ánh xạ 1 biểu mẫu (BM) + DFD + endpoint API tương ứng (ghi
 |---|---|---|---|
 | SYS_BM1 | Đăng nhập | [`dang-nhap.html`](design/ui/dang-nhap.html) | §7.6.1 |
 
-<div>
-    <img src="design/images/dang-nhap-1.png" width="70%">
-    <img src="design/images/dang-nhap-2.png" width="25%">
-</div>
+| Desktop | Mobile |
+|--|--|
+|![test](design/images/dang-nhap-1.png)|![test](design/images/dang-nhap-2.png)|
 
 ## 3.2. Bộ phận Phục vụ
 
@@ -518,26 +517,12 @@ Mỗi màn ánh xạ 1 biểu mẫu (BM) + DFD + endpoint API tương ứng (ghi
 | PV_BM4 | Phục vụ món ra bàn | [`pv-phuc-vu.html`](design/ui/pv-phuc-vu.html) | §7.1.4 |
 | PV_BM3 | Phiếu chuyển bếp | [`pv-phieu-bep.html`](design/ui/pv-phieu-bep.html) | §7.1.3 |
 
-<div>
-    <img src="design/images/pv-dat-ban-1.png" width="70%">
-    <img src="design/images/pv-dat-ban-2.png" width="25%">
-</div>
-<div>
-    <img src="design/images/pv-goi-mon-1.png" width="70%">
-    <img src="design/images/pv-goi-mon-2.png" width="25%">
-</div>
-<div>
-    <img src="design/images/pv-phuv-vu-1.png" width="70%">
-    <img src="design/images/pv-phuc-vu-2.png" width="25%">
-</div>
-<div>
-    <img src="design/images/pv-phuv-vu-1.png" width="70%">
-    <img src="design/images/pv-phuc-vu-2.png" width="25%">
-</div>
-<div>
-    <img src="design/images/pv-phieu-bep-1.png" width="70%">
-    <img src="design/images/pv-phieu-bep-2.png" width="25%">
-</div>
+| Desktop | Mobile |
+|--|--|
+|![test](design/images/pv-dat-ban-1.png)|![test](design/images/pv-dat-ban-2.png)|
+|![test](design/images/pv-goi-mon-1.png)|![test](design/images/pv-goi-mon-2.png)|
+|![test](design/images/pv-phuc-vu-1.png)|![test](design/images/pv-phuc-vu-2.png)|
+|![test](design/images/pv-phieu-bep-1.png)|![test](design/images/pv-phieu-bep-2.png)|
 
 ## 3.3. Bộ phận Bếp
 
@@ -546,14 +531,10 @@ Mỗi màn ánh xạ 1 biểu mẫu (BM) + DFD + endpoint API tương ứng (ghi
 | B_BM2 | Màn hình bếp (cập nhật trạng thái món) | [`bep-kitchen-display.html`](design/ui/bep-kitchen-display.html) | §7.3.2 |
 | B_BM1 | Phiếu order bếp (in) | [`bep-phieu-order.html`](design/ui/bep-phieu-order.html) | §7.3.1 |
 
-<div>
-    <img src="design/images/bep-kitchen-display-1.png" width="70%">
-    <img src="design/images/bep-kitchen-display-2.png" width="25%">
-</div>
-<div>
-    <img src="design/images/bep-phieu-order-1.png" width="70%">
-    <img src="design/images/bep-phieu-order-2.png" width="25%">
-</div>
+| Desktop | Mobile |
+|--|--|
+|![test](design/images/bep-kitchen-display-1.png)|![test](design/images/bep-kitchen-display-2.png)|
+|![test](design/images/bep-phieu-order-1.png)|![test](design/images/bep-phieu-order-2.png)|
 
 ## 3.4. Bộ phận Thu ngân
 
@@ -563,18 +544,11 @@ Mỗi màn ánh xạ 1 biểu mẫu (BM) + DFD + endpoint API tương ứng (ghi
 | TN_BM3 | Hóa đơn (in / in lại) | [`tn-hoa-don.html`](design/ui/tn-hoa-don.html) | §7.2.3 |
 | TN_BM1 | Báo cáo doanh thu | [`tn-bao-cao-doanh-thu.html`](design/ui/tn-bao-cao-doanh-thu.html) | §7.2.2 |
 
-<div>
-    <img src="design/images/tn-thanh-toan-1.png" width="70%">
-    <img src="design/images/tn-thanh-toan-2.png" width="25%">
-</div>
-<div>
-    <img src="design/images/tn-hoa-don-1.png" width="70%">
-    <img src="design/images/tn-hoa-don-2.png" width="25%">
-</div>
-<div>
-    <img src="design/images/tn-bao-cao-doanh-thu-1.png" width="70%">
-    <img src="design/images/tn-bao-cao-doanh-thu-2.png" width="25%">
-</div>
+| Desktop | Mobile |
+|--|--|
+|![test](design/images/tn-thanh-toan-1.png)|![test](design/images/tn-thanh-toan-2.png)|
+|![test](design/images/tn-hoa-don-1.png)|![test](design/images/tn-hoa-don-2.png)|
+|![test](design/images/tn-bao-cao-doanh-thu-1.png)|![test](design/images/tn-bao-cao-doanh-thu-2.png)|
 
 ## 3.5. Bộ phận Kho
 
@@ -586,26 +560,13 @@ Mỗi màn ánh xạ 1 biểu mẫu (BM) + DFD + endpoint API tương ứng (ghi
 | K_BM4 | Báo cáo nhập kho | [`kho-bc-nhap.html`](design/ui/kho-bc-nhap.html) | §7.4.4 |
 | K_BM5 | Báo cáo xuất kho | [`kho-bc-xuat.html`](design/ui/kho-bc-xuat.html) | §7.4.5 |
 
-<div>
-    <img src="design/images/kho-nhap-1.png" width="70%">
-    <img src="design/images/kho-nhap-2.png" width="25%">
-</div>
-<div>
-    <img src="design/images/kho-xuat-1.png" width="70%">
-    <img src="design/images/kho-xuat-2.png" width="25%">
-</div>
-<div>
-    <img src="design/images/kho-bc-ton-1.png" width="70%">
-    <img src="design/images/kho-bc-ton-2.png" width="25%">
-</div>
-<div>
-    <img src="design/images/kho-bc-nhap-1.png" width="70%">
-    <img src="design/images/kho-bc-nhap-2.png" width="25%">
-</div>
-<div>
-    <img src="design/images/kho-bc-xuat-1.png" width="70%">
-    <img src="design/images/kho-bc-xuat-2.png" width="25%">
-</div>
+| Desktop | Mobile |
+|--|--|
+|![test](design/images/kho-nhap-1.png)|![test](design/images/kho-nhap-2.png)|
+|![test](design/images/kho-xuat-1.png)|![test](design/images/kho-xuat-2.png)|
+|![test](design/images/kho-bc-ton-1.png)|![test](design/images/kho-bc-ton-2.png)|
+|![test](design/images/kho-bc-nhap-1.png)|![test](design/images/kho-bc-nhap-2.png)|
+|![test](design/images/kho-bc-xuat-1.png)|![test](design/images/kho-bc-xuat-2.png)|
 
 ## 3.6. Quản lý (Admin)
 
@@ -616,25 +577,11 @@ Mỗi màn ánh xạ 1 biểu mẫu (BM) + DFD + endpoint API tương ứng (ghi
 | QL_BM3 | Quản lý tài khoản | [`ql-tai-khoan.html`](design/ui/ql-tai-khoan.html) | §7.5.3 |
 | QL_BM4 | Báo cáo tổng hợp (Dashboard) | [`ql-dashboard.html`](design/ui/ql-dashboard.html) | §7.5.4 |
 
-<div style="display:flex; align-items:center; height: 400px;">
-    <img src="design/images/ql-thuc-don-1.png" width="70%">
-    <img src="design/images/ql-thuc-don-2.png" width="25%">
-</div>
-<div>
-    <img src="design/images/ql-ban-1.png" width="70%">
-    <img src="design/images/ql-ban-2.png" width="25%">
-</div>
-<div>
-    <img src="design/images/ql-tai-khoan-1.png" width="70%">
-    <img src="design/images/ql-tai-khoan-2.png" width="25%">
-</div>
-<div>
-    <img src="design/images/ql-dashboard-1.png" width="70%">
-    <img src="design/images/ql-dashboard-2.png" width="25%">
-</div>
-
-|  |  |
+| Desktop | Mobile |
 |--|--|
+|![test](design/images/ql-thuc-don-1.png)|![test](design/images/ql-thuc-don-2.png)|
+|![test](design/images/ql-ban-1.png)|![test](design/images/ql-ban-2.png)|
+|![test](design/images/ql-tai-khoan-1.png)|![test](design/images/ql-tai-khoan-2.png)|
 |![test](design/images/ql-dashboard-1.png)|![test](design/images/ql-dashboard-2.png)|
 
 # 4. THIẾT KẾ API {#thiết-kế-api}
