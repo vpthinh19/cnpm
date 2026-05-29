@@ -62,7 +62,7 @@
 - **Giá trị enum** giữ ASCII không dấu (`HoatDong`/`DaKhoa`, vai trò như trên).
 - **FK trỏ User trong bảng nghiệp vụ** đặt tên ngữ nghĩa `NhanVien…ID` (`NhanVienTiepNhanID`, `NhanVienPhucVuID`, `NhanVienXacNhanID`, `NhanVienThuNganID`, `NhanVienLapID`), đều INT FK → `User.UserID`.
 
-**Bảng chi tiết (`ChiTiet*`) — không có khóa surrogate riêng, dùng PK ghép:**
+**Bảng chi tiết (`ChiTiet*`) — không có khóa PK riêng, dùng PK ghép:**
 - `ChiTietHoaDon` → PK `(HoaDonID, MonAnID)`; `ChiTietNhapKho` → `(PhieuNhapKhoID, NguyenLieuID)`; `ChiTietXuatKho` → `(PhieuXuatKhoID, NguyenLieuID)`.
 - `ChiTietOrder` không phải junction thuần (cùng món có thể có nhiều dòng, trạng thái riêng từng dòng) → PK ghép `(PhieuOrderID, SoDong)` với `SoDong` = số thứ tự dòng trong order.
 
@@ -136,7 +136,7 @@ Sơ đồ ERD **toàn hệ thống** (15 bảng): thuộc tính có đánh dấu
 
 ## 2.3. Chi tiết từng bảng
 
-### 2.3.1. `Role` (thực thể hệ thống — tên tiếng Anh)
+### 2.3.1. `Role` (thực thể hệ thống)
 
 | Tên trường | Kiểu dữ liệu | Ràng buộc | Mô tả |
 |---|---|---|---|
@@ -146,7 +146,7 @@ Sơ đồ ERD **toàn hệ thống** (15 bảng): thuộc tính có đánh dấu
 
 Bảng tĩnh, 5 dòng, seed sẵn. PK là mã chuỗi (ngoại lệ kiểu, xem §1.2).
 
-### 2.3.2. `User` (thực thể hệ thống — tên tiếng Anh)
+### 2.3.2. `User` (thực thể hệ thống)
 
 | Tên trường | Kiểu dữ liệu | Ràng buộc | Mô tả |
 |---|---|---|---|
