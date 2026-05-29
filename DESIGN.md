@@ -504,8 +504,10 @@ Mỗi màn ánh xạ 1 biểu mẫu (BM) + DFD + endpoint API tương ứng (ghi
 |---|---|---|---|
 | SYS_BM1 | Đăng nhập | [`dang-nhap.html`](design/ui/dang-nhap.html) | §7.6.1 |
 
-<img src="design/images/dang-nhap-1.png" width="70%">
-<img src="design/images/dang-nhap-2.png" width="20%">
+<div>
+    <img src="design/images/dang-nhap-1.png" width="70%">
+    <img src="design/images/dang-nhap-2.png" width="20%">
+</div>
 
 ## 3.2. Bộ phận Phục vụ
 
