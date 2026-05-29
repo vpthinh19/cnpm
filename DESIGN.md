@@ -30,7 +30,7 @@
                               ▼
 ┌──────────────────────────────────────────────────────────────────────┐
 │  CSDL — Microsoft SQL Server 2019+                                   │
-│  ─ 13 bảng (§2)                                                      │
+│  ─ 15 bảng (§2)                                                      │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -289,6 +289,8 @@ Dòng món của hóa đơn — **snapshot** lúc thanh toán để hóa đơn b
 | `ThanhTien` | DECIMAL(15,0) | NOT NULL, AS (`SoLuong * DonGia`) PERSISTED | |
 
 **PK ghép `(HoaDonID, MonAnID)`** — mỗi món 1 dòng/hóa đơn (đã gộp số lượng).
+
+> **Giả định khi gộp:** đơn giá một món **không đổi trong suốt một phiên order** — Admin sửa giá menu (§4.3) chỉ ảnh hưởng order tạo về sau, không hồi tố. Nhờ vậy mọi dòng `ChiTietOrder` cùng `MonAnID` trong một order luôn có cùng `DonGia`, nên gộp theo `MonAnID` an toàn và bảo toàn `SUM(ChiTietHoaDon.ThanhTien) = HoaDon.TongTienMon`.
 
 ### 2.3.10. `NhaCungCap`
 
@@ -592,7 +594,7 @@ Mỗi màn ánh xạ 1 biểu mẫu (BM) + DFD + endpoint API tương ứng (ghi
 
 **Prefix:** mọi endpoint nằm dưới `/api/v1`. Ví dụ `/api/v1/auth/login`. Bên dưới viết tắt bỏ prefix.
 
-**Xác thực:** trừ `POST /auth/login`, mọi endpoint yêu cầu header `Authorization: Bearer <JWT>`. Middleware `authenticate` giải mã token, kiểm tra `User.status = 'HoatDong'` mỗi request (cơ chế thu hồi sớm, xem §7.6.1 ghi chú). Middleware `authorize(...roles)` chặn vai trò không hợp lệ. (Hai middleware này thuộc thực thể hệ thống nên đặt tên tiếng Anh; các hàm nghiệp vụ vẫn PascalCase TV như `CapNhatTrangThaiBan`.)
+**Xác thực:** trừ `POST /auth/login`, mọi endpoint yêu cầu header `Authorization: Bearer <JWT>`. Middleware `authenticate` giải mã token, kiểm tra `User.Status = 'HoatDong'` mỗi request (cơ chế thu hồi sớm, xem §7.6.1 ghi chú). Middleware `authorize(...roles)` chặn vai trò không hợp lệ. (Hai middleware này thuộc thực thể hệ thống nên đặt tên tiếng Anh; các hàm nghiệp vụ vẫn PascalCase TV như `CapNhatTrangThaiBan`.)
 
 **Định dạng response (envelope thống nhất):**
 ```jsonc
@@ -621,9 +623,9 @@ Mỗi màn ánh xạ 1 biểu mẫu (BM) + DFD + endpoint API tương ứng (ghi
 | `VALIDATION` | Dữ liệu đầu vào không hợp lệ |
 | `NOT_FOUND` | Không tìm thấy |
 | `DUPLICATE` | Trùng trường duy nhất |
-| `CONFLICT_STATE` | Sai trạng thái cho thao tác |
+| `CONFLICT_STATE` | Vi phạm do **trạng thái hiện tại** của bản ghi: thanh toán khi còn món chưa phục vụ (TN_QĐ1), sai thứ tự chế biến (B_QĐ1), xuất quá tồn (K_QĐ1), đặt/mở order bàn không Trống (PV_QĐ1), thanh toán 2 lần |
 | `UNAUTHORIZED` / `FORBIDDEN` | Lỗi xác thực / phân quyền |
-| `RULE_VIOLATION` | Vi phạm quy định nghiệp vụ (PV_QĐ1, TN_QĐ1, B_QĐ1, K_QĐ1, QL_QĐ1) |
+| `RULE_VIOLATION` | Vi phạm ràng buộc **giá trị đầu vào**: số người > sức chứa (PV_QĐ1), thời gian ngoài giờ hoạt động, mật khẩu yếu (QL_QĐ1), số lượng/đơn giá ≤ 0 (K_QĐ1) |
 
 **Danh sách:** các endpoint `GET` trả danh sách trả thẳng mảng trong `data`, **không phân trang** (quy mô 1 nhà hàng, đủ dùng). Lọc qua query string.
 
@@ -956,11 +958,11 @@ Kiểm `TuNgay ≤ DenNgay`. Trả 3 phần đúng QL_BM4 (§7.5.4 Bước 3–5
     "TheoNgay": [ { "Ngay": "2026-05-29", "SoHoaDon": 42, "Tong": 6150000, "TienMat": 4000000, "ChuyenKhoan": 2150000 } ],
     "TongDoanhThuKy": 6150000
   },
-  "TopMon": [                    // B — TOP_N_BAO_CAO món bán chạy (đơn đã thanh toán, dòng <> DaHuy)
+  "TopMon": [                    // B — TOP_N_BAO_CAO món bán chạy (nguồn ChiTietHoaDon snapshot của HĐ trong kỳ)
     { "MonAnID": 1, "TenMon": "NÉ MC", "SoLuongBan": 320, "DoanhThu": 30400000 }
   ],
   "CanhBaoTon": [                // C — NVL có TonHienTai <= DinhMucToiThieu
-    { "NguyenLieuID": 4, "TenNVL": "Cà phê hạt", "DonViTinh": "kg", "TonHienTai": 2.0, "DinhMucToiThieu": 3.0 }
+    { "NguyenLieuID": 12, "TenNVL": "Hành phi", "DonViTinh": "kg", "TonHienTai": 0.3, "DinhMucToiThieu": 0.5 }
   ]
 }}
 ```
@@ -998,8 +1000,11 @@ HÀM CapNhatTrangThaiBan(banID, trangThaiMoi):
 ```
 HÀM DangNhap(tenDangNhap, matKhau):
     u ← repo.TimUserTheoUsername(tenDangNhap)
-    NẾU u = null HOẶC u.Status = 'DaKhoa' THÌ
-        NÉM_LỖI(401, 'UNAUTHORIZED', 'Tài khoản không tồn tại / đã bị khóa')
+    NẾU u = null THÌ
+        NÉM_LỖI(401, 'UNAUTHORIZED', 'Tên đăng nhập hoặc mật khẩu không đúng')  // không tiết lộ tài khoản có tồn tại hay không
+    HẾT_NẾU
+    NẾU u.Status = 'DaKhoa' THÌ
+        NÉM_LỖI(401, 'UNAUTHORIZED', 'Tài khoản đã bị khóa, liên hệ Admin')
     HẾT_NẾU
 
     NẾU KHÔNG Bcrypt.So(matKhau, u.PasswordHash) THÌ          // sai mật khẩu
@@ -1153,6 +1158,23 @@ HÀM HuyDongMon(phieuOrderID, soDong):
         repo.CapNhat('ChiTietOrder', (phieuOrderID, soDong), { TrangThai: 'DaHuy' })
         repo.CapNhat('PhieuOrder', phieuOrderID, { TongTamTinh: TinhTongTamTinh(phieuOrderID) })
     }
+
+// Hủy cả order (DFD §7.1.4) — hủy nhầm / khách bỏ về khi CHƯA dòng nào gửi bếp
+HÀM HuyOrder(phieuOrderID):
+    order ← repo.LayOrder(phieuOrderID)
+    NẾU order = null THÌ NÉM_LỖI(404, 'NOT_FOUND', 'Không tìm thấy order') HẾT_NẾU
+    NẾU order.TrangThai ≠ 'DangPhucVu' THÌ
+        NÉM_LỖI(409, 'CONFLICT_STATE', 'Order đã thanh toán / đã hủy') HẾT_NẾU
+    dong ← repo.LayChiTiet(phieuOrderID)
+    NẾU TỒN_TẠI d TRONG dong SAO_CHO d.TrangThai ≠ 'ChuaChot' THÌ
+        NÉM_LỖI(409, 'CONFLICT_STATE', 'Đã có món gửi bếp — hủy từng món thay vì cả order') HẾT_NẾU
+    GIAO_DỊCH {
+        repo.CapNhat('PhieuOrder', phieuOrderID, { TrangThai: 'DaHuy' })
+        VỚI MỖI d TRONG dong LÀM
+            repo.CapNhat('ChiTietOrder', (phieuOrderID, d.SoDong), { TrangThai: 'DaHuy' })
+        HẾT_VỚI
+        CapNhatTrangThaiBan(order.BanID, 'Trong')           // trả bàn về Trống
+    }
 ```
 
 ## 5.5. M6 — Thanh toán (DFD §7.2.1, TN_QĐ1)
@@ -1167,7 +1189,7 @@ HÀM XuLyThanhToan(dl):   // dl: PhieuOrderID, HinhThucTT, TienKhachDua, MaGiaoD
 
     dong ← repo.LayChiTiet(dl.PhieuOrderID)
     NẾU TỒN_TẠI d TRONG dong SAO_CHO d.TrangThai KHÔNG_THUỘC ('DaPhucVu', 'DaHuy') THÌ
-        NÉM_LỖI(409, 'RULE_VIOLATION', 'Còn món chưa phục vụ xong')         // TN_QĐ1
+        NÉM_LỖI(409, 'CONFLICT_STATE', 'Còn món chưa phục vụ xong')         // TN_QĐ1
     HẾT_NẾU
 
     dongTinhTien  ← các d TRONG dong có d.TrangThai ≠ 'DaHuy'
