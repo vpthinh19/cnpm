@@ -586,7 +586,26 @@ Mỗi màn ánh xạ 1 biểu mẫu (BM) + DFD + endpoint API tương ứng (ghi
 | K_BM4 | Báo cáo nhập kho | [`kho-bc-nhap.html`](design/ui/kho-bc-nhap.html) | §7.4.4 |
 | K_BM5 | Báo cáo xuất kho | [`kho-bc-xuat.html`](design/ui/kho-bc-xuat.html) | §7.4.5 |
 
-> 📷 **\[CHÈN ẢNH: 5 màn Kho]**
+<div>
+    <img src="design/images/kho-nhap-1.png" width="70%">
+    <img src="design/images/kho-nhap-2.png" width="25%">
+</div>
+<div>
+    <img src="design/images/kho-xuat-1.png" width="70%">
+    <img src="design/images/kho-xuat-2.png" width="25%">
+</div>
+<div>
+    <img src="design/images/kho-bc-ton-1.png" width="70%">
+    <img src="design/images/kho-bc-ton-2.png" width="25%">
+</div>
+<div>
+    <img src="design/images/kho-bc-nhap-1.png" width="70%">
+    <img src="design/images/kho-bc-nhap-2.png" width="25%">
+</div>
+<div>
+    <img src="design/images/kho-bc-xuat-1.png" width="70%">
+    <img src="design/images/kho-bc-xuat-2.png" width="25%">
+</div>
 
 ## 3.6. Quản lý (Admin)
 
@@ -597,7 +616,22 @@ Mỗi màn ánh xạ 1 biểu mẫu (BM) + DFD + endpoint API tương ứng (ghi
 | QL_BM3 | Quản lý tài khoản | [`ql-tai-khoan.html`](design/ui/ql-tai-khoan.html) | §7.5.3 |
 | QL_BM4 | Báo cáo tổng hợp (Dashboard) | [`ql-dashboard.html`](design/ui/ql-dashboard.html) | §7.5.4 |
 
-> 📷 **\[CHÈN ẢNH: 4 màn Quản lý]**
+<div>
+    <img src="design/images/ql-thuc-don-1.png" width="70%">
+    <img src="design/images/ql-thuc-don-2.png" width="25%">
+</div>
+<div>
+    <img src="design/images/ql-ban-1.png" width="70%">
+    <img src="design/images/ql-ban-2.png" width="25%">
+</div>
+<div>
+    <img src="design/images/ql-tai-khoan-1.png" width="70%">
+    <img src="design/images/ql-tai-khoan-2.png" width="25%">
+</div>
+<div>
+    <img src="design/images/ql-dashboard-1.png" width="70%">
+    <img src="design/images/ql-dashboard-2.png" width="25%">
+</div>
 
 # 4. THIẾT KẾ API {#thiết-kế-api}
 
