@@ -506,7 +506,7 @@ Mỗi màn ánh xạ 1 biểu mẫu (BM) + DFD + endpoint API tương ứng (ghi
 
 <div>
     <img src="design/images/dang-nhap-1.png" width="70%">
-    <img src="design/images/dang-nhap-2.png" width="20%">
+    <img src="design/images/dang-nhap-2.png" width="30%">
 </div>
 
 ## 3.2. Bộ phận Phục vụ
