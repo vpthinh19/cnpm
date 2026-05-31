@@ -163,7 +163,7 @@ Bảng tĩnh, 5 dòng, seed sẵn. PK là mã chuỗi (ngoại lệ kiểu, xem 
 
 **Index:** `IX_User_Role (RoleID)`.
 
-> `User` là từ khóa SQL Server → trong câu lệnh SQL phải bao `[User]` (xem seed §2.5).
+> `User` là từ khóa SQL Server → trong câu lệnh SQL phải bao `[User]` (xem `database.sql`).
 
 ### 2.3.3. `Ban`
 
@@ -214,7 +214,7 @@ Bảng tĩnh, 5 dòng, seed sẵn. PK là mã chuỗi (ngoại lệ kiểu, xem 
 
 | Tên trường | Kiểu dữ liệu | Ràng buộc | Mô tả |
 |---|---|---|---|
-| `PhieuOrderID` | INT IDENTITY(1,1) | **PK** | |
+| `PhieuOrderID` | INT IDENTITY(1,1) | **PK** | Cũng là "Số phiếu order" in trên PV_BM3 / B_BM1 (không có cột `Ma…` riêng — khác các phiếu kho/hóa đơn) |
 | `BanID` | INT | FK → `Ban.BanID`, NOT NULL | |
 | `NhanVienPhucVuID` | INT | FK → `User.UserID`, NOT NULL | NV mở order |
 | `ThoiGianTao` | DATETIME2 | NOT NULL, DEFAULT SYSDATETIME() | |
@@ -382,81 +382,11 @@ Dòng món của hóa đơn — **snapshot** lúc thanh toán để hóa đơn b
 | 7 | Khóa tài khoản khi `User.FailedLoginCount ≥ 5` | M1 | Sau mỗi lần sai |
 | 8 | Đặt bàn / nhận bàn / thanh toán: đồng bộ `Ban.TrangThai` trong cùng transaction với phiếu | M2 (cross-call) | Hàm dùng chung |
 
+> **Giản lược có chủ đích về đặt bàn:** tạo phiếu đặt set `Ban.TrangThai='DaDat'` **ngay** và yêu cầu bàn đang `'Trong'`, nên một bàn chỉ giữ được **một** phiếu đặt còn hiệu lực tại một thời điểm — mô hình hoạt động như "giữ chỗ tức thời", **không** hỗ trợ đặt trước nhiều khung giờ tương lai cho cùng một bàn (cột `ThoiGianDat` chỉ để ghi nhận/in PV_BM1, không dùng để kiểm tra xung đột theo giờ). Đủ cho quy mô đồ án; nếu cần đặt theo lịch thì thuộc hướng Tiến hóa (§6 DESCRIPTION).
+
 ## 2.5. Dữ liệu seed mẫu
 
-```sql
--- 1. Role (cố định)
-INSERT INTO Role (RoleID, RoleName, Description) VALUES
-('Admin',   N'Quản lý',       N'Quản lý toàn hệ thống'),
-('PhucVu',  N'Phục vụ',       N'Tiếp nhận đặt bàn, gọi món, phục vụ'),
-('Bep',     N'Bộ phận Bếp',   N'Chế biến món ăn / đồ uống'),
-('ThuNgan', N'Thu ngân',      N'Thanh toán, xuất hóa đơn'),
-('Kho',     N'Bộ phận Kho',   N'Nhập / xuất / báo cáo kho');
-
--- 2. User (mật khẩu mặc định = 'matkhau123', đã hash bcrypt cost 10)
-INSERT INTO [User] (Username, PasswordHash, FullName, RoleID) VALUES
-('admin',    '$2b$10$EXAMPLEHASHADMIN........................', N'Quản trị viên', 'Admin'),
-('phucvu1',  '$2b$10$EXAMPLEHASHPHUCVU.......................', N'Nguyễn Văn A',   'PhucVu'),
-('bep1',     '$2b$10$EXAMPLEHASHBEP..........................', N'Trần Thị B',     'Bep'),
-('thungan1', '$2b$10$EXAMPLEHASHTHUNGAN......................', N'Lê Văn C',       'ThuNgan'),
-('kho1',     '$2b$10$EXAMPLEHASHKHO..........................', N'Phạm Thị D',     'Kho');
-
--- 3. Ban
-INSERT INTO Ban (MaBan, KhuVuc, SucChua) VALUES
-('B01',   N'Tầng 1',     4),
-('B02',   N'Tầng 1',     6),
-('B03',   N'Tầng 2',     4),
-('B04',   N'Tầng 2',     6),
-('SV01',  N'Sân vườn',   8),
-('VIP01', N'Phòng VIP', 10);
-
--- 4. MonAn — menu thật của Bò Né Mỹ Cảnh
-INSERT INTO MonAn (MaSanPham, TenMon, LoaiMon, DonGia) VALUES
--- Món ăn (→ Bếp)
-('SP000221', N'NÉ MC',                    'MonAn',  95000),
-('SP000205', N'BÍT TẾT MC',               'MonAn', 140000),
-('SP000251', N'CƠM BLL',                  'MonAn', 160000),
-('SP000211', N'BÍT TẾT ĐẶC BIỆT',         'MonAn', 228000),
-('SP000230', N'NÉ SỐT PATE',              'MonAn', 100000),
-('SP000237', N'NÉ TRỨNG',                 'MonAn',  93000),
-('SP000219', N'BÍT TẾT + TRỨNG',          'MonAn', 155000),
-('SP000231', N'NÉ + PATE',                'MonAn', 119000),
-('SP000269', N'MÌ Ý',                     'MonAn', 105000),
-('SP000229', N'NÉ SỐT PATE KHÔNG TRỨNG',  'MonAn',  98000),
-('SP000290', N'BÒ KHO',                   'MonAn',  95000),
-('SP000391', N'NÉ NHỎ + X.XÍCH',          'MonAn',  94000),
-('SP000234', N'NÉ KHÔNG XÍU MẠI',         'MonAn',  90000),
-('SP000297', N'PHỞ MC',                   'MonAn',  65000),
-('SP000303', N'KHOAI TÂY',                'MonAn',  45000),
-('SP000352', N'BÁNH MÌ',                  'MonAn',   6000),
-('SP000353', N'TRỨNG',                    'MonAn',  15000),
--- Đồ uống (phục vụ trực tiếp, không qua Bếp)
-('SP000324', N'RAU MÁ',                   'DoUong',  20000),
-('SP000325', N'ĐẬU NÀNH',                 'DoUong',  20000),
-('SP000337', N'CAM LON',                  'DoUong',  17000),
-('SP000335', N'KHOÁNG LẠT',               'DoUong',  17000),
-('SP000330', N'SUỐI',                     'DoUong',  11000),
-('SP000342', N'TRÀ ĐÁ',                   'DoUong',   3000);
-
--- 5. NhaCungCap & NguyenLieu (NVL thật của Bò Né Mỹ Cảnh — chọn nhóm tiêu biểu cho M7 demo)
-INSERT INTO NhaCungCap (TenNCC, SoDienThoai, DiaChi) VALUES
-(N'Cơ sở cung cấp thịt bò',  N'0901234567', N'TP.HCM'),
-(N'Đại lý thực phẩm - đồ khô', N'0907654321', N'TP.HCM');
-
-INSERT INTO NguyenLieu (TenNVL, DonViTinh, TonHienTai, DinhMucToiThieu) VALUES
-(N'Miếng bò né',     N'kg',    30.0,  5.0),
-(N'Miếng bò bít tết', N'kg',   25.0,  5.0),
-(N'Pa tê',           N'kg',    10.0,  2.0),
-(N'Xíu mại',         N'phần', 100.0, 20.0),
-(N'Xúc xích',        N'kg',     8.0,  2.0),
-(N'Bò kho',          N'kg',    12.0,  3.0),
-(N'Trứng',           N'quả',  200.0, 30.0),
-(N'Bánh mì',         N'ổ',    100.0, 20.0),
-(N'Bánh phở',        N'kg',    10.0,  2.0),
-(N'Khoai tây',       N'kg',    15.0,  3.0),
-(N'Cà chua',         N'kg',    10.0,  2.0),
-(N'Hành phi',        N'kg',     3.0,  0.5);
-```
+Toàn bộ DDL (15 bảng + index + ràng buộc CHECK/FK) **và** dữ liệu seed (5 tài khoản, 6 bàn, 23 món, 2 NCC, 12 NVL) nằm trong tệp [`database.sql`](database.sql) ở thư mục gốc — chạy trực tiếp trên SQL Server 2019+. Mật khẩu seed mặc định cho mọi tài khoản = `matkhau123` (bcrypt cost 10, hash thật đã nhúng trong file). Khi triển khai, `database.sql` là **nguồn sự thật** cho schema; mô tả từng cột vẫn ở §2.3.
 
 ## 2.6. Hằng số hệ thống (tệp `config/constants.js`)
 
@@ -496,7 +426,7 @@ module.exports = {
 
 Giao diện phác họa bằng **HTML/CSS thuần** — mỗi màn 1 tệp trong `design/ui/`, dùng chung [`design/ui/style.css`](design/ui/style.css). Vừa là mockup cho báo cáo (render trình duyệt → chụp ảnh chèn vào), vừa tái dùng khi triển khai (bố cục khớp thiết kế). Đặc điểm: tối giản, **responsive cho điện thoại** (nhân viên phục vụ dùng mobile — sidebar thu thành thanh tab cố định đáy, bố cục về 1 cột).
 
-Mỗi màn ánh xạ 1 biểu mẫu (BM) + DFD + endpoint API tương ứng (ghi trong comment đầu tệp HTML). Bao gồm **toàn bộ màn hình**: chung, Phục vụ, Bếp, Thu ngân (D3a) và Kho, Quản lý (D3b).
+Mỗi màn ánh xạ 1 biểu mẫu (BM) + DFD + endpoint API tương ứng (ghi trong comment đầu tệp HTML). Bao gồm **toàn bộ 19 màn hình**: chung, Phục vụ, Bếp, Thu ngân, Kho, Quản lý.
 
 > 📷 **Cách chèn báo cáo:** mở từng tệp `.html` bằng trình duyệt (thu hẹp cửa sổ để xem bản mobile), chụp màn hình rồi chèn vào vị trí 📷 tương ứng bên dưới.
 
@@ -738,7 +668,7 @@ Base: `/dat-ban/*`. Bảng: `PhieuDatBan` (R/W), `Ban` (R + đổi trạng thái
 | GET | `/dat-ban` | PhucVu, Admin | Danh sách phiếu đặt. Query: `?TrangThai=&Ngay=&q=` (SĐT/tên/mã đặt) |
 | GET | `/dat-ban/:id` | PhucVu, Admin | Chi tiết phiếu đặt (theo PV_BM1) |
 | POST | `/dat-ban` | PhucVu | Tiếp nhận đặt bàn mới |
-| POST | `/dat-ban/:id/nhan-ban` | PhucVu | Đánh dấu khách đến (check-in thủ công) |
+| POST | `/dat-ban/:id/nhan-ban` | PhucVu | Đánh dấu khách đến (nhận bàn thủ công) |
 | POST | `/dat-ban/:id/huy` | PhucVu | Hủy phiếu đặt |
 
 **`POST /dat-ban`** (DFD §7.1.1 Bước 3–7) — Request:
@@ -753,10 +683,6 @@ Kiểm tra (PV_QĐ1): bàn tồn tại & `TrangThai='Trong'` (→ `409 CONFLICT_
 **`POST /dat-ban/:id/huy`** — điều kiện phiếu `TrangThai='DaDat'`. **Transaction**: `PhieuDatBan.TrangThai='DaHuy'` + `ThoiGianHuy=now` + trả `Ban.TrangThai='Trong'`. Không hủy phiếu `DaNhanBan` (khách đã tới — đã chuyển sang luồng order).
 
 > Đồng bộ `Ban.TrangThai` luôn nằm **cùng transaction** với thay đổi phiếu (ràng buộc §2.4 #8), qua hàm dùng chung `CapNhatTrangThaiBan`. Không có hủy tự động sau 15 phút (yêu cầu Tiến hóa §6 — ngoài phạm vi).
-
----
-
-> **Kết thúc D2a (M1–M4).**
 
 ## 4.5. Module M5 — Order + Bếp
 
@@ -873,7 +799,7 @@ Sinh `MaHoaDon = 'HD' + yyyymmdd + '-' + STT5` (STT theo ngày). **Transaction**
 |---|---|---|---|
 | GET | `/bao-cao/doanh-thu` | ThuNgan, Admin | TN_BM1. Query `?TuNgay=&DenNgay=` |
 
-Kiểm `TuNgay ≤ DenNgay` (→ `400`). Trả `{ DanhSach: [ {MaHoaDon, ThoiGianTao, MaBanSnapshot, TongThanhToan, HinhThucTT} ], TongDoanhThu }` (`TongDoanhThu = SUM(TongThanhToan)` HĐ trong kỳ). Chỉ đọc.
+Kiểm `TuNgay ≤ DenNgay` (→ `400`). Trả `{ DanhSach: [ {MaHoaDon, ThoiGianTao, MaBanSnapshot, TongThanhToan, HinhThucTT} ], TongDoanhThu }` (`TongDoanhThu = SUM(TongThanhToan)` HĐ trong kỳ — **doanh thu tính theo tổng thanh toán đã gồm VAT**, cột "Tổng tiền" trên TN_BM1). Chỉ đọc.
 
 ---
 
@@ -966,7 +892,7 @@ Kiểm `TuNgay ≤ DenNgay`. Trả 3 phần đúng QL_BM4 (§7.5.4 Bước 3–5
   ]
 }}
 ```
-- **A** từ `HoaDon` (`ThoiGianTao ∈ kỳ`), gộp theo `CAST(ThoiGianTao AS DATE)` và `HinhThucTT`.
+- **A** từ `HoaDon` (`ThoiGianTao ∈ kỳ`), gộp theo `CAST(ThoiGianTao AS DATE)` và `HinhThucTT`. `Tong`/`TongDoanhThuKy` = `SUM(TongThanhToan)` — **doanh thu đã gồm VAT** (đồng nhất với §4.6.3).
 - **B** JOIN `HoaDon → ChiTietHoaDon → MonAn` (HĐ trong kỳ), `SUM(SoLuong)`/`SUM(ThanhTien)` theo món, ORDER giảm dần, `TOP TOP_N_BAO_CAO`. *(Dùng `ChiTietHoaDon` snapshot — chính xác doanh số đã chốt.)*
 - **C** `NguyenLieu` `DangSuDung=1` và `TonHienTai ≤ DinhMucToiThieu`.
 
@@ -1047,7 +973,7 @@ HÀM XuLyDatBan(dl):   // dl: BanID, TenKhach, SoDienThoai, SoNguoi, ThoiGianDat
     }
     TRẢ_VỀ phieu
 
-HÀM NhanBan(phieuDatBanID):      // khách đến (check-in thủ công, §7.1.1 ghi chú)
+HÀM NhanBan(phieuDatBanID):      // khách đến (nhận bàn thủ công, §7.1.1 ghi chú)
     phieu ← repo.LayPhieuDatBan(phieuDatBanID)
     NẾU phieu = null THÌ NÉM_LỖI(404, 'NOT_FOUND', '...') HẾT_NẾU
     NẾU phieu.TrangThai ≠ 'DaDat' THÌ NÉM_LỖI(409, 'CONFLICT_STATE', '...') HẾT_NẾU

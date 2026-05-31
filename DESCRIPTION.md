@@ -39,7 +39,7 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 
 | **STT** | **Công việc** | **Loại công việc** | **Quy định / Công thức liên quan** | **Biểu mẫu liên quan** | **Ghi chú** |
 |----|----|----|----|----|----|
-| 1 | Lập báo cáo doanh thu | Kết xuất | Tổng doanh thu = ∑ (Tổng tiền các hóa đơn đã thanh toán trong kỳ). | TN_BM1 |  |
+| 1 | Lập báo cáo doanh thu | Kết xuất | Tổng doanh thu = ∑ (Tổng thanh toán **đã gồm VAT** của các hóa đơn đã thanh toán trong kỳ). | TN_BM1 |  |
 | 2 | Xử lý thanh toán | Tính toán | TN_QĐ1 | TN_BM2 | Xem bảng quy định |
 | 3 | Xuất hóa đơn | Kết xuất | Hóa đơn đầy đủ: thông tin nhà hàng, chi tiết món, SL, đơn giá, thành tiền, thuế VAT, ngày giờ. | TN_BM3 |  |
 
@@ -79,7 +79,7 @@ Hệ thống phân quyền cho 5 vai trò: Quản lý (Admin), Phục vụ, Bộ
 | 2 | Quản lý bàn | Lưu trữ | Thêm/sửa/xóa bàn. Thiết lập sức chứa, khu vực. | QL_BM2 |  |
 | 3 | Xem báo cáo tổng hợp | Kết xuất | Xem tất cả báo cáo: doanh thu, tồn kho, nhập/xuất. | QL_BM4 |  |
 
-*Ghi chú:* Các chức năng hệ thống do Admin thực hiện (quản lý tài khoản, cấu hình hệ thống, sao lưu/phục hồi) và chức năng đăng nhập áp dụng cho mọi vai trò được liệt kê tại §5 — không thuộc nhóm nghiệp vụ.
+*Ghi chú:* Các chức năng hệ thống do Admin thực hiện (quản lý tài khoản) và chức năng đăng nhập áp dụng cho mọi vai trò được liệt kê tại §5 — không thuộc nhóm nghiệp vụ.
 
 # 3. BẢNG YÊU CẦU CHỨC NĂNG NGHIỆP VỤ {#bảng-yêu-cầu-chức-năng-nghiệp-vụ}
 
@@ -668,7 +668,7 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 >
 > **Bước 3:** Nhận D1: Phục vụ chọn bàn, chọn món, nhập số lượng, ghi chú.
 >
-> **Bước 4:** **Kiểm tra trạng thái bàn**: chỉ chấp nhận nếu bàn = "Trống" (walk-in tự mở bàn) hoặc "Có khách" (đã check-in / đã có order trước đó). Nếu bàn = "Đã đặt" → thông báo lỗi D6 ("Bàn đang giữ chỗ — vui lòng thực hiện check-in trước") → kết thúc.
+> **Bước 4:** **Kiểm tra trạng thái bàn**: chỉ chấp nhận nếu bàn = "Trống" (walk-in tự mở bàn) hoặc "Có khách" (đã nhận bàn / đã có order trước đó). Nếu bàn = "Đã đặt" → thông báo lỗi D6 ("Bàn đang giữ chỗ — vui lòng nhận bàn trước") → kết thúc.
 >
 > **Bước 5:** Kiểm tra dữ liệu món: món có trong thực đơn; trạng thái "Còn hàng"; số lượng > 0.
 >
@@ -863,8 +863,8 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 |----|----|
 | D1 | Thông tin do Thu ngân nhập: Số hóa đơn cần in (hoặc tra theo bàn + ngày), số bản in. |
 | D2 | Không có. |
-| D3 | Đọc từ CSDL: Hóa đơn (tổng tiền, VAT, hình thức TT), chi tiết món của hóa đơn, thông tin nhà hàng (tên, địa chỉ, MST từ CSDL Cấu hình). |
-| D4 | Ghi vào CSDL: Ghi log audit (ai in lại, hóa đơn nào, lúc nào, số bản). Không sửa nội dung hóa đơn gốc. |
+| D3 | Đọc từ CSDL: Hóa đơn (tổng tiền, VAT, hình thức TT), chi tiết món của hóa đơn (bảng `ChiTietHoaDon` snapshot); thông tin nhà hàng (tên, địa chỉ, MST) lấy từ hằng số `config/constants.js`. |
+| D4 | Ghi vào CSDL: Tăng bộ đếm số lần in `HoaDon.SoLanIn` (từ lần in ≥ 2 → đóng dấu "BẢN SAO"). Không sửa nội dung hóa đơn gốc; không ghi log audit riêng. |
 | D5 | Xuất ra máy in: Hóa đơn thanh toán (TN_BM3) — có thể đánh dấu "BẢN SAO" nếu in lại lần ≥ 2. |
 | D6 | Hiển thị cho Thu ngân: Xem trước hóa đơn, kết quả in. |
 
@@ -882,7 +882,7 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 >
 > **Bước 6:** Xuất D5: in hóa đơn ra máy in.
 >
-> **Bước 7:** Ghi D4: lưu log in lại.
+> **Bước 7:** Ghi D4: tăng `HoaDon.SoLanIn` (không sửa nội dung hóa đơn gốc).
 >
 > **Bước 8:** Kết thúc.
 
