@@ -5,6 +5,8 @@ const authRoutes = require('../modules/auth/auth.routes');
 const userRoutes = require('../modules/users/user.routes');
 const banRoutes = require('../modules/ban/ban.routes');
 const monAnRoutes = require('../modules/monan/monan.routes');
+const datBanRoutes = require('../modules/datban/datban.routes');
+const orderRoutes = require('../modules/order/order.routes');
 
 const router = express.Router();
 
@@ -21,6 +23,12 @@ router.use('/ban', banRoutes);
 // M3 — Thực đơn
 router.use('/mon-an', monAnRoutes);
 
-// Các module M4–M8 sẽ gắn ở các đợt sau.
+// M4 — Đặt bàn
+router.use('/dat-ban', datBanRoutes);
+
+// M5 — Order + Bếp
+router.use('/order', orderRoutes);
+
+// Các module M6–M8 sẽ gắn ở các đợt sau.
 
 module.exports = router;

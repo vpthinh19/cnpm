@@ -1,5 +1,5 @@
 // Tầng repository M2 — bảng "Ban".
-const { query } = require('../../config/db');
+const { query, q } = require('../../config/db');
 
 const COLS = '"BanID", "MaBan", "KhuVuc", "SucChua", "TrangThai", "GhiChu", "DangSuDung"';
 
@@ -22,9 +22,14 @@ async function DanhSach({ TrangThai, KhuVuc } = {}) {
   return result.rows;
 }
 
-async function TimTheoID(banID) {
-  const result = await query(`SELECT ${COLS} FROM "Ban" WHERE "BanID" = $1`, [banID]);
+async function TimTheoID(banID, client = null) {
+  const result = await q(client, `SELECT ${COLS} FROM "Ban" WHERE "BanID" = $1`, [banID]);
   return result.rows[0] || null;
+}
+
+// Hàm dùng chung CapNhatTrangThaiBan (DESIGN §5.1) — gọi trong transaction của M4/M5/M6.
+async function CapNhatTrangThai(banID, trangThaiMoi, client = null) {
+  await q(client, 'UPDATE "Ban" SET "TrangThai" = $2 WHERE "BanID" = $1', [banID, trangThaiMoi]);
 }
 
 // Kiểm tra trùng MaBan (bỏ qua chính bản ghi banID nếu có — dùng khi sửa).
@@ -63,4 +68,4 @@ async function XoaMem(banID) {
   await query('UPDATE "Ban" SET "DangSuDung" = FALSE WHERE "BanID" = $1', [banID]);
 }
 
-module.exports = { DanhSach, TimTheoID, TonTaiMaBan, Them, CapNhat, XoaMem };
+module.exports = { DanhSach, TimTheoID, CapNhatTrangThai, TonTaiMaBan, Them, CapNhat, XoaMem };
