@@ -1,19 +1,7 @@
-/* =====================================================================
-   HỆ THỐNG QUẢN LÝ NHÀ HÀNG BÒ NÉ MỸ CẢNH
-   Script khởi tạo CSDL — Microsoft SQL Server 2019+
-   Sinh theo DESIGN.md §2 (15 bảng, 8 module). Quy ước: PK <Bảng>ID INT
-   IDENTITY; mã nghiệp vụ Ma<...> VARCHAR; bảng ChiTiet* dùng PK ghép.
-   Thực thể hệ thống (Role/User) đặt tên tiếng Anh; User là từ khóa → [User].
-
-   Cách dùng: mở bằng SSMS / sqlcmd, đặt đúng database rồi chạy toàn bộ.
-   Mật khẩu seed mặc định cho mọi tài khoản = 'matkhau123' (bcrypt cost 10).
-   ===================================================================== */
-
--- (Tùy chọn) tạo & chọn database. Bỏ comment nếu muốn script tự tạo DB.
--- IF DB_ID('BoNeMyCanh') IS NULL CREATE DATABASE BoNeMyCanh;
--- GO
--- USE BoNeMyCanh;
--- GO
+IF DB_ID('BoNeMyCanh') IS NULL CREATE DATABASE BoNeMyCanh;
+GO
+USE BoNeMyCanh;
+GO
 
 SET NOCOUNT ON;
 SET XACT_ABORT ON;
