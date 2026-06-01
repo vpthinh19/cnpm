@@ -7,6 +7,9 @@ const banRoutes = require('../modules/ban/ban.routes');
 const monAnRoutes = require('../modules/monan/monan.routes');
 const datBanRoutes = require('../modules/datban/datban.routes');
 const orderRoutes = require('../modules/order/order.routes');
+const thanhToanRoutes = require('../modules/thanhtoan/thanhtoan.routes');
+const khoRoutes = require('../modules/kho/kho.routes');
+const baoCaoRoutes = require('../modules/baocao/baocao.routes');
 
 const router = express.Router();
 
@@ -29,6 +32,15 @@ router.use('/dat-ban', datBanRoutes);
 // M5 — Order + Bếp
 router.use('/order', orderRoutes);
 
-// Các module M6–M8 sẽ gắn ở các đợt sau.
+// M6 — Thanh toán (3 prefix)
+router.use('/thanh-toan', thanhToanRoutes.thanhToan);
+router.use('/hoa-don', thanhToanRoutes.hoaDon);
+router.use('/bao-cao', thanhToanRoutes.baoCao);
+
+// M7 — Kho
+router.use('/kho', khoRoutes);
+
+// M8 — Báo cáo tổng hợp (Dashboard Admin) — thêm vào nhánh /bao-cao
+router.use('/bao-cao', baoCaoRoutes);
 
 module.exports = router;

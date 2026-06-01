@@ -35,23 +35,19 @@
           <div class="card-head"><h2>Phiếu đặt bàn mới</h2></div>
           <div class="card-body">
             <div class="form-grid">
-              <div class="field"><label>Tên khách</label><input type="text" placeholder="vd: Nguyễn Văn A"></div>
-              <div class="field"><label>Số điện thoại</label><input type="tel" placeholder="09xx xxx xxx"></div>
-              <div class="field"><label>Số người</label><input type="number" min="1" value="4"></div>
-              <div class="field"><label>Bàn</label>
-                <select>
-                  <option>B01 — Tầng 1 (4 chỗ) · Trống</option>
-                  <option>B03 — Tầng 2 (4 chỗ) · Trống</option>
-                  <option>SV01 — Sân vườn (8 chỗ) · Trống</option>
-                </select>
+              <div class="field"><label>Tên khách</label><input type="text" id="db_ten" placeholder="vd: Nguyễn Văn A"></div>
+              <div class="field"><label>Số điện thoại</label><input type="tel" id="db_sdt" placeholder="09xx xxx xxx"></div>
+              <div class="field"><label>Số người</label><input type="number" id="db_songuoi" min="1" value="4"></div>
+              <div class="field"><label>Bàn (đang trống)</label>
+                <select id="db_ban"></select>
               </div>
-              <div class="field"><label>Thời gian đặt</label><input type="datetime-local"></div>
+              <div class="field"><label>Thời gian đặt</label><input type="datetime-local" id="db_thoigian"></div>
               <div class="field"><label>Hình thức</label>
-                <select><option>Qua điện thoại</option><option>Trực tiếp</option></select>
+                <select id="db_hinhthuc"><option value="QuaDienThoai">Qua điện thoại</option><option value="TrucTiep">Trực tiếp</option></select>
               </div>
-              <div class="field full"><label>Ghi chú</label><textarea placeholder="Yêu cầu thêm..."></textarea></div>
+              <div class="field full"><label>Ghi chú</label><textarea id="db_ghichu" placeholder="Yêu cầu thêm..."></textarea></div>
             </div>
-            <button class="btn btn-primary btn-block" style="margin-top:16px">Lưu phiếu đặt bàn</button>
+            <button class="btn btn-primary btn-block" id="db_luu" style="margin-top:16px">Lưu phiếu đặt bàn</button>
           </div>
         </section>
 
@@ -59,27 +55,11 @@
         <section class="card">
           <div class="card-head"><h2>Phiếu đặt bàn hôm nay</h2></div>
           <div class="card-body">
-            <div class="toolbar"><div class="search"><input type="text" placeholder="Tìm theo SĐT / tên / mã..."></div></div>
+            <div class="toolbar"><div class="search"><input type="text" id="db_search" placeholder="Tìm theo SĐT / tên / mã..."></div></div>
             <div class="table-scroll">
             <table class="tbl">
               <thead><tr><th>Mã</th><th>Khách</th><th>Bàn</th><th>Giờ</th><th>Trạng thái</th><th></th></tr></thead>
-              <tbody>
-                <tr>
-                  <td>#15</td><td>Trần B<div class="muted" style="font-size:12px">0903…</div></td><td>B02</td><td>18:30</td>
-                  <td><span class="badge blue">Đã đặt</span></td>
-                  <td><div class="btn-row"><button class="btn btn-sm btn-success">Nhận bàn</button><button class="btn btn-sm btn-danger">Hủy</button></div></td>
-                </tr>
-                <tr>
-                  <td>#14</td><td>Lê C</td><td>VIP01</td><td>19:00</td>
-                  <td><span class="badge green">Đã nhận bàn</span></td>
-                  <td class="muted">—</td>
-                </tr>
-                <tr>
-                  <td>#12</td><td>Phạm D</td><td>B04</td><td>12:00</td>
-                  <td><span class="badge red">Đã hủy</span></td>
-                  <td class="muted">—</td>
-                </tr>
-              </tbody>
+              <tbody id="db_list"></tbody>
             </table>
             </div>
           </div>
@@ -89,5 +69,7 @@
     </div>
   </div>
 </div>
+<script src="js/app.js"></script>
+<script src="js/pv-dat-ban.js"></script>
 </body>
 </html>

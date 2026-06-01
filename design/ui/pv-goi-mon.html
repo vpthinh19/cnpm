@@ -45,11 +45,11 @@
           </div>
           <div class="card-body">
             <div class="toolbar">
-              <div class="search"><input type="text" placeholder="Tìm món..."></div>
-              <select style="width:auto">
-                <option>Tất cả loại</option>
-                <option>Món ăn</option>
-                <option>Đồ uống</option>
+              <div class="search"><input type="text" id="gm_search" placeholder="Tìm món..."></div>
+              <select style="width:auto" id="gm_loai">
+                <option value="">Tất cả loại</option>
+                <option value="MonAn">Món ăn</option>
+                <option value="DoUong">Đồ uống</option>
               </select>
             </div>
             <div class="table-scroll">
@@ -57,14 +57,7 @@
               <thead>
                 <tr><th>Tên món</th><th class="center">Loại</th><th class="num">Đơn giá</th><th class="center">Thêm</th></tr>
               </thead>
-              <tbody>
-                <tr><td>NÉ MC</td><td class="center"><span class="tag-loai">Món ăn</span></td><td class="num money">95.000</td><td class="center"><button class="btn btn-sm btn-primary">+</button></td></tr>
-                <tr><td>BÍT TẾT MC</td><td class="center"><span class="tag-loai">Món ăn</span></td><td class="num money">140.000</td><td class="center"><button class="btn btn-sm btn-primary">+</button></td></tr>
-                <tr><td>NÉ + PATE</td><td class="center"><span class="tag-loai">Món ăn</span></td><td class="num money">119.000</td><td class="center"><button class="btn btn-sm btn-primary">+</button></td></tr>
-                <tr><td>CƠM BLL</td><td class="center"><span class="tag-loai">Món ăn</span></td><td class="num money">160.000</td><td class="center"><button class="btn btn-sm btn-primary">+</button></td></tr>
-                <tr><td>ĐẬU NÀNH</td><td class="center"><span class="tag-loai">Đồ uống</span></td><td class="num money">20.000</td><td class="center"><button class="btn btn-sm btn-primary">+</button></td></tr>
-                <tr><td>TRÀ ĐÁ</td><td class="center"><span class="tag-loai">Đồ uống</span></td><td class="num money">3.000</td><td class="center"><button class="btn btn-sm btn-primary">+</button></td></tr>
-              </tbody>
+              <tbody id="gm_menu"></tbody>
             </table>
             </div>
           </div>
@@ -73,22 +66,18 @@
         <!-- CỘT PHẢI: order hiện tại của bàn -->
         <section class="card">
           <div class="card-head">
-            <h2>Order — Bàn B02</h2>
-            <span class="badge green">Có khách</span>
+            <h2 id="gm_ordertitle">Order</h2>
+            <span id="gm_orderbadge"></span>
           </div>
           <div class="card-body">
             <div class="form-grid" style="margin-bottom:14px">
               <div class="field">
                 <label>Bàn</label>
-                <select>
-                  <option>B02 — Tầng 1 (6 chỗ)</option>
-                  <option>B01 — Tầng 1 (4 chỗ)</option>
-                  <option>SV01 — Sân vườn (8 chỗ)</option>
-                </select>
+                <select id="gm_ban"></select>
               </div>
               <div class="field">
                 <label>Mã order</label>
-                <input type="text" value="#10" readonly>
+                <input type="text" id="gm_orderma" value="—" readonly>
               </div>
             </div>
 
@@ -97,40 +86,18 @@
               <thead>
                 <tr><th>Món</th><th class="center">SL</th><th class="num">Thành tiền</th><th class="center">TT</th><th></th></tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>NÉ MC<div class="muted" style="font-size:12px">ốp la</div></td>
-                  <td class="center"><input type="number" value="2" min="1" style="width:56px;text-align:center"></td>
-                  <td class="num money">190.000</td>
-                  <td class="center"><span class="badge gray">Chưa chốt</span></td>
-                  <td class="center"><button class="btn btn-sm btn-danger" title="Xóa dòng (chưa chốt)">✕</button></td>
-                </tr>
-                <tr>
-                  <td>TRÀ ĐÁ</td>
-                  <td class="center"><input type="number" value="2" min="1" style="width:56px;text-align:center"></td>
-                  <td class="num money">6.000</td>
-                  <td class="center"><span class="badge gray">Chưa chốt</span></td>
-                  <td class="center"><button class="btn btn-sm btn-danger" title="Xóa dòng (chưa chốt)">✕</button></td>
-                </tr>
-                <tr>
-                  <td>BÍT TẾT MC</td>
-                  <td class="center">1</td>
-                  <td class="num money">140.000</td>
-                  <td class="center"><span class="badge amber">Đang chế biến</span></td>
-                  <td class="center muted" title="Đã chốt — không sửa/xóa">🔒</td>
-                </tr>
-              </tbody>
+              <tbody id="gm_order"></tbody>
               <tfoot>
                 <tr>
                   <td colspan="2" class="right"><b>Tổng tạm tính</b></td>
-                  <td class="num money"><b>336.000</b></td>
+                  <td class="num money"><b id="gm_total">0</b></td>
                   <td colspan="2"></td>
                 </tr>
               </tfoot>
             </table>
             </div>
 
-            <button class="btn btn-primary btn-block" style="margin-top:16px">Chốt order → Bếp</button>
+            <button class="btn btn-primary btn-block" id="gm_chot" style="margin-top:16px">Chốt order → Bếp</button>
           </div>
         </section>
 
@@ -138,5 +105,7 @@
     </div>
   </div>
 </div>
+<script src="js/app.js"></script>
+<script src="js/pv-goi-mon.js"></script>
 </body>
 </html>

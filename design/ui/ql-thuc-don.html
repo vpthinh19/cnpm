@@ -29,23 +29,17 @@
 
     <div class="content">
       <div class="card">
-        <div class="card-head"><h2>Danh sách món</h2><button class="btn btn-primary btn-sm">+ Thêm món</button></div>
+        <div class="card-head"><h2>Danh sách món</h2><button class="btn btn-primary btn-sm" id="qm_them">+ Thêm món</button></div>
         <div class="card-body">
           <div class="toolbar">
-            <div class="search"><input type="text" placeholder="Tìm theo tên / mã SP..."></div>
-            <select style="width:auto"><option>Tất cả loại</option><option>Món ăn</option><option>Đồ uống</option></select>
-            <select style="width:auto"><option>Mọi trạng thái</option><option>Còn hàng</option><option>Hết hàng</option></select>
+            <div class="search"><input type="text" id="qm_search" placeholder="Tìm theo tên / mã SP..."></div>
+            <select style="width:auto" id="qm_loai"><option value="">Tất cả loại</option><option value="MonAn">Món ăn</option><option value="DoUong">Đồ uống</option></select>
+            <select style="width:auto" id="qm_trangthai"><option value="">Mọi trạng thái</option><option value="ConHang">Còn hàng</option><option value="HetHang">Hết hàng</option></select>
           </div>
           <div class="table-scroll">
           <table class="tbl">
             <thead><tr><th>Mã SP</th><th>Tên món</th><th>Loại</th><th class="num">Đơn giá</th><th class="center">Trạng thái</th><th class="center">Thao tác</th></tr></thead>
-            <tbody>
-              <tr><td>SP000221</td><td>NÉ MC</td><td><span class="tag-loai">Món ăn</span></td><td class="num money">95.000</td><td class="center"><span class="badge green">Còn hàng</span></td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm btn-danger">Xóa</button></div></td></tr>
-              <tr><td>SP000205</td><td>BÍT TẾT MC</td><td><span class="tag-loai">Món ăn</span></td><td class="num money">140.000</td><td class="center"><span class="badge green">Còn hàng</span></td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm btn-danger">Xóa</button></div></td></tr>
-              <tr><td>SP000211</td><td>BÍT TẾT ĐẶC BIỆT</td><td><span class="tag-loai">Món ăn</span></td><td class="num money">228.000</td><td class="center"><span class="badge red">Hết hàng</span></td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm btn-danger">Xóa</button></div></td></tr>
-              <tr><td>SP000342</td><td>TRÀ ĐÁ</td><td><span class="tag-loai">Đồ uống</span></td><td class="num money">3.000</td><td class="center"><span class="badge green">Còn hàng</span></td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm btn-danger">Xóa</button></div></td></tr>
-              <tr><td>SP000325</td><td>ĐẬU NÀNH</td><td><span class="tag-loai">Đồ uống</span></td><td class="num money">20.000</td><td class="center"><span class="badge green">Còn hàng</span></td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm btn-danger">Xóa</button></div></td></tr>
-            </tbody>
+            <tbody id="qm_list"></tbody>
           </table>
           </div>
         </div>
@@ -53,5 +47,7 @@
     </div>
   </div>
 </div>
+<script src="js/app.js"></script>
+<script src="js/ql-thuc-don.js"></script>
 </body>
 </html>

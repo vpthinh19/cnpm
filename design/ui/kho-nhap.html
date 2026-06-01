@@ -35,43 +35,26 @@
         <div class="card-body">
           <div class="form-grid">
             <div class="field"><label>Nhà cung cấp</label>
-              <select><option>Cơ sở cung cấp thịt bò</option><option>Đại lý thực phẩm - đồ khô</option></select>
+              <select id="kn_ncc"></select>
             </div>
-            <div class="field"><label>Ngày nhập</label><input type="date" value="2026-05-29"></div>
-            <div class="field full"><label>Ghi chú</label><input type="text" placeholder="..."></div>
+            <div class="field"><label>Ngày nhập</label><input type="date" id="kn_ngay"></div>
+            <div class="field full"><label>Ghi chú</label><input type="text" id="kn_ghichu" placeholder="..."></div>
           </div>
 
           <div class="table-scroll" style="margin-top:16px">
           <table class="tbl">
             <thead><tr><th>Nguyên liệu</th><th>ĐVT</th><th class="center">SL</th><th class="num">Đơn giá</th><th class="num">Thành tiền</th><th></th></tr></thead>
-            <tbody>
-              <tr>
-                <td><select><option>Miếng bò né</option><option>Pa tê</option><option>Xíu mại</option></select></td>
-                <td class="muted">kg</td>
-                <td class="center"><input type="number" value="10" style="width:70px;text-align:center"></td>
-                <td class="num"><input type="number" value="250000" style="width:110px;text-align:right"></td>
-                <td class="num money">2.500.000</td>
-                <td class="center"><button class="btn btn-sm btn-danger">✕</button></td>
-              </tr>
-              <tr>
-                <td><select><option>Trứng</option><option>Bánh mì</option></select></td>
-                <td class="muted">quả</td>
-                <td class="center"><input type="number" value="200" style="width:70px;text-align:center"></td>
-                <td class="num"><input type="number" value="3500" style="width:110px;text-align:right"></td>
-                <td class="num money">700.000</td>
-                <td class="center"><button class="btn btn-sm btn-danger">✕</button></td>
-              </tr>
-            </tbody>
+            <tbody id="kn_lines"></tbody>
             <tfoot>
-              <tr><td colspan="4" class="right"><b>Tổng giá trị nhập</b></td><td class="num money"><b>3.200.000</b></td><td></td></tr>
+              <tr><td colspan="4" class="right"><b>Tổng giá trị nhập</b></td><td class="num money"><b id="kn_total">0</b></td><td></td></tr>
             </tfoot>
           </table>
           </div>
 
           <div class="btn-row" style="margin-top:14px">
-            <button class="btn">+ Thêm dòng</button>
+            <button class="btn" id="kn_add">+ Thêm dòng</button>
             <div class="spacer" style="flex:1"></div>
-            <button class="btn btn-primary">Lưu phiếu nhập</button>
+            <button class="btn btn-primary" id="kn_save">Lưu phiếu nhập</button>
           </div>
         </div>
       </div>
@@ -82,10 +65,7 @@
           <div class="table-scroll">
           <table class="tbl">
             <thead><tr><th>Số phiếu</th><th>Ngày</th><th>NCC</th><th class="num">Tổng giá trị</th><th></th></tr></thead>
-            <tbody>
-              <tr><td>PN20260529-001</td><td>29/05/2026</td><td>Cơ sở cung cấp thịt bò</td><td class="num money">3.200.000</td><td><button class="btn btn-sm">Xem</button></td></tr>
-              <tr><td>PN20260528-002</td><td>28/05/2026</td><td>Đại lý thực phẩm - đồ khô</td><td class="num money">1.150.000</td><td><button class="btn btn-sm">Xem</button></td></tr>
-            </tbody>
+            <tbody id="kn_recent"></tbody>
           </table>
           </div>
         </div>
@@ -93,5 +73,7 @@
     </div>
   </div>
 </div>
+<script src="js/app.js"></script>
+<script src="js/kho-nhap.js"></script>
 </body>
 </html>

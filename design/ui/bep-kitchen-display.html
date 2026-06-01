@@ -28,49 +28,18 @@
 
     <div class="content">
       <div class="toolbar">
-        <div class="tabs" style="margin:0">
-          <span class="tab active">Tất cả</span>
-          <span class="tab">Chờ</span>
-          <span class="tab">Đang chế biến</span>
+        <div class="tabs" style="margin:0" id="kds_tabs">
+          <span class="tab active" data-filter="">Tất cả</span>
+          <span class="tab" data-filter="ChoCheBien">Chờ</span>
+          <span class="tab" data-filter="DangCheBien">Đang chế biến</span>
         </div>
       </div>
 
-      <div class="kds-grid">
-        <div class="kds-card cho">
-          <div class="kds-head"><span class="ban">Bàn B02</span><span class="time">⏱ 18:31</span></div>
-          <div class="kds-body">
-            <div class="kds-mon">NÉ MC × 2</div>
-            <div class="kds-meta">Ghi chú: ốp la</div>
-            <button class="btn btn-primary btn-block">Bắt đầu chế biến</button>
-          </div>
-        </div>
-        <div class="kds-card cho">
-          <div class="kds-head"><span class="ban">Bàn SV01</span><span class="time">⏱ 18:33</span></div>
-          <div class="kds-body">
-            <div class="kds-mon">PHỞ MC × 3</div>
-            <div class="kds-meta">Ghi chú: ít hành</div>
-            <button class="btn btn-primary btn-block">Bắt đầu chế biến</button>
-          </div>
-        </div>
-        <div class="kds-card dang">
-          <div class="kds-head"><span class="ban">Bàn B05</span><span class="time">⏱ 18:28</span></div>
-          <div class="kds-body">
-            <div class="kds-mon">BÍT TẾT ĐẶC BIỆT × 1</div>
-            <div class="kds-meta"><span class="badge amber">Đang chế biến</span></div>
-            <button class="btn btn-success btn-block">Hoàn thành (Đã xong)</button>
-          </div>
-        </div>
-        <div class="kds-card dang">
-          <div class="kds-head"><span class="ban">Bàn B02</span><span class="time">⏱ 18:31</span></div>
-          <div class="kds-body">
-            <div class="kds-mon">BÍT TẾT MC × 1</div>
-            <div class="kds-meta"><span class="badge amber">Đang chế biến</span></div>
-            <button class="btn btn-success btn-block">Hoàn thành (Đã xong)</button>
-          </div>
-        </div>
-      </div>
+      <div class="kds-grid" id="kds_grid"></div>
     </div>
   </div>
 </div>
+<script src="js/app.js"></script>
+<script src="js/bep-kitchen-display.js"></script>
 </body>
 </html>

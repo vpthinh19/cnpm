@@ -30,21 +30,16 @@
 
     <div class="content">
       <div class="card">
-        <div class="card-head"><h2>Danh sách tài khoản</h2><button class="btn btn-primary btn-sm">+ Thêm tài khoản</button></div>
+        <div class="card-head"><h2>Danh sách tài khoản</h2><button class="btn btn-primary btn-sm" id="qa_them">+ Thêm tài khoản</button></div>
         <div class="card-body">
           <div class="toolbar">
-            <div class="search"><input type="text" placeholder="Tìm theo họ tên / tên đăng nhập..."></div>
-            <select style="width:auto"><option>Mọi vai trò</option><option>Admin</option><option>Phục vụ</option><option>Bếp</option><option>Thu ngân</option><option>Kho</option></select>
+            <div class="search"><input type="text" id="qa_search" placeholder="Tìm theo họ tên / tên đăng nhập..."></div>
+            <select style="width:auto" id="qa_role"><option value="">Mọi vai trò</option><option value="Admin">Admin</option><option value="PhucVu">Phục vụ</option><option value="Bep">Bếp</option><option value="ThuNgan">Thu ngân</option><option value="Kho">Kho</option></select>
           </div>
           <div class="table-scroll">
           <table class="tbl">
             <thead><tr><th>Mã NV</th><th>Họ tên</th><th>Tên đăng nhập</th><th>Vai trò</th><th class="center">Trạng thái</th><th class="center">Thao tác</th></tr></thead>
-            <tbody>
-              <tr><td>1</td><td>Quản trị viên</td><td>admin</td><td>Admin</td><td class="center"><span class="badge green">Hoạt động</span></td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm">Đặt lại MK</button></div></td></tr>
-              <tr><td>2</td><td>Nguyễn Văn A</td><td>phucvu1</td><td>Phục vụ</td><td class="center"><span class="badge green">Hoạt động</span></td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm btn-danger">Khóa</button></div></td></tr>
-              <tr><td>4</td><td>Lê Văn C</td><td>thungan1</td><td>Thu ngân</td><td class="center"><span class="badge red">Đã khóa</span></td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm btn-success">Mở khóa</button></div></td></tr>
-              <tr><td>5</td><td>Phạm Thị D</td><td>kho1</td><td>Kho</td><td class="center"><span class="badge green">Hoạt động</span></td><td class="center"><div class="btn-row"><button class="btn btn-sm">Sửa</button><button class="btn btn-sm btn-danger">Khóa</button></div></td></tr>
-            </tbody>
+            <tbody id="qa_list"></tbody>
           </table>
           </div>
         </div>
@@ -52,5 +47,7 @@
     </div>
   </div>
 </div>
+<script src="js/app.js"></script>
+<script src="js/ql-tai-khoan.js"></script>
 </body>
 </html>

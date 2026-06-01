@@ -4,8 +4,14 @@
 //   - query(text, params)        : chạy 1 câu lệnh trên pool (rows giữ key PascalCase).
 //   - q(client, text, params)    : chạy trên client (trong transaction) hoặc pool nếu client null.
 //   - withTransaction(fn)        : GIAO_DỊCH — BEGIN → fn(client) → COMMIT, lỗi thì ROLLBACK.
-const { Pool } = require('pg');
+const { Pool, types } = require('pg');
 const env = require('./env');
+
+// pg mặc định trả NUMERIC/BIGINT dưới dạng chuỗi (giữ độ chính xác tùy ý).
+// Giá tiền & tồn kho của hệ thống đều < 2^53 nên parse về số JS an toàn,
+// đúng quy ước JSON §4.0 (TongThanhToan, DonGia, TonHienTai... là số, không phải chuỗi).
+types.setTypeParser(1700, (v) => (v === null ? null : parseFloat(v))); // NUMERIC/DECIMAL
+types.setTypeParser(20, (v) => (v === null ? null : parseInt(v, 10))); // BIGINT (vd SUM)
 
 const pool = new Pool({
   host: env.PGHOST,

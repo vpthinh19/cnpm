@@ -35,50 +35,33 @@
         <div class="card-head"><h2>Thông tin phiếu xuất</h2></div>
         <div class="card-body">
           <div class="form-grid">
-            <div class="field"><label>Ngày xuất</label><input type="date" value="2026-05-29"></div>
-            <div class="field"><label>Ghi chú</label><input type="text" placeholder="vd: xuất cho bếp ca sáng"></div>
+            <div class="field"><label>Ngày xuất</label><input type="date" id="kx_ngay"></div>
+            <div class="field"><label>Ghi chú</label><input type="text" id="kx_ghichu" placeholder="vd: xuất cho bếp ca sáng"></div>
           </div>
 
           <div class="table-scroll" style="margin-top:16px">
           <table class="tbl">
             <thead><tr><th>Nguyên liệu</th><th>ĐVT</th><th class="num">Tồn hiện tại</th><th class="center">SL xuất</th><th class="num">Đơn giá</th><th class="num">Thành tiền</th><th></th></tr></thead>
-            <tbody>
-              <tr>
-                <td><select><option>Miếng bò né</option><option>Pa tê</option></select></td>
-                <td class="muted">kg</td>
-                <td class="num">30,000</td>
-                <td class="center"><input type="number" value="5" style="width:70px;text-align:center"></td>
-                <td class="num"><input type="number" value="250000" style="width:110px;text-align:right"></td>
-                <td class="num money">1.250.000</td>
-                <td class="center"><button class="btn btn-sm btn-danger">✕</button></td>
-              </tr>
-              <tr>
-                <td><select><option>Bò kho</option><option>Hành phi</option></select></td>
-                <td class="muted">kg</td>
-                <td class="num" style="color:var(--c-danger)">2,000 ⚠</td>
-                <td class="center"><input type="number" value="1" style="width:70px;text-align:center"></td>
-                <td class="num"><input type="number" value="120000" style="width:110px;text-align:right"></td>
-                <td class="num money">120.000</td>
-                <td class="center"><button class="btn btn-sm btn-danger">✕</button></td>
-              </tr>
-            </tbody>
+            <tbody id="kx_lines"></tbody>
             <tfoot>
-              <tr><td colspan="5" class="right"><b>Tổng giá trị xuất</b></td><td class="num money"><b>1.370.000</b></td><td></td></tr>
+              <tr><td colspan="5" class="right"><b>Tổng giá trị xuất</b></td><td class="num money"><b id="kx_total">0</b></td><td></td></tr>
             </tfoot>
           </table>
           </div>
 
-          <p class="muted" style="font-size:12.5px;margin:10px 0 0">⚠ Cảnh báo: nguyên liệu sắp chạm định mức tối thiểu sau khi xuất.</p>
+          <p class="muted" id="kx_canhbao" style="font-size:12.5px;margin:10px 0 0;display:none"></p>
 
           <div class="btn-row" style="margin-top:14px">
-            <button class="btn">+ Thêm dòng</button>
+            <button class="btn" id="kx_add">+ Thêm dòng</button>
             <div class="spacer" style="flex:1"></div>
-            <button class="btn btn-primary">Lưu phiếu xuất</button>
+            <button class="btn btn-primary" id="kx_save">Lưu phiếu xuất</button>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+<script src="js/app.js"></script>
+<script src="js/kho-xuat.js"></script>
 </body>
 </html>
