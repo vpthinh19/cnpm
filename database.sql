@@ -59,7 +59,7 @@ CREATE TABLE "Ban" (
 /* ---- M3: Thực đơn ---- */
 CREATE TABLE "MonAn" (
     "MonAnID"     INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    "MaSanPham"   VARCHAR(20)   NOT NULL UNIQUE,   -- mã theo sổ sách (vd SP000221)
+    "MaMonAn"   VARCHAR(20)   NOT NULL UNIQUE,   -- mã theo sổ sách (vd SP000221)
     "TenMon"      VARCHAR(100)  NOT NULL UNIQUE,
     "LoaiMon"     VARCHAR(10)   NOT NULL
                   CONSTRAINT ck_monan_loaimon CHECK ("LoaiMon" IN ('MonAn','DoUong')),
@@ -271,7 +271,7 @@ INSERT INTO "Ban" ("MaBan", "KhuVuc", "SucChua") VALUES
 ('B217', 'Tầng 2', 4), ('B218', 'Tầng 2', 4);
 
 /* ---- 3.4 MonAn ---- */
-INSERT INTO "MonAn" ("MaSanPham", "TenMon", "LoaiMon", "DonGia") VALUES
+INSERT INTO "MonAn" ("MaMonAn", "TenMon", "LoaiMon", "DonGia") VALUES
 -- Món ăn (→ Bếp)
 ('SP000221', 'NÉ MC',                    'MonAn',  95000),
 ('SP000205', 'BÍT TẾT MC',               'MonAn', 140000),

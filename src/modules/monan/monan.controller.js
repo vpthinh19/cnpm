@@ -12,8 +12,8 @@ async function detail(req, res) {
 }
 
 async function create(req, res) {
-  const { MaSanPham, TenMon, LoaiMon, DonGia, MoTa } = req.body || {};
-  return created(res, await service.TaoMon({ MaSanPham, TenMon, LoaiMon, DonGia, MoTa }), 'Thêm món thành công');
+  const { MaMonAn, TenMon, LoaiMon, DonGia, MoTa } = req.body || {};
+  return created(res, await service.TaoMon({ MaMonAn, TenMon, LoaiMon, DonGia, MoTa }), 'Thêm món thành công');
 }
 
 async function update(req, res) {

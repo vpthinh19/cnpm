@@ -13,7 +13,7 @@
         tb.innerHTML = rows.map(function (m) {
           var doiNhan = m.TrangThai === 'ConHang' ? 'Hết hàng' : 'Còn hàng';
           return '<tr>' +
-            '<td>' + App.escapeHtml(m.MaSanPham) + '</td><td>' + App.escapeHtml(m.TenMon) + '</td>' +
+            '<td>' + App.escapeHtml(m.MaMonAn) + '</td><td>' + App.escapeHtml(m.TenMon) + '</td>' +
             '<td><span class="tag-loai">' + (m.LoaiMon === 'MonAn' ? 'Món ăn' : 'Đồ uống') + '</span></td>' +
             '<td class="num money">' + App.money(m.DonGia) + '</td>' +
             '<td class="center">' + App.badge(m.TrangThai) + '</td>' +
@@ -38,7 +38,7 @@
   function themMon() {
     App.formModal({
       title: 'Thêm món', fields: [
-        { name: 'MaSanPham', label: 'Mã sản phẩm', value: '' },
+        { name: 'MaMonAn', label: 'Mã sản phẩm', value: '' },
         { name: 'TenMon', label: 'Tên món', value: '' },
         { name: 'LoaiMon', label: 'Loại', type: 'select', options: LOAI, value: 'MonAn' },
         { name: 'DonGia', label: 'Đơn giá', type: 'number', value: 0 },
@@ -46,7 +46,7 @@
       ]
     }).then(function (v) {
       if (!v) return;
-      App.api('/mon-an', { method: 'POST', body: { MaSanPham: v.MaSanPham.trim(), TenMon: v.TenMon.trim(), LoaiMon: v.LoaiMon, DonGia: Number(v.DonGia), MoTa: v.MoTa.trim() } })
+      App.api('/mon-an', { method: 'POST', body: { MaMonAn: v.MaMonAn.trim(), TenMon: v.TenMon.trim(), LoaiMon: v.LoaiMon, DonGia: Number(v.DonGia), MoTa: v.MoTa.trim() } })
         .then(function () { App.toast('Đã thêm món'); nap(); }).catch(App.showError);
     });
   }

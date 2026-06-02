@@ -43,7 +43,7 @@
 | Bảng CSDL | PascalCase tiếng Việt không dấu | `Ban`, `PhieuDatBan`, `ChiTietOrder` |
 | Cột CSDL | **PascalCase** tiếng Việt không dấu | `TenKhach`, `TongThanhToan`, `ThoiGianTao` |
 | Khóa chính (surrogate) | `<Bảng>ID`, **INT IDENTITY** | `HoaDonID`, `MonAnID`, `BanID` |
-| Mã nghiệp vụ (người dùng đọc) | `Ma<…>`, **VARCHAR** (ASCII) | `MaHoaDon`, `MaSanPham`, `MaPhieuNhap`, `MaBan` |
+| Mã nghiệp vụ (người dùng đọc) | `Ma<…>`, **VARCHAR** (ASCII) | `MaHoaDon`, `MaMonAn`, `MaPhieuNhap`, `MaBan` |
 | Khóa ngoại | **Cùng tên với PK tham chiếu** (`<Bảng>ID`) | `BanID` ở `PhieuOrder` → `Ban.BanID` |
 | FK trỏ `User` (ngữ nghĩa) | `NhanVien<VaiTrò>ID` | `NhanVienPhucVuID`, `NhanVienThuNganID`, `NhanVienLapID` |
 | Trường thời gian | `ThoiGian<SựKiện>` | `ThoiGianTao`, `ThoiGianXong` |
@@ -182,7 +182,7 @@ Bảng tĩnh, 5 dòng, seed sẵn. PK là mã chuỗi (ngoại lệ kiểu, xem 
 | Tên trường | Kiểu dữ liệu | Ràng buộc | Mô tả |
 |---|---|---|---|
 | `MonAnID` | INT GENERATED ALWAYS AS IDENTITY | **PK** | Khóa kỹ thuật tự sinh |
-| `MaSanPham` | VARCHAR(20) | UNIQUE, NOT NULL | Mã món theo sổ sách nhà hàng (vd `SP000221`) |
+| `MaMonAn` | VARCHAR(20) | UNIQUE, NOT NULL | Mã món theo sổ sách nhà hàng (vd `SP000221`) |
 | `TenMon` | VARCHAR(100) | UNIQUE, NOT NULL | |
 | `LoaiMon` | VARCHAR(10) | NOT NULL, CHECK IN (`'MonAn'`,`'DoUong'`) | Phân loại menu. Món ăn → qua Bếp; Đồ uống → phục vụ trực tiếp (không qua Bếp) |
 | `DonGia` | NUMERIC(15,0) | NOT NULL, CHECK (`DonGia >= 0`) | VND (không phần thập phân) |
@@ -651,7 +651,7 @@ Base: `/mon-an/*`. Bảng: `MonAn` (R/W). DFD: §7.5.1 (QL_BM1). CRUD do **Admin
 | PATCH | `/mon-an/:id/trang-thai` | Admin | Đổi `ConHang`↔`HetHang` |
 | DELETE | `/mon-an/:id` | Admin | Xóa mềm (`DangSuDung=0`) |
 
-**`POST /mon-an`** — Request `{ "MaSanPham": "SP000400", "TenMon": "Gỏi cuốn", "LoaiMon": "MonAn", "DonGia": 40000, "MoTa": "" }`. Kiểm tra (§7.5.1 Bước 4): `MaSanPham` và `TenMon` không trùng (→ `409 DUPLICATE`); `DonGia >= 0`; `LoaiMon ∈ ('MonAn','DoUong')`. Trạng thái khởi tạo `'ConHang'`.
+**`POST /mon-an`** — Request `{ "MaMonAn": "SP000400", "TenMon": "Gỏi cuốn", "LoaiMon": "MonAn", "DonGia": 40000, "MoTa": "" }`. Kiểm tra (§7.5.1 Bước 4): `MaMonAn` và `TenMon` không trùng (→ `409 DUPLICATE`); `DonGia >= 0`; `LoaiMon ∈ ('MonAn','DoUong')`. Trạng thái khởi tạo `'ConHang'`.
 
 **`PATCH /mon-an/:id/trang-thai`** — Request `{ "TrangThai": "HetHang" }`. Phục vụ khi gọi món chỉ thấy món `ConHang` (lọc ở M5).
 

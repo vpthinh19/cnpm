@@ -21,13 +21,13 @@ async function LayChiTiet(monAnID) {
   return mon;
 }
 
-async function TaoMon({ MaSanPham, TenMon, LoaiMon, DonGia, MoTa }) {
-  if (!MaSanPham || !TenMon) throw ApiError.validation('Thiếu mã sản phẩm hoặc tên món');
+async function TaoMon({ MaMonAn, TenMon, LoaiMon, DonGia, MoTa }) {
+  if (!MaMonAn || !TenMon) throw ApiError.validation('Thiếu mã sản phẩm hoặc tên món');
   if (!LOAI_MON.includes(LoaiMon)) throw ApiError.validation('Loại món không hợp lệ');
   const donGia = kiemTraDonGia(DonGia);
-  if (await repo.TonTaiCot('MaSanPham', MaSanPham)) throw ApiError.duplicate('Mã sản phẩm đã tồn tại');
+  if (await repo.TonTaiCot('MaMonAn', MaMonAn)) throw ApiError.duplicate('Mã sản phẩm đã tồn tại');
   if (await repo.TonTaiCot('TenMon', TenMon)) throw ApiError.duplicate('Tên món đã tồn tại');
-  return repo.Them({ MaSanPham, TenMon, LoaiMon, DonGia: donGia, MoTa });
+  return repo.Them({ MaMonAn, TenMon, LoaiMon, DonGia: donGia, MoTa });
 }
 
 async function CapNhatMon(monAnID, { TenMon, LoaiMon, DonGia, MoTa }) {
@@ -35,7 +35,7 @@ async function CapNhatMon(monAnID, { TenMon, LoaiMon, DonGia, MoTa }) {
   if (!TenMon) throw ApiError.validation('Thiếu tên món');
   if (!LOAI_MON.includes(LoaiMon)) throw ApiError.validation('Loại món không hợp lệ');
   const donGia = kiemTraDonGia(DonGia);
-  // MaSanPham (mã sổ sách) không sửa — chỉ kiểm tra trùng TenMon.
+  // MaMonAn (mã sổ sách) không sửa — chỉ kiểm tra trùng TenMon.
   if (await repo.TonTaiCot('TenMon', TenMon, monAnID)) throw ApiError.duplicate('Tên món đã tồn tại');
   return repo.CapNhat(monAnID, { TenMon, LoaiMon, DonGia: donGia, MoTa });
 }

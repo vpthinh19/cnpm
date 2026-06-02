@@ -132,7 +132,7 @@ package "Phân hệ Bán Hàng & Phục Vụ" <<Rectangle>> {
   entity "MonAn" as MonAn {
     * MonAnID <<PK>>
     --
-    MaSanPham
+    MaMonAn
     TenMon
     LoaiMon
     DonGia

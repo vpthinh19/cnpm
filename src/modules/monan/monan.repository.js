@@ -1,7 +1,7 @@
 // Tầng repository M3 — bảng "MonAn".
 const { query } = require('../../config/db');
 
-const COLS = '"MonAnID", "MaSanPham", "TenMon", "LoaiMon", "DonGia", "TrangThai", "MoTa", "DangSuDung"';
+const COLS = '"MonAnID", "MaMonAn", "TenMon", "LoaiMon", "DonGia", "TrangThai", "MoTa", "DangSuDung"';
 
 // Chỉ liệt kê món đang kinh doanh (DangSuDung = TRUE).
 async function DanhSach({ LoaiMon, TrangThai, q } = {}) {
@@ -17,7 +17,7 @@ async function DanhSach({ LoaiMon, TrangThai, q } = {}) {
   }
   if (q) {
     params.push(`%${q}%`);
-    dieuKien.push(`("TenMon" ILIKE $${params.length} OR "MaSanPham" ILIKE $${params.length})`);
+    dieuKien.push(`("TenMon" ILIKE $${params.length} OR "MaMonAn" ILIKE $${params.length})`);
   }
   const result = await query(
     `SELECT ${COLS} FROM "MonAn" WHERE ${dieuKien.join(' AND ')} ORDER BY "MonAnID"`,
@@ -32,7 +32,7 @@ async function TimTheoID(monAnID) {
 }
 
 async function TonTaiCot(cot, giaTri, boQuaID = null) {
-  // cot ∈ {MaSanPham, TenMon} — kiểm soát nội bộ, an toàn với nháy kép.
+  // cot ∈ {MaMonAn, TenMon} — kiểm soát nội bộ, an toàn với nháy kép.
   const params = [giaTri];
   let sql = `SELECT 1 FROM "MonAn" WHERE "${cot}" = $1`;
   if (boQuaID) {
@@ -43,12 +43,12 @@ async function TonTaiCot(cot, giaTri, boQuaID = null) {
   return result.rows.length > 0;
 }
 
-async function Them({ MaSanPham, TenMon, LoaiMon, DonGia, MoTa }) {
+async function Them({ MaMonAn, TenMon, LoaiMon, DonGia, MoTa }) {
   const result = await query(
-    `INSERT INTO "MonAn" ("MaSanPham", "TenMon", "LoaiMon", "DonGia", "MoTa")
+    `INSERT INTO "MonAn" ("MaMonAn", "TenMon", "LoaiMon", "DonGia", "MoTa")
      VALUES ($1, $2, $3, $4, $5)
      RETURNING ${COLS}`,
-    [MaSanPham, TenMon, LoaiMon, DonGia, MoTa ?? null]
+    [MaMonAn, TenMon, LoaiMon, DonGia, MoTa ?? null]
   );
   return result.rows[0];
 }
