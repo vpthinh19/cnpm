@@ -9,7 +9,7 @@ async function khoiDong() {
     client.release();
     console.log('[DB] Kết nối PostgreSQL thành công');
     app.listen(env.PORT, () => {
-      console.log(`[SERVER] Bò Né Mỹ Cảnh API chạy tại http://localhost:${env.PORT}/api/v1`);
+      console.log(`[SERVER] Bò Né Mỹ Cảnh API chạy tại http://localhost:${env.PORT}`);
     });
   } catch (err) {
     console.error('[DB] Không kết nối được PostgreSQL:', err.message);
