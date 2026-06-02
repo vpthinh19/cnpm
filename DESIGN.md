@@ -260,7 +260,7 @@ ORDER BY ct."ThoiGianChot";
 | `HoaDonID` | INT GENERATED ALWAYS AS IDENTITY | **PK** | Khóa kỹ thuật |
 | `MaHoaDon` | VARCHAR(20) | UNIQUE, NOT NULL | Số hóa đơn, vd `HD20260529-00001` (sinh ở service) |
 | `PhieuOrderID` | INT | FK → `PhieuOrder.PhieuOrderID`, UNIQUE, NOT NULL | 1 order ↔ 1 hóa đơn |
-| `MaBanSnapshot` | VARCHAR(10) | NOT NULL | Snapshot `Ban.MaBan` |
+| `MaBan` | VARCHAR(10) | NOT NULL | Snapshot `Ban.MaBan` |
 | `NhanVienThuNganID` | INT | FK → `User.UserID`, NOT NULL | |
 | `TongTienMon` | NUMERIC(15,0) | NOT NULL | ∑(SL × đơn giá) |
 | `TyLeVat` | NUMERIC(5,4) | NOT NULL, DEFAULT 0.1 | Snapshot (mặc định 0.1 = 10%) |
@@ -781,7 +781,7 @@ Xử lý (§7.2.1 Bước 8–11): kiểm lại TN_QĐ1 + order `DangPhucVu` (ch
 - **`TienMat`**: bắt buộc `TienKhachDua ≥ TongThanhToan` (thiếu → `400 RULE_VIOLATION`); `TienThua = TienKhachDua − TongThanhToan`.
 - **`ChuyenKhoan`**: `TienKhachDua=NULL`, `TienThua=0`, `MaGiaoDich` tùy chọn.
 
-Sinh `MaHoaDon = 'HD' + yyyymmdd + '-' + STT5` (STT theo ngày). **Transaction**: INSERT `HoaDon` (snapshot `MaBanSnapshot`, `TyLeVat`, `NhanVienThuNganID`=token, `SoLanIn=0`) + **INSERT `ChiTietHoaDon`** (gộp các dòng `ChiTietOrder` không hủy theo `MonAnID`: snapshot `TenMon`, `SoLuong` tổng, `DonGia`) + `PhieuOrder.TrangThai='DaThanhToan'` + `Ban.TrangThai='Trong'`. Trả `201` hóa đơn. (In hóa đơn = gọi tiếp §4.6.2.)
+Sinh `MaHoaDon = 'HD' + yyyymmdd + '-' + STT5` (STT theo ngày). **Transaction**: INSERT `HoaDon` (snapshot `MaBan`, `TyLeVat`, `NhanVienThuNganID`=token, `SoLanIn=0`) + **INSERT `ChiTietHoaDon`** (gộp các dòng `ChiTietOrder` không hủy theo `MonAnID`: snapshot `TenMon`, `SoLuong` tổng, `DonGia`) + `PhieuOrder.TrangThai='DaThanhToan'` + `Ban.TrangThai='Trong'`. Trả `201` hóa đơn. (In hóa đơn = gọi tiếp §4.6.2.)
 
 ### 4.6.2. Xuất / in lại hóa đơn (DFD §7.2.3, TN_BM3)
 
@@ -799,7 +799,7 @@ Sinh `MaHoaDon = 'HD' + yyyymmdd + '-' + STT5` (STT theo ngày). **Transaction**
 |---|---|---|---|
 | GET | `/bao-cao/doanh-thu` | ThuNgan, Admin | TN_BM1. Query `?TuNgay=&DenNgay=` |
 
-Kiểm `TuNgay ≤ DenNgay` (→ `400`). Trả `{ DanhSach: [ {MaHoaDon, ThoiGianTao, MaBanSnapshot, TongThanhToan, HinhThucTT} ], TongDoanhThu }` (`TongDoanhThu = SUM(TongThanhToan)` HĐ trong kỳ — **doanh thu tính theo tổng thanh toán đã gồm VAT**, cột "Tổng tiền" trên TN_BM1). Chỉ đọc.
+Kiểm `TuNgay ≤ DenNgay` (→ `400`). Trả `{ DanhSach: [ {MaHoaDon, ThoiGianTao, MaBan, TongThanhToan, HinhThucTT} ], TongDoanhThu }` (`TongDoanhThu = SUM(TongThanhToan)` HĐ trong kỳ — **doanh thu tính theo tổng thanh toán đã gồm VAT**, cột "Tổng tiền" trên TN_BM1). Chỉ đọc.
 
 ---
 
@@ -1139,7 +1139,7 @@ HÀM XuLyThanhToan(dl):   // dl: PhieuOrderID, HinhThucTT, TienKhachDua, MaGiaoD
     ban ← repo.LayBan(order.BanID)
     GIAO_DỊCH {
         hd ← repo.Them('HoaDon', {
-                PhieuOrderID: dl.PhieuOrderID, MaHoaDon: maHoaDon, MaBanSnapshot: ban.MaBan,
+                PhieuOrderID: dl.PhieuOrderID, MaHoaDon: maHoaDon, MaBan: ban.MaBan,
                 NhanVienThuNganID: nguoiDung.UserID, TongTienMon: tongTienMon, TyLeVat: tyLeVat,
                 TienVat: tienVat, TongThanhToan: tongThanhToan, HinhThucTT: dl.HinhThucTT,
                 TienKhachDua: tienKhachDua, TienThua: tienThua, MaGiaoDich: dl.MaGiaoDich,

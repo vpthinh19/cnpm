@@ -1,7 +1,7 @@
 // Tầng repository M6 — "HoaDon" + "ChiTietHoaDon" (đọc order qua orderRepo ở service).
 const { query, q } = require('../../config/db');
 
-const HD_COLS = `"HoaDonID", "MaHoaDon", "PhieuOrderID", "MaBanSnapshot", "NhanVienThuNganID",
+const HD_COLS = `"HoaDonID", "MaHoaDon", "PhieuOrderID", "MaBan", "NhanVienThuNganID",
   "TongTienMon", "TyLeVat", "TienVat", "TongThanhToan", "HinhThucTT", "TienKhachDua", "TienThua",
   "MaGiaoDich", "ThoiGianTao", "SoLanIn"`;
 
@@ -13,17 +13,17 @@ async function DemHoaDonTrongNgay(client = null) {
 
 async function ThemHoaDon(data, client = null) {
   const {
-    MaHoaDon, PhieuOrderID, MaBanSnapshot, NhanVienThuNganID, TongTienMon, TyLeVat, TienVat,
+    MaHoaDon, PhieuOrderID, MaBan, NhanVienThuNganID, TongTienMon, TyLeVat, TienVat,
     TongThanhToan, HinhThucTT, TienKhachDua, TienThua, MaGiaoDich,
   } = data;
   const result = await q(
     client,
     `INSERT INTO "HoaDon"
-       ("MaHoaDon", "PhieuOrderID", "MaBanSnapshot", "NhanVienThuNganID", "TongTienMon", "TyLeVat",
+       ("MaHoaDon", "PhieuOrderID", "MaBan", "NhanVienThuNganID", "TongTienMon", "TyLeVat",
         "TienVat", "TongThanhToan", "HinhThucTT", "TienKhachDua", "TienThua", "MaGiaoDich", "SoLanIn")
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12, 0)
      RETURNING ${HD_COLS}`,
-    [MaHoaDon, PhieuOrderID, MaBanSnapshot, NhanVienThuNganID, TongTienMon, TyLeVat, TienVat,
+    [MaHoaDon, PhieuOrderID, MaBan, NhanVienThuNganID, TongTienMon, TyLeVat, TienVat,
       TongThanhToan, HinhThucTT, TienKhachDua ?? null, TienThua, MaGiaoDich ?? null]
   );
   return result.rows[0];
@@ -79,7 +79,7 @@ async function DanhSachHoaDon({ TuNgay, DenNgay, MaHoaDon, MaBan } = {}) {
   }
   if (MaBan) {
     params.push(MaBan);
-    dk.push(`"MaBanSnapshot" = $${params.length}`);
+    dk.push(`"MaBan" = $${params.length}`);
   }
   const where = dk.length ? `WHERE ${dk.join(' AND ')}` : '';
   const result = await query(`SELECT ${HD_COLS} FROM "HoaDon" ${where} ORDER BY "ThoiGianTao" DESC`, params);
@@ -89,7 +89,7 @@ async function DanhSachHoaDon({ TuNgay, DenNgay, MaHoaDon, MaBan } = {}) {
 // Báo cáo doanh thu (TN_BM1): danh sách HĐ trong kỳ + tổng.
 async function BaoCaoDoanhThu({ TuNgay, DenNgay }) {
   const result = await query(
-    `SELECT "MaHoaDon", "ThoiGianTao", "MaBanSnapshot", "TongThanhToan", "HinhThucTT"
+    `SELECT "MaHoaDon", "ThoiGianTao", "MaBan", "TongThanhToan", "HinhThucTT"
      FROM "HoaDon"
      WHERE "ThoiGianTao"::date >= $1 AND "ThoiGianTao"::date <= $2
      ORDER BY "ThoiGianTao"`,

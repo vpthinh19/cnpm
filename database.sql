@@ -134,7 +134,7 @@ CREATE TABLE "HoaDon" (
     "HoaDonID"            INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     "MaHoaDon"            VARCHAR(20)  NOT NULL UNIQUE,    -- vd HD20260529-00001
     "PhieuOrderID"        INT          NOT NULL UNIQUE,    -- 1 order ↔ 1 hóa đơn
-    "MaBanSnapshot"       VARCHAR(10)  NOT NULL,
+    "MaBan"               VARCHAR(10)  NOT NULL,
     "NhanVienThuNganID"   INT          NOT NULL,
     "TongTienMon"         NUMERIC(15,0) NOT NULL,
     "TyLeVat"             NUMERIC(5,4) NOT NULL DEFAULT 0.1,   -- snapshot (0.1 = 10%)

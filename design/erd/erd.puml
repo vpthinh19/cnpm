@@ -106,7 +106,7 @@ package "Phân hệ Bán Hàng & Phục Vụ" <<Rectangle>> {
     MaHoaDon
     PhieuOrderID <<FK>>
     NhanVienThuNganID <<FK>>
-    MaBanSnapshot
+    MaBan
     TongTienMon
     TyLeVat
     TienVat

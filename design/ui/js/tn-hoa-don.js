@@ -11,7 +11,7 @@
       var tb = App.el('hd_list');
       if (!rows.length) { tb.innerHTML = '<tr><td colspan="5" class="muted">Chưa có hóa đơn.</td></tr>'; return; }
       tb.innerHTML = rows.map(function (h) {
-        return '<tr><td>' + App.escapeHtml(h.MaHoaDon) + '</td><td>' + App.escapeHtml(h.MaBanSnapshot) + '</td><td>' +
+        return '<tr><td>' + App.escapeHtml(h.MaHoaDon) + '</td><td>' + App.escapeHtml(h.MaBan) + '</td><td>' +
           App.timeShort(h.ThoiGianTao) + '</td><td class="num money">' + App.money(h.TongThanhToan) +
           '</td><td><button class="btn btn-sm" data-xem="' + h.HoaDonID + '">Xem</button></td></tr>';
       }).join('');
@@ -32,7 +32,7 @@
       App.el('hd_nhahang').innerHTML = App.escapeHtml(nhaHang.dia_chi || '') + '<br>ĐT: ' + App.escapeHtml(nhaHang.so_dien_thoai || '') + ' · MST: ' + App.escapeHtml(nhaHang.ma_so_thue || '');
     }
     App.el('hd_so').textContent = hd.MaHoaDon;
-    App.el('hd_ban').textContent = hd.MaBanSnapshot;
+    App.el('hd_ban').textContent = hd.MaBan;
     App.el('hd_ngay').textContent = App.dateTime(hd.ThoiGianTao);
     App.el('hd_ht').textContent = HT[hd.HinhThucTT] || hd.HinhThucTT;
     App.el('hd_lines').innerHTML = (chiTiet || []).map(function (d) {

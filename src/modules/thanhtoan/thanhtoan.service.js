@@ -73,7 +73,7 @@ async function XuLyThanhToan(dl, nhanVienID) {
     const MaHoaDon = `HD${ngayYYYYMMDD()}-${String(seq).padStart(5, '0')}`;
     const hd = await repo.ThemHoaDon(
       {
-        MaHoaDon, PhieuOrderID, MaBanSnapshot: ban.MaBan, NhanVienThuNganID: nhanVienID,
+        MaHoaDon, PhieuOrderID, MaBan: ban.MaBan, NhanVienThuNganID: nhanVienID,
         TongTienMon, TyLeVat, TienVat, TongThanhToan, HinhThucTT,
         TienKhachDua: tienKhachDua, TienThua: tienThua, MaGiaoDich,
       },

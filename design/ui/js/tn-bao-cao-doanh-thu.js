@@ -16,7 +16,7 @@
       else {
         tb.innerHTML = r.DanhSach.map(function (h, i) {
           return '<tr><td>' + (i + 1) + '</td><td>' + App.escapeHtml(h.MaHoaDon) + '</td><td>' + App.dateVN(h.ThoiGianTao) +
-            '</td><td>' + App.escapeHtml(h.MaBanSnapshot) + '</td><td class="num money">' + App.money(h.TongThanhToan) +
+            '</td><td>' + App.escapeHtml(h.MaBan) + '</td><td class="num money">' + App.money(h.TongThanhToan) +
             '</td><td>' + (HT[h.HinhThucTT] || h.HinhThucTT) + '</td></tr>';
         }).join('');
       }
