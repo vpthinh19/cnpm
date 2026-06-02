@@ -36,7 +36,9 @@ body {
 }
 
 /* ---------- Bố cục khung ứng dụng ---------- */
-.app { display: flex; min-height: 100vh; }
+/* Khoá toàn ứng dụng đúng 1 màn hình: sidebar + topbar cố định, chỉ vùng
+   nội dung (và khung danh sách bên trong) cuộn — trang không kéo dài quá viewport. */
+.app { display: flex; height: 100vh; overflow: hidden; }
 
 .sidebar {
   width: 220px; flex: 0 0 220px;
@@ -83,7 +85,7 @@ body {
 }
 .topbar .user .role { color: var(--c-muted); font-size: 12px; }
 
-.content { padding: 22px; flex: 1; overflow: auto; }
+.content { padding: 22px; flex: 1; overflow: auto; min-height: 0; }
 .content.narrow { max-width: 920px; margin: 0 auto; width: 100%; }
 
 /* ---------- Tiêu đề trang ---------- */
@@ -147,11 +149,21 @@ textarea { resize: vertical; min-height: 64px; }
 
 /* ---------- Bảng ---------- */
 table.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-table.tbl th, table.tbl td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--c-border); }
+table.tbl th, table.tbl td { padding: 6px 12px; text-align: left; border-bottom: 1px solid var(--c-border); }
 table.tbl th { background: #fafbfc; color: #475467; font-weight: 600; font-size: 12.5px; text-transform: none; }
 table.tbl tbody tr:hover { background: #fafbfc; }
 table.tbl td.num, table.tbl th.num { text-align: right; font-variant-numeric: tabular-nums; }
 table.tbl td.center, table.tbl th.center { text-align: center; }
+/* Nút thao tác trong dòng nhỏ gọn lại để dòng không bị cao */
+table.tbl td .btn-sm { padding: 4px 9px; font-size: 12px; }
+table.tbl td input[type="number"], table.tbl td input[type="text"] { padding: 5px 8px; }
+
+/* Danh sách cuộn trong khung: lấp phần cao còn lại của 1 màn hình (trừ hao
+   topbar + tiêu đề/bộ lọc + lề), không kéo dài trang theo số dòng.
+   Tiêu đề cột dính trên đầu khi cuộn. */
+.table-scroll { max-height: max(220px, calc(100vh - 360px)); overflow-y: auto; }
+table.tbl thead th { position: sticky; top: 0; z-index: 1; }
+table.tbl tfoot td { position: sticky; bottom: 0; background: var(--c-surface); }
 
 /* ---------- Toolbar / Bộ lọc ---------- */
 .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
@@ -192,7 +204,9 @@ table.tbl td.center, table.tbl th.center { text-align: center; }
    Sidebar → thanh tab cố định đáy màn hình; mọi bố cục về 1 cột.
    ============================================================ */
 @media (max-width: 820px) {
-  .app { flex-direction: column; }
+  /* Mobile: cuộn trang tự nhiên, không khoá viewport, danh sách dài đầy đủ */
+  .app { flex-direction: column; height: auto; overflow: visible; }
+  .table-scroll { max-height: none; overflow-y: visible; }
 
   .sidebar {
     width: 100%; flex: none; order: 2;
@@ -292,6 +306,8 @@ table.tbl td.center, table.tbl th.center { text-align: center; }
   /* Card bên trong vùng in: bỏ viền/bóng cho sạch trang */
   body.printing .print-area .card,
   body.printing .print-area.card { border: none; box-shadow: none; }
+  /* Bỏ giới hạn chiều cao/cuộn để in đủ toàn bộ danh sách */
+  body.printing .print-area .table-scroll { max-height: none !important; overflow: visible !important; }
 
   @page { margin: 12mm; }
 }
