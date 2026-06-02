@@ -1,14 +1,3 @@
-/* =====================================================================
-   CSDL "Bò Né Mỹ Cảnh" — PostgreSQL
-   ---------------------------------------------------------------------
-   Cách chạy:
-     1) Tạo database (1 lần, chạy ở DB 'postgres'):
-          CREATE DATABASE "BoNeMyCanh";
-     2) Kết nối vào "BoNeMyCanh" rồi chạy toàn bộ file này:
-          psql -U postgres -d BoNeMyCanh -f database.sql
-   Quy ước: giữ PascalCase → mọi định danh bọc nháy kép "...".
-   ===================================================================== */
-
 /* ---------------------------------------------------------------------
    1. XÓA BẢNG CŨ (nếu chạy lại) — theo thứ tự phụ thuộc ngược
    --------------------------------------------------------------------- */
@@ -275,7 +264,7 @@ INSERT INTO "Ban" ("MaBan", "KhuVuc", "SucChua") VALUES
 ('SV01',  'Sân vườn',   8),
 ('VIP01', 'Phòng VIP', 10);
 
-/* ---- 3.4 MonAn — menu thật của Bò Né Mỹ Cảnh (23 món) ---- */
+/* ---- 3.4 MonAn ---- */
 INSERT INTO "MonAn" ("MaSanPham", "TenMon", "LoaiMon", "DonGia") VALUES
 -- Món ăn (→ Bếp)
 ('SP000221', 'NÉ MC',                    'MonAn',  95000),
@@ -321,7 +310,3 @@ INSERT INTO "NguyenLieu" ("TenNVL", "DonViTinh", "TonHienTai", "DinhMucToiThieu"
 ('Khoai tây',        'kg',    15.0,  3.0),
 ('Cà chua',          'kg',    10.0,  2.0),
 ('Hành phi',         'kg',     3.0,  0.5);
-
-DO $$ BEGIN
-  RAISE NOTICE '>> Khởi tạo CSDL Bò Né Mỹ Cảnh hoàn tất: 15 bảng + seed (5 tài khoản, 6 bàn, 23 món, 2 NCC, 12 NVL).';
-END $$;
