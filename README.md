@@ -20,10 +20,16 @@ npm install
 psql -U postgres -c "CREATE DATABASE \"BoNeMyCanh\";"
 psql -U postgres -d BoNeMyCanh -f database.sql
 
-# 4) Chạy server
-npm start          # http://localhost:3000/api/v1
+# 4) Chạy server (backend API + giao diện web cùng 1 cổng)
+npm start          # API: http://localhost:3000/api/v1
 # hoặc: npm run dev  (tự reload khi đổi mã)
+
+# 5) Mở giao diện trên trình duyệt
+#    http://localhost:3000/  → tự chuyển tới màn đăng nhập
 ```
+
+## Giao diện web
+Frontend HTML/CSS/JS thuần trong `design/ui/` được chính server Express phục vụ (cùng origin với API, không cần CORS). Sau khi `npm start`, mở **http://localhost:3000/** và đăng nhập — hệ thống tự đưa tới giao diện theo vai trò. 19 màn, mỗi màn 1 file JS trong `design/ui/js/`; thư viện chung `js/app.js` lo xác thực JWT, gọi API, phân quyền, định dạng.
 
 ## Tài khoản mẫu (mật khẩu: `matkhau123`)
 | Username | Vai trò |
