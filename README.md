@@ -17,6 +17,7 @@ npm install
 #    (mặc định: localhost:5432, user postgres, DB BoNeMyCanh)
 
 # 3) Tạo CSDL + nạp schema/seed
+# đảm bảo đã có C:\Program Files\PostgreSQL\18\bin trong Path enviroment (mở bằng pgAdmin dễ hơn)
 psql -U postgres -c 'CREATE DATABASE \"BoNeMyCanh\";'
 psql -U postgres -d BoNeMyCanh -f database.sql
 # nếu lỗi UTF-8 thì chạy `chcp 6500` và `set PGCLIENTENCODING=utf8` (đối với CMD) hoặc `$env:PGCLIENTENCODING="utf8"` (đối với POWERSHELL)
