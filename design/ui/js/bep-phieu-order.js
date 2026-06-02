@@ -49,6 +49,6 @@
     }).catch(App.showError);
   }
 
-  App.on('po_print', 'click', function () { window.print(); });
+  App.on('po_print', 'click', function () { App.print('.receipt'); });
   nap();
 })();

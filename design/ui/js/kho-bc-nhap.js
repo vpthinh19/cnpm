@@ -31,7 +31,7 @@
   }
 
   App.on('bn_xem', 'click', xem);
-  App.on('bn_print', 'click', function () { window.print(); });
+  App.on('bn_print', 'click', function () { App.print('#bn_area'); });
   App.el('bn_tu').value = App.todayISO();
   App.el('bn_den').value = App.todayISO();
   napNCC().then(xem);

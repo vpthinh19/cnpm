@@ -35,7 +35,7 @@
   }
 
   App.on('dash_xem', 'click', xem);
-  App.on('dash_print', 'click', function () { window.print(); });
+  App.on('dash_print', 'click', function () { App.print('#dash_area'); });
   App.el('dash_tu').value = App.todayISO();
   App.el('dash_den').value = App.todayISO();
   xem();

@@ -21,7 +21,7 @@
   }
 
   App.on('bx_xem', 'click', xem);
-  App.on('bx_print', 'click', function () { window.print(); });
+  App.on('bx_print', 'click', function () { App.print('#bx_area'); });
   App.el('bx_tu').value = App.todayISO();
   App.el('bx_den').value = App.todayISO();
   xem();

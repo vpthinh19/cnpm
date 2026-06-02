@@ -20,7 +20,7 @@
   }
 
   App.on('bt_xem', 'click', xem);
-  App.on('bt_print', 'click', function () { window.print(); });
+  App.on('bt_print', 'click', function () { App.print('#bt_area'); });
   App.el('bt_tu').value = App.todayISO();
   App.el('bt_den').value = App.todayISO();
   xem();

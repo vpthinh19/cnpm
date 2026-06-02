@@ -42,6 +42,6 @@
   }
 
   App.on('pb_order', 'change', xemPhieu);
-  App.on('pb_print', 'click', function () { window.print(); });
+  App.on('pb_print', 'click', function () { App.print('.receipt'); });
   napDanhSach();
 })();

@@ -53,7 +53,7 @@
     if (!hoaDonHienTai) return;
     App.api('/hoa-don/' + hoaDonHienTai + '/in', { method: 'POST' }).then(function (r) {
       renderReceipt(r.HoaDon, r.ChiTiet, r.NhaHang, r.BanSao);
-      window.print();
+      App.print('.receipt');
     }).catch(App.showError);
   }
 

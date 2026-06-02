@@ -221,6 +221,24 @@
     });
   }
 
+  /* ---------- In ấn ---------- */
+  // print(selector): chỉ in đúng vùng cần (phiếu/hóa đơn/báo cáo), không in
+  // cả sidebar/topbar/toolbar. Đánh dấu tạm class .print-area cho phần tử
+  // được chọn rồi gọi window.print(); CSS @media print lo phần ẩn/hiện.
+  function print(selector) {
+    var node = document.querySelector(selector);
+    if (!node) { window.print(); return; }
+    node.classList.add('print-area');
+    document.body.classList.add('printing');
+    function cleanup() {
+      document.body.classList.remove('printing');
+      node.classList.remove('print-area');
+      window.removeEventListener('afterprint', cleanup);
+    }
+    window.addEventListener('afterprint', cleanup);
+    window.print();
+  }
+
   /* ---------- Helper DOM ---------- */
   function el(id) { return document.getElementById(id); }
   function on(id, ev, fn) { var e = el(id); if (e) e.addEventListener(ev, fn); }
@@ -229,7 +247,7 @@
     api: api, guard: guard, logout: logout, setSession: setSession, token: token, user: user,
     money: money, qty: qty, dateTime: dateTime, timeShort: timeShort, dateVN: dateVN, todayISO: todayISO,
     escapeHtml: escapeHtml, badge: badge, trangThaiLabel: trangThaiLabel,
-    toast: toast, showError: showError, el: el, on: on, formModal: formModal,
+    toast: toast, showError: showError, el: el, on: on, formModal: formModal, print: print,
     ROLE_LABEL: ROLE_LABEL, ROLE_HOME: ROLE_HOME,
   };
 })(window);

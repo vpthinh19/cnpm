@@ -25,7 +25,7 @@
   }
 
   App.on('dt_xem', 'click', xem);
-  App.on('dt_print', 'click', function () { window.print(); });
+  App.on('dt_print', 'click', function () { App.print('#dt_area'); });
   App.el('dt_tu').value = App.todayISO();
   App.el('dt_den').value = App.todayISO();
   xem();

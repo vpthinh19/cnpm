@@ -255,14 +255,20 @@ INSERT INTO "User" ("Username", "PasswordHash", "FullName", "RoleID") VALUES
 ('thungan1', '$2b$10$Wt3dMdDuiHaq8PjW8j0.jeQrKn0inwnWMVf0lsxFnbTG6AzhA25oW', 'Lê Văn C',       'ThuNgan'),
 ('kho1',     '$2b$10$6GJG7aWBUXE/RQxlfNSIPOF/GwjSeGYWGaL3GujwIEvMa3jxhRkoG', 'Phạm Thị D',     'Kho');
 
-/* ---- 3.3 Ban ---- */
+/* ---- 3.3 Ban ---- (2 tầng, T1 17 bàn, T2 18 bàn, sức chứa 4) */
 INSERT INTO "Ban" ("MaBan", "KhuVuc", "SucChua") VALUES
-('B01',   'Tầng 1',     4),
-('B02',   'Tầng 1',     6),
-('B03',   'Tầng 2',     4),
-('B04',   'Tầng 2',     6),
-('SV01',  'Sân vườn',   8),
-('VIP01', 'Phòng VIP', 10);
+-- Tầng 1: 17 bàn
+('B101', 'Tầng 1', 4), ('B102', 'Tầng 1', 4), ('B103', 'Tầng 1', 4), ('B104', 'Tầng 1', 4),
+('B105', 'Tầng 1', 4), ('B106', 'Tầng 1', 4), ('B107', 'Tầng 1', 4), ('B108', 'Tầng 1', 4),
+('B109', 'Tầng 1', 4), ('B110', 'Tầng 1', 4), ('B111', 'Tầng 1', 4), ('B112', 'Tầng 1', 4),
+('B113', 'Tầng 1', 4), ('B114', 'Tầng 1', 4), ('B115', 'Tầng 1', 4), ('B116', 'Tầng 1', 4),
+('B117', 'Tầng 1', 4),
+-- Tầng 2: 18 bàn
+('B201', 'Tầng 2', 4), ('B202', 'Tầng 2', 4), ('B203', 'Tầng 2', 4), ('B204', 'Tầng 2', 4),
+('B205', 'Tầng 2', 4), ('B206', 'Tầng 2', 4), ('B207', 'Tầng 2', 4), ('B208', 'Tầng 2', 4),
+('B209', 'Tầng 2', 4), ('B210', 'Tầng 2', 4), ('B211', 'Tầng 2', 4), ('B212', 'Tầng 2', 4),
+('B213', 'Tầng 2', 4), ('B214', 'Tầng 2', 4), ('B215', 'Tầng 2', 4), ('B216', 'Tầng 2', 4),
+('B217', 'Tầng 2', 4), ('B218', 'Tầng 2', 4);
 
 /* ---- 3.4 MonAn ---- */
 INSERT INTO "MonAn" ("MaSanPham", "TenMon", "LoaiMon", "DonGia") VALUES

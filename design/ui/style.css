@@ -269,3 +269,29 @@ table.tbl td.center, table.tbl th.center { text-align: center; }
 
 /* Khu vực xem trước bản in (căn giữa, nền xám) */
 .print-stage { background: #eceef1; border-radius: var(--radius); padding: 24px; display: flex; justify-content: center; }
+
+/* ============================================================
+   IN ẤN — chỉ in vùng .print-area (App.print), ẩn sidebar/topbar/toolbar.
+   Dùng visibility để giữ layout nội dung bên trong vùng in.
+   ============================================================ */
+@media print {
+  body.printing { background: #fff; }
+  /* Ẩn toàn bộ, sau đó hiện lại đúng vùng in + con của nó */
+  body.printing * { visibility: hidden !important; box-shadow: none !important; }
+  body.printing .print-area,
+  body.printing .print-area * { visibility: visible !important; }
+
+  /* Đưa vùng in lên đầu trang giấy, bỏ viền/nền khung xem trước */
+  body.printing .print-area {
+    position: absolute; left: 0; top: 0; margin: 0;
+    border: none; background: #fff;
+  }
+  /* Báo cáo (card/bảng) trải hết khổ giấy; phiếu nhiệt giữ bề rộng gọn của nó */
+  body.printing .print-area:not(.receipt) { width: 100%; }
+  body.printing .print-area.receipt { right: 0; margin: 0 auto; border: none; }
+  /* Card bên trong vùng in: bỏ viền/bóng cho sạch trang */
+  body.printing .print-area .card,
+  body.printing .print-area.card { border: none; box-shadow: none; }
+
+  @page { margin: 12mm; }
+}

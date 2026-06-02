@@ -20,7 +20,7 @@
       <a href="pv-phuc-vu.html">🛎️ Phục vụ ra bàn</a>
       <a href="pv-phieu-bep.html">🧾 Phiếu chuyển bếp</a>
     </nav>
-    <div class="foot">Phục vụ · ca chiều</div>
+    <div class="foot">Phục vụ</div>
   </aside>
 
   <div class="main">
@@ -36,6 +36,23 @@
     </header>
 
     <div class="content">
+
+      <!-- CHỌN BÀN (lên đầu — nhân viên chọn bàn trước rồi mới chọn món) -->
+      <section class="card">
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="field">
+              <label>Bàn</label>
+              <select id="gm_ban"></select>
+            </div>
+            <div class="field">
+              <label>Mã order</label>
+              <input type="text" id="gm_orderma" value="—" readonly>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <div class="split">
 
         <!-- CỘT TRÁI: thực đơn để chọn món -->
@@ -70,17 +87,6 @@
             <span id="gm_orderbadge"></span>
           </div>
           <div class="card-body">
-            <div class="form-grid" style="margin-bottom:14px">
-              <div class="field">
-                <label>Bàn</label>
-                <select id="gm_ban"></select>
-              </div>
-              <div class="field">
-                <label>Mã order</label>
-                <input type="text" id="gm_orderma" value="—" readonly>
-              </div>
-            </div>
-
             <div class="table-scroll">
             <table class="tbl">
               <thead>
