@@ -23,18 +23,18 @@
 │  ─ Tầng route (Express Router) ──────────────► §4 API                │
 │  ─ Tầng controller — validate + middleware JWT/role                  │
 │  ─ Tầng service — logic nghiệp vụ ──────────► §5 Pseudocode          │
-│  ─ Tầng repository — truy vấn SQL (driver mssql)                     │
+│  ─ Tầng repository — truy vấn SQL (driver pg)                        │
 │  ─ Hằng số hệ thống: tệp config/constants.js (VAT, giờ HĐ, ...)      │
 └──────────────────────────────────────────────────────────────────────┘
-                              │  TCP/IP (mssql driver)
+                              │  TCP/IP (pg driver)
                               ▼
 ┌──────────────────────────────────────────────────────────────────────┐
-│  CSDL — Microsoft SQL Server 2019+                                   │
+│  CSDL — PostgreSQL 14+                                               │
 │  ─ 15 bảng (§2)                                                      │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
-**Mô hình triển khai:** chạy trên 1 máy chủ trong mạng LAN của nhà hàng. Toàn bộ client là PC/laptop trong cùng mạng LAN. Sao lưu CSDL nằm ngoài phạm vi ứng dụng (việc của DBA, dùng tính năng backup của SQL Server).
+**Mô hình triển khai:** chạy trên 1 máy chủ trong mạng LAN của nhà hàng. Toàn bộ client là PC/laptop trong cùng mạng LAN. Sao lưu CSDL nằm ngoài phạm vi ứng dụng (việc của DBA, dùng `pg_dump` của PostgreSQL).
 
 ## 1.2. Quy ước đặt tên
 
@@ -48,7 +48,7 @@
 | FK trỏ `User` (ngữ nghĩa) | `NhanVien<VaiTrò>ID` | `NhanVienPhucVuID`, `NhanVienThuNganID`, `NhanVienLapID` |
 | Trường thời gian | `ThoiGian<SựKiện>` | `ThoiGianTao`, `ThoiGianXong` |
 | Trường boolean | `Dang<TrạngThái>` | `DangSuDung` |
-| Kiểu chuỗi | **VARCHAR** cho ASCII (mã, enum, username); **NVARCHAR** cho text tiếng Việt (tên, ghi chú) | `MaBan VARCHAR(10)`, `TenMon NVARCHAR(100)` |
+| Kiểu chuỗi | **VARCHAR** cho mọi chuỗi (Postgres dùng UTF-8 — một kiểu `VARCHAR` cho cả ASCII lẫn tiếng Việt) | `MaBan VARCHAR(10)`, `TenMon VARCHAR(100)` |
 | Trường enum/trạng thái | `VARCHAR(20)` + CHECK, giá trị PascalCase ASCII | `'Trong'`, `'DaDat'`, `'CoKhach'` |
 | API endpoint | kebab-case không dấu, prefix `/api/v1` | `/api/v1/dat-ban`, `/api/v1/thanh-toan` |
 | Trường JSON request/response | **PascalCase, đồng nhất cột DB** | `{"TenKhach": "Nguyen Van A"}` |
@@ -141,8 +141,8 @@ Sơ đồ ERD **toàn hệ thống** (15 bảng): thuộc tính có đánh dấu
 | Tên trường | Kiểu dữ liệu | Ràng buộc | Mô tả |
 |---|---|---|---|
 | `RoleID` | VARCHAR(10) | **PK** | `Admin` / `PhucVu` / `Bep` / `ThuNgan` / `Kho` (mã tự nhiên, ASCII) |
-| `RoleName` | NVARCHAR(50) | NOT NULL | Tên hiển thị (Vd "Quản lý") |
-| `Description` | NVARCHAR(200) | NULL | Mô tả vai trò |
+| `RoleName` | VARCHAR(50) | NOT NULL | Tên hiển thị (Vd "Quản lý") |
+| `Description` | VARCHAR(200) | NULL | Mô tả vai trò |
 
 Bảng tĩnh, 5 dòng, seed sẵn. PK là mã chuỗi (ngoại lệ kiểu, xem §1.2).
 
@@ -150,78 +150,78 @@ Bảng tĩnh, 5 dòng, seed sẵn. PK là mã chuỗi (ngoại lệ kiểu, xem 
 
 | Tên trường | Kiểu dữ liệu | Ràng buộc | Mô tả |
 |---|---|---|---|
-| `UserID` | INT IDENTITY(1,1) | **PK** | Mã NV tự sinh |
+| `UserID` | INT GENERATED ALWAYS AS IDENTITY | **PK** | Mã NV tự sinh |
 | `Username` | VARCHAR(50) | UNIQUE, NOT NULL | Tên đăng nhập (ASCII, không khoảng trắng) |
 | `PasswordHash` | VARCHAR(255) | NOT NULL | Hash bcrypt (ASCII) |
-| `FullName` | NVARCHAR(100) | NOT NULL | Họ và tên NV |
+| `FullName` | VARCHAR(100) | NOT NULL | Họ và tên NV |
 | `RoleID` | VARCHAR(10) | FK → `Role.RoleID`, NOT NULL | Vai trò gắn |
 | `Status` | VARCHAR(20) | NOT NULL, CHECK IN (`'HoatDong'`,`'DaKhoa'`), DEFAULT `'HoatDong'` | |
-| `FailedLoginCount` | TINYINT | NOT NULL, DEFAULT 0 | Tăng khi sai; reset khi đúng; ≥ 5 → khóa |
-| `LastLoginAt` | DATETIME2 | NULL | Lúc đăng nhập thành công gần nhất |
-| `CreatedAt` | DATETIME2 | NOT NULL, DEFAULT SYSDATETIME() | |
-| `UpdatedAt` | DATETIME2 | NULL | |
+| `FailedLoginCount` | SMALLINT | NOT NULL, DEFAULT 0 | Tăng khi sai; reset khi đúng; ≥ 5 → khóa |
+| `LastLoginAt` | TIMESTAMP | NULL | Lúc đăng nhập thành công gần nhất |
+| `CreatedAt` | TIMESTAMP | NOT NULL, DEFAULT CURRENT_TIMESTAMP | |
+| `UpdatedAt` | TIMESTAMP | NULL | |
 
-**Index:** `IX_User_Role (RoleID)`.
+**Index:** `ix_user_role (RoleID)`.
 
-> `User` là từ khóa SQL Server → trong câu lệnh SQL phải bao `[User]` (xem `database.sql`).
+> `User` là từ khóa SQL → trong câu lệnh phải bao nháy kép `"User"` (PostgreSQL; xem `database.sql`).
 
 ### 2.3.3. `Ban`
 
 | Tên trường | Kiểu dữ liệu | Ràng buộc | Mô tả |
 |---|---|---|---|
-| `BanID` | INT IDENTITY(1,1) | **PK** | |
-| `MaBan` | VARCHAR(10) | UNIQUE, NOT NULL | Mã hiển thị (Vd `B01`) |
-| `KhuVuc` | NVARCHAR(50) | NOT NULL | `Tầng 1`, `Sân vườn`… |
+| `BanID` | INT GENERATED ALWAYS AS IDENTITY | **PK** | |
+| `MaBan` | VARCHAR(10) | UNIQUE, NOT NULL | Mã hiển thị (Vd `B101`) |
+| `KhuVuc` | VARCHAR(50) | NOT NULL | `Tầng 1`, `Sân vườn`… |
 | `SucChua` | INT | NOT NULL, CHECK (`SucChua > 0`) | Số người tối đa |
 | `TrangThai` | VARCHAR(20) | NOT NULL, CHECK IN (`'Trong'`,`'DaDat'`,`'CoKhach'`), DEFAULT `'Trong'` | |
-| `GhiChu` | NVARCHAR(200) | NULL | |
-| `DangSuDung` | BIT | NOT NULL, DEFAULT 1 | Soft delete |
+| `GhiChu` | VARCHAR(200) | NULL | |
+| `DangSuDung` | BOOLEAN | NOT NULL, DEFAULT TRUE | Soft delete |
 
 ### 2.3.4. `MonAn`
 
 | Tên trường | Kiểu dữ liệu | Ràng buộc | Mô tả |
 |---|---|---|---|
-| `MonAnID` | INT IDENTITY(1,1) | **PK** | Khóa kỹ thuật tự sinh |
+| `MonAnID` | INT GENERATED ALWAYS AS IDENTITY | **PK** | Khóa kỹ thuật tự sinh |
 | `MaSanPham` | VARCHAR(20) | UNIQUE, NOT NULL | Mã món theo sổ sách nhà hàng (vd `SP000221`) |
-| `TenMon` | NVARCHAR(100) | UNIQUE, NOT NULL | |
+| `TenMon` | VARCHAR(100) | UNIQUE, NOT NULL | |
 | `LoaiMon` | VARCHAR(10) | NOT NULL, CHECK IN (`'MonAn'`,`'DoUong'`) | Phân loại menu. Món ăn → qua Bếp; Đồ uống → phục vụ trực tiếp (không qua Bếp) |
-| `DonGia` | DECIMAL(15,0) | NOT NULL, CHECK (`DonGia >= 0`) | VND (không phần thập phân) |
+| `DonGia` | NUMERIC(15,0) | NOT NULL, CHECK (`DonGia >= 0`) | VND (không phần thập phân) |
 | `TrangThai` | VARCHAR(10) | NOT NULL, CHECK IN (`'ConHang'`,`'HetHang'`), DEFAULT `'ConHang'` | |
-| `MoTa` | NVARCHAR(500) | NULL | |
-| `DangSuDung` | BIT | NOT NULL, DEFAULT 1 | Soft delete |
+| `MoTa` | VARCHAR(500) | NULL | |
+| `DangSuDung` | BOOLEAN | NOT NULL, DEFAULT TRUE | Soft delete |
 
 ### 2.3.5. `PhieuDatBan`
 
 | Tên trường | Kiểu dữ liệu | Ràng buộc | Mô tả |
 |---|---|---|---|
-| `PhieuDatBanID` | INT IDENTITY(1,1) | **PK** | Cũng là "Mã đặt bàn" in trên PV_BM1 |
+| `PhieuDatBanID` | INT GENERATED ALWAYS AS IDENTITY | **PK** | Cũng là "Mã đặt bàn" in trên PV_BM1 |
 | `BanID` | INT | FK → `Ban.BanID`, NOT NULL | |
-| `TenKhach` | NVARCHAR(100) | NOT NULL | |
+| `TenKhach` | VARCHAR(100) | NOT NULL | |
 | `SoDienThoai` | VARCHAR(15) | NOT NULL | |
 | `SoNguoi` | INT | NOT NULL, CHECK (`SoNguoi > 0`) | Kiểm tra ≤ `Ban.SucChua` ở service |
-| `ThoiGianDat` | DATETIME2 | NOT NULL | Khung giờ khách hẹn |
+| `ThoiGianDat` | TIMESTAMP | NOT NULL | Khung giờ khách hẹn |
 | `HinhThucDat` | VARCHAR(20) | NOT NULL, CHECK IN (`'TrucTiep'`,`'QuaDienThoai'`) | |
-| `GhiChu` | NVARCHAR(500) | NULL | |
+| `GhiChu` | VARCHAR(500) | NULL | |
 | `NhanVienTiepNhanID` | INT | FK → `User.UserID`, NOT NULL | |
 | `TrangThai` | VARCHAR(20) | NOT NULL, CHECK IN (`'DaDat'`,`'DaNhanBan'`,`'DaHuy'`), DEFAULT `'DaDat'` | |
-| `ThoiGianTao` | DATETIME2 | NOT NULL, DEFAULT SYSDATETIME() | |
-| `ThoiGianNhanBan` | DATETIME2 | NULL | Lúc Phục vụ bấm "Đã nhận bàn" |
-| `ThoiGianHuy` | DATETIME2 | NULL | |
+| `ThoiGianTao` | TIMESTAMP | NOT NULL, DEFAULT CURRENT_TIMESTAMP | |
+| `ThoiGianNhanBan` | TIMESTAMP | NULL | Lúc Phục vụ bấm "Đã nhận bàn" |
+| `ThoiGianHuy` | TIMESTAMP | NULL | |
 
-**Index:** `IX_PhieuDatBan_Ban_ThoiGian (BanID, ThoiGianDat)`.
+**Index:** `ix_phieudatban_ban_thoigian (BanID, ThoiGianDat)`.
 
 ### 2.3.6. `PhieuOrder`
 
 | Tên trường | Kiểu dữ liệu | Ràng buộc | Mô tả |
 |---|---|---|---|
-| `PhieuOrderID` | INT IDENTITY(1,1) | **PK** | Cũng là "Số phiếu order" in trên PV_BM3 / B_BM1 (không có cột `Ma…` riêng — khác các phiếu kho/hóa đơn) |
+| `PhieuOrderID` | INT GENERATED ALWAYS AS IDENTITY | **PK** | Cũng là "Số phiếu order" in trên PV_BM3 / B_BM1 (không có cột `Ma…` riêng — khác các phiếu kho/hóa đơn) |
 | `BanID` | INT | FK → `Ban.BanID`, NOT NULL | |
 | `NhanVienPhucVuID` | INT | FK → `User.UserID`, NOT NULL | NV mở order |
-| `ThoiGianTao` | DATETIME2 | NOT NULL, DEFAULT SYSDATETIME() | |
+| `ThoiGianTao` | TIMESTAMP | NOT NULL, DEFAULT CURRENT_TIMESTAMP | |
 | `TrangThai` | VARCHAR(20) | NOT NULL, CHECK IN (`'DangPhucVu'`,`'DaThanhToan'`,`'DaHuy'`), DEFAULT `'DangPhucVu'` | |
-| `TongTamTinh` | DECIMAL(15,0) | NOT NULL, DEFAULT 0 | Cập nhật khi thêm/sửa/hủy dòng |
+| `TongTamTinh` | NUMERIC(15,0) | NOT NULL, DEFAULT 0 | Cập nhật khi thêm/sửa/hủy dòng |
 
-**Index:** `IX_PhieuOrder_Ban_TrangThai (BanID, TrangThai)`.
+**Index:** `ix_phieuorder_ban_trangthai (BanID, TrangThai)`.
 
 ### 2.3.7. `ChiTietOrder`
 
@@ -231,49 +231,49 @@ Bảng tĩnh, 5 dòng, seed sẵn. PK là mã chuỗi (ngoại lệ kiểu, xem 
 | `SoDong` | INT | **PK (phần 2)** | Số thứ tự dòng trong order (1, 2, 3…) |
 | `MonAnID` | INT | FK → `MonAn.MonAnID`, NOT NULL | |
 | `SoLuong` | INT | NOT NULL, CHECK (`SoLuong > 0`) | |
-| `DonGia` | DECIMAL(15,0) | NOT NULL | **Snapshot** giá tại thời điểm gọi |
-| `ThanhTien` | DECIMAL(15,0) | NOT NULL, AS (`SoLuong * DonGia`) PERSISTED | Cột tính, lưu vật lý |
-| `GhiChu` | NVARCHAR(200) | NULL | |
+| `DonGia` | NUMERIC(15,0) | NOT NULL | **Snapshot** giá tại thời điểm gọi |
+| `ThanhTien` | NUMERIC(18,0) | GENERATED ALWAYS AS (`SoLuong * DonGia`) STORED | Cột tính, lưu vật lý |
+| `GhiChu` | VARCHAR(200) | NULL | |
 | `TrangThai` | VARCHAR(20) | NOT NULL, CHECK IN (`'ChuaChot'`,`'ChoCheBien'`,`'DangCheBien'`,`'DaXong'`,`'DaPhucVu'`,`'DaHuy'`), DEFAULT `'ChuaChot'` | |
-| `ThoiGianTao` | DATETIME2 | NOT NULL, DEFAULT SYSDATETIME() | |
-| `ThoiGianChot` | DATETIME2 | NULL | Lúc chuyển `ChuaChot` → `ChoCheBien` (chốt sang bếp) |
-| `ThoiGianXong` | DATETIME2 | NULL | Lúc chuyển → `DaXong` |
-| `ThoiGianPhucVu` | DATETIME2 | NULL | Lúc chuyển → `DaPhucVu` |
+| `ThoiGianTao` | TIMESTAMP | NOT NULL, DEFAULT CURRENT_TIMESTAMP | |
+| `ThoiGianChot` | TIMESTAMP | NULL | Lúc chuyển `ChuaChot` → `ChoCheBien` (chốt sang bếp) |
+| `ThoiGianXong` | TIMESTAMP | NULL | Lúc chuyển → `DaXong` |
+| `ThoiGianPhucVu` | TIMESTAMP | NULL | Lúc chuyển → `DaPhucVu` |
 | `NhanVienXacNhanID` | INT | FK → `User.UserID`, NULL | NV xác nhận đã đem ra bàn |
 
 **PK ghép `(PhieuOrderID, SoDong)`** — không có khóa surrogate riêng (§1.2). `SoDong` cấp phát tăng dần trong từng order (cho phép cùng một món có nhiều dòng, mỗi dòng trạng thái/ghi chú riêng).
 
-**Index:** `IX_ChiTietOrder_TrangThai_Chot (TrangThai, ThoiGianChot)` — FIFO Bếp.
+**Index:** `ix_chitietorder_trangthai_chot (TrangThai, ThoiGianChot)` — FIFO Bếp.
 
 **Ghi chú:** Không có bảng `PhieuChuyenBep` riêng. "Phiếu chuyển bếp" PV_BM3 là document sinh trên-bay từ (chỉ món ăn — đồ uống không qua Bếp):
 ```sql
-SELECT ct.*, m.TenMon FROM ChiTietOrder ct JOIN MonAn m ON ct.MonAnID = m.MonAnID
-WHERE ct.PhieuOrderID = @PhieuOrderID AND ct.TrangThai = 'ChoCheBien'
-  AND m.LoaiMon = 'MonAn'
-ORDER BY ct.ThoiGianChot;
+SELECT ct.*, m."TenMon" FROM "ChiTietOrder" ct JOIN "MonAn" m ON ct."MonAnID" = m."MonAnID"
+WHERE ct."PhieuOrderID" = $1 AND ct."TrangThai" = 'ChoCheBien'
+  AND m."LoaiMon" = 'MonAn'
+ORDER BY ct."ThoiGianChot";
 ```
 
 ### 2.3.8. `HoaDon`
 
 | Tên trường | Kiểu dữ liệu | Ràng buộc | Mô tả |
 |---|---|---|---|
-| `HoaDonID` | INT IDENTITY(1,1) | **PK** | Khóa kỹ thuật |
+| `HoaDonID` | INT GENERATED ALWAYS AS IDENTITY | **PK** | Khóa kỹ thuật |
 | `MaHoaDon` | VARCHAR(20) | UNIQUE, NOT NULL | Số hóa đơn, vd `HD20260529-00001` (sinh ở service) |
 | `PhieuOrderID` | INT | FK → `PhieuOrder.PhieuOrderID`, UNIQUE, NOT NULL | 1 order ↔ 1 hóa đơn |
 | `MaBanSnapshot` | VARCHAR(10) | NOT NULL | Snapshot `Ban.MaBan` |
 | `NhanVienThuNganID` | INT | FK → `User.UserID`, NOT NULL | |
-| `TongTienMon` | DECIMAL(15,0) | NOT NULL | ∑(SL × đơn giá) |
-| `TyLeVat` | DECIMAL(5,4) | NOT NULL, DEFAULT 0.1 | Snapshot (mặc định 0.1 = 10%) |
-| `TienVat` | DECIMAL(15,0) | NOT NULL, DEFAULT 0 | ROUND(`TongTienMon * TyLeVat`, 0) |
-| `TongThanhToan` | DECIMAL(15,0) | NOT NULL | `TongTienMon + TienVat` |
+| `TongTienMon` | NUMERIC(15,0) | NOT NULL | ∑(SL × đơn giá) |
+| `TyLeVat` | NUMERIC(5,4) | NOT NULL, DEFAULT 0.1 | Snapshot (mặc định 0.1 = 10%) |
+| `TienVat` | NUMERIC(15,0) | NOT NULL, DEFAULT 0 | ROUND(`TongTienMon * TyLeVat`, 0) |
+| `TongThanhToan` | NUMERIC(15,0) | NOT NULL | `TongTienMon + TienVat` |
 | `HinhThucTT` | VARCHAR(20) | NOT NULL, CHECK IN (`'TienMat'`,`'ChuyenKhoan'`) | |
-| `TienKhachDua` | DECIMAL(15,0) | NULL | NULL khi `ChuyenKhoan` |
-| `TienThua` | DECIMAL(15,0) | NOT NULL, DEFAULT 0 | 0 khi `ChuyenKhoan` |
+| `TienKhachDua` | NUMERIC(15,0) | NULL | NULL khi `ChuyenKhoan` |
+| `TienThua` | NUMERIC(15,0) | NOT NULL, DEFAULT 0 | 0 khi `ChuyenKhoan` |
 | `MaGiaoDich` | VARCHAR(100) | NULL | Mã/đường dẫn ảnh giao dịch CK (tùy chọn) |
-| `ThoiGianTao` | DATETIME2 | NOT NULL, DEFAULT SYSDATETIME() | |
+| `ThoiGianTao` | TIMESTAMP | NOT NULL, DEFAULT CURRENT_TIMESTAMP | |
 | `SoLanIn` | INT | NOT NULL, DEFAULT 0 | ≥ 2 → đánh dấu "BẢN SAO" trên bản in |
 
-**Index:** `IX_HoaDon_ThoiGian (ThoiGianTao DESC)`.
+**Index:** `ix_hoadon_thoigian (ThoiGianTao DESC)`.
 
 ### 2.3.9. `ChiTietHoaDon`
 
@@ -283,10 +283,10 @@ Dòng món của hóa đơn — **snapshot** lúc thanh toán để hóa đơn b
 |---|---|---|---|
 | `HoaDonID` | INT | **PK (phần 1)**, FK → `HoaDon.HoaDonID`, ON DELETE CASCADE | |
 | `MonAnID` | INT | **PK (phần 2)**, FK → `MonAn.MonAnID` | |
-| `TenMon` | NVARCHAR(100) | NOT NULL | Snapshot tên món lúc lập HĐ |
+| `TenMon` | VARCHAR(100) | NOT NULL | Snapshot tên món lúc lập HĐ |
 | `SoLuong` | INT | NOT NULL, CHECK (`SoLuong > 0`) | Tổng SL món này trong order (đã gộp) |
-| `DonGia` | DECIMAL(15,0) | NOT NULL | Snapshot đơn giá |
-| `ThanhTien` | DECIMAL(15,0) | NOT NULL, AS (`SoLuong * DonGia`) PERSISTED | |
+| `DonGia` | NUMERIC(15,0) | NOT NULL | Snapshot đơn giá |
+| `ThanhTien` | NUMERIC(18,0) | GENERATED ALWAYS AS (`SoLuong * DonGia`) STORED | |
 
 **PK ghép `(HoaDonID, MonAnID)`** — mỗi món 1 dòng/hóa đơn (đã gộp số lượng).
 
@@ -296,38 +296,38 @@ Dòng món của hóa đơn — **snapshot** lúc thanh toán để hóa đơn b
 
 | Tên trường | Kiểu dữ liệu | Ràng buộc | Mô tả |
 |---|---|---|---|
-| `NhaCungCapID` | INT IDENTITY(1,1) | **PK** | |
-| `TenNCC` | NVARCHAR(150) | UNIQUE, NOT NULL | |
+| `NhaCungCapID` | INT GENERATED ALWAYS AS IDENTITY | **PK** | |
+| `TenNCC` | VARCHAR(150) | UNIQUE, NOT NULL | |
 | `SoDienThoai` | VARCHAR(15) | NULL | |
-| `DiaChi` | NVARCHAR(300) | NULL | |
-| `DangSuDung` | BIT | NOT NULL, DEFAULT 1 | |
+| `DiaChi` | VARCHAR(300) | NULL | |
+| `DangSuDung` | BOOLEAN | NOT NULL, DEFAULT TRUE | |
 
 ### 2.3.11. `NguyenLieu`
 
 | Tên trường | Kiểu dữ liệu | Ràng buộc | Mô tả |
 |---|---|---|---|
-| `NguyenLieuID` | INT IDENTITY(1,1) | **PK** | |
-| `TenNVL` | NVARCHAR(100) | UNIQUE, NOT NULL | |
-| `DonViTinh` | NVARCHAR(20) | NOT NULL | `kg`, `quả`, `ổ`, `phần`… |
-| `TonHienTai` | DECIMAL(15,3) | NOT NULL, DEFAULT 0, CHECK (`TonHienTai >= 0`) | Tồn real-time, cập nhật trong transaction nhập/xuất |
-| `DinhMucToiThieu` | DECIMAL(15,3) | NOT NULL, DEFAULT 0, CHECK (`DinhMucToiThieu >= 0`) | Ngưỡng cảnh báo tồn thấp theo từng NVL (K_QĐ1; dùng ở §7.4.3, §7.5.4 / QL_BM4-C) |
-| `ThoiGianCapNhatTon` | DATETIME2 | NULL | Lần tồn thay đổi gần nhất |
-| `DangSuDung` | BIT | NOT NULL, DEFAULT 1 | |
+| `NguyenLieuID` | INT GENERATED ALWAYS AS IDENTITY | **PK** | |
+| `TenNVL` | VARCHAR(100) | UNIQUE, NOT NULL | |
+| `DonViTinh` | VARCHAR(20) | NOT NULL | `kg`, `quả`, `ổ`, `phần`… |
+| `TonHienTai` | NUMERIC(15,3) | NOT NULL, DEFAULT 0, CHECK (`TonHienTai >= 0`) | Tồn real-time, cập nhật trong transaction nhập/xuất |
+| `DinhMucToiThieu` | NUMERIC(15,3) | NOT NULL, DEFAULT 0, CHECK (`DinhMucToiThieu >= 0`) | Ngưỡng cảnh báo tồn thấp theo từng NVL (K_QĐ1; dùng ở §7.4.3, §7.5.4 / QL_BM4-C) |
+| `ThoiGianCapNhatTon` | TIMESTAMP | NULL | Lần tồn thay đổi gần nhất |
+| `DangSuDung` | BOOLEAN | NOT NULL, DEFAULT TRUE | |
 
 ### 2.3.12. `PhieuNhapKho`
 
 | Tên trường | Kiểu dữ liệu | Ràng buộc | Mô tả |
 |---|---|---|---|
-| `PhieuNhapKhoID` | INT IDENTITY(1,1) | **PK** | |
+| `PhieuNhapKhoID` | INT GENERATED ALWAYS AS IDENTITY | **PK** | |
 | `MaPhieuNhap` | VARCHAR(20) | UNIQUE, NOT NULL | Vd `PN20260529-001` |
 | `NhaCungCapID` | INT | FK → `NhaCungCap.NhaCungCapID`, NOT NULL | |
 | `NhanVienLapID` | INT | FK → `User.UserID`, NOT NULL | |
 | `NgayNhap` | DATE | NOT NULL | |
-| `TongGiaTri` | DECIMAL(15,0) | NOT NULL | ∑(SL × đơn giá) |
-| `GhiChu` | NVARCHAR(500) | NULL | |
-| `ThoiGianTao` | DATETIME2 | NOT NULL, DEFAULT SYSDATETIME() | |
+| `TongGiaTri` | NUMERIC(15,0) | NOT NULL | ∑(SL × đơn giá) |
+| `GhiChu` | VARCHAR(500) | NULL | |
+| `ThoiGianTao` | TIMESTAMP | NOT NULL, DEFAULT CURRENT_TIMESTAMP | |
 
-**Index:** `IX_PhieuNhapKho_Ngay (NgayNhap)`.
+**Index:** `ix_phieunhapkho_ngay (NgayNhap)`.
 
 ### 2.3.13. `ChiTietNhapKho`
 
@@ -335,10 +335,10 @@ Dòng món của hóa đơn — **snapshot** lúc thanh toán để hóa đơn b
 |---|---|---|---|
 | `PhieuNhapKhoID` | INT | **PK (phần 1)**, FK → `PhieuNhapKho.PhieuNhapKhoID`, ON DELETE CASCADE | |
 | `NguyenLieuID` | INT | **PK (phần 2)**, FK → `NguyenLieu.NguyenLieuID` | |
-| `SoLuong` | DECIMAL(15,3) | NOT NULL, CHECK (`SoLuong > 0`) | |
-| `DonGia` | DECIMAL(15,0) | NOT NULL, CHECK (`DonGia > 0`) | |
-| `ThanhTien` | DECIMAL(15,0) | NOT NULL, AS (`SoLuong * DonGia`) PERSISTED | |
-| `GhiChu` | NVARCHAR(200) | NULL | |
+| `SoLuong` | NUMERIC(15,3) | NOT NULL, CHECK (`SoLuong > 0`) | |
+| `DonGia` | NUMERIC(15,0) | NOT NULL, CHECK (`DonGia > 0`) | |
+| `ThanhTien` | NUMERIC(18,3) | GENERATED ALWAYS AS (`SoLuong * DonGia`) STORED | |
+| `GhiChu` | VARCHAR(200) | NULL | |
 
 **PK ghép `(PhieuNhapKhoID, NguyenLieuID)`** — mỗi NVL 1 dòng/phiếu.
 
@@ -346,15 +346,15 @@ Dòng món của hóa đơn — **snapshot** lúc thanh toán để hóa đơn b
 
 | Tên trường | Kiểu dữ liệu | Ràng buộc | Mô tả |
 |---|---|---|---|
-| `PhieuXuatKhoID` | INT IDENTITY(1,1) | **PK** | |
+| `PhieuXuatKhoID` | INT GENERATED ALWAYS AS IDENTITY | **PK** | |
 | `MaPhieuXuat` | VARCHAR(20) | UNIQUE, NOT NULL | Vd `PX20260529-001` |
 | `NhanVienLapID` | INT | FK → `User.UserID`, NOT NULL | |
 | `NgayXuat` | DATE | NOT NULL | |
-| `TongGiaTri` | DECIMAL(15,0) | NOT NULL | |
-| `GhiChu` | NVARCHAR(500) | NULL | |
-| `ThoiGianTao` | DATETIME2 | NOT NULL, DEFAULT SYSDATETIME() | |
+| `TongGiaTri` | NUMERIC(15,0) | NOT NULL | |
+| `GhiChu` | VARCHAR(500) | NULL | |
+| `ThoiGianTao` | TIMESTAMP | NOT NULL, DEFAULT CURRENT_TIMESTAMP | |
 
-**Index:** `IX_PhieuXuatKho_Ngay (NgayXuat)`.
+**Index:** `ix_phieuxuatkho_ngay (NgayXuat)`.
 
 ### 2.3.15. `ChiTietXuatKho`
 
@@ -362,10 +362,10 @@ Dòng món của hóa đơn — **snapshot** lúc thanh toán để hóa đơn b
 |---|---|---|---|
 | `PhieuXuatKhoID` | INT | **PK (phần 1)**, FK → `PhieuXuatKho.PhieuXuatKhoID`, ON DELETE CASCADE | |
 | `NguyenLieuID` | INT | **PK (phần 2)**, FK → `NguyenLieu.NguyenLieuID` | |
-| `SoLuong` | DECIMAL(15,3) | NOT NULL, CHECK (`SoLuong > 0`) | |
-| `DonGia` | DECIMAL(15,0) | NOT NULL, CHECK (`DonGia > 0`) | |
-| `ThanhTien` | DECIMAL(15,0) | NOT NULL, AS (`SoLuong * DonGia`) PERSISTED | |
-| `GhiChu` | NVARCHAR(200) | NULL | |
+| `SoLuong` | NUMERIC(15,3) | NOT NULL, CHECK (`SoLuong > 0`) | |
+| `DonGia` | NUMERIC(15,0) | NOT NULL, CHECK (`DonGia > 0`) | |
+| `ThanhTien` | NUMERIC(18,3) | GENERATED ALWAYS AS (`SoLuong * DonGia`) STORED | |
+| `GhiChu` | VARCHAR(200) | NULL | |
 
 **PK ghép `(PhieuXuatKhoID, NguyenLieuID)`** — mỗi NVL 1 dòng/phiếu.
 
@@ -378,7 +378,7 @@ Dòng món của hóa đơn — **snapshot** lúc thanh toán để hóa đơn b
 | 3 | `ChiTietXuatKho.SoLuong ≤ NguyenLieu.TonHienTai` tại thời điểm lưu | M7 | Transaction + check trước UPDATE tồn |
 | 4 | Chỉ cho thanh toán `PhieuOrder` khi mọi `ChiTietOrder.TrangThai IN ('DaPhucVu','DaHuy')` | M6 | SQL check trước INSERT `HoaDon` |
 | 5 | Chuyển trạng thái `ChiTietOrder` tuần tự (`ChoCheBien → DangCheBien → DaXong → DaPhucVu`), không bỏ bước | M5 | State machine ở tầng service |
-| 6 | Cập nhật `NguyenLieu.TonHienTai` và INSERT phiếu kho trong CÙNG transaction | M7 | `BEGIN TRAN` … `COMMIT` |
+| 6 | Cập nhật `NguyenLieu.TonHienTai` và INSERT phiếu kho trong CÙNG transaction | M7 | `BEGIN` … `COMMIT` |
 | 7 | Khóa tài khoản khi `User.FailedLoginCount ≥ 5` | M1 | Sau mỗi lần sai |
 | 8 | Đặt bàn / nhận bàn / thanh toán: đồng bộ `Ban.TrangThai` trong cùng transaction với phiếu | M2 (cross-call) | Hàm dùng chung |
 
@@ -386,7 +386,7 @@ Dòng món của hóa đơn — **snapshot** lúc thanh toán để hóa đơn b
 
 ## 2.5. Dữ liệu seed mẫu
 
-Toàn bộ DDL (15 bảng + index + ràng buộc CHECK/FK) **và** dữ liệu seed (5 tài khoản, 6 bàn, 23 món, 2 NCC, 12 NVL) nằm trong tệp [`database.sql`](database.sql) ở thư mục gốc — chạy trực tiếp trên SQL Server 2019+. Mật khẩu seed mặc định cho mọi tài khoản = `matkhau123` (bcrypt cost 10, hash thật đã nhúng trong file). Khi triển khai, `database.sql` là **nguồn sự thật** cho schema; mô tả từng cột vẫn ở §2.3.
+Toàn bộ DDL (15 bảng + index + ràng buộc CHECK/FK) **và** dữ liệu seed (5 tài khoản, 35 bàn, 23 món, 2 NCC, 12 NVL) nằm trong tệp [`database.sql`](database.sql) ở thư mục gốc — chạy trực tiếp trên PostgreSQL 14+. Mật khẩu seed mặc định cho mọi tài khoản = `matkhau123` (bcrypt cost 10, hash thật đã nhúng trong file). Khi triển khai, `database.sql` là **nguồn sự thật** cho schema; mô tả từng cột vẫn ở §2.3.
 
 ## 2.6. Hằng số hệ thống (tệp `config/constants.js`)
 
@@ -850,7 +850,7 @@ Kiểm (K_QĐ1, §7.4.1 Bước 4): `NhaCungCapID` tồn tại; mỗi dòng `Ngu
 { "NgayXuat": "2026-05-29", "GhiChu": "Xuất cho bếp",
   "ChiTiet": [ { "NguyenLieuID": 1, "SoLuong": 3, "DonGia": 250000, "GhiChu": "" } ] }
 ```
-Kiểm (K_QĐ1, §7.4.3 Bước 4): mỗi dòng `SoLuong>0`, `DonGia>0`, và **`SoLuong ≤ TonHienTai`** (ràng buộc §2.4 #3 — vượt tồn → `409 CONFLICT_STATE`). *(Quán 1 bếp nên bỏ trường "bộ phận nhận"; nơi nhận ghi ở `GhiChu` nếu cần.)* **Transaction**: INSERT phiếu + chi tiết + `UPDATE NguyenLieu SET TonHienTai = TonHienTai - SoLuong WHERE NguyenLieuID=? AND TonHienTai >= SoLuong` (kiểm tra lại trong UPDATE chống tranh chấp; nếu `@@ROWCOUNT=0` → rollback). Trả `201` kèm cờ cảnh báo NVL có `TonHienTai ≤ DinhMucToiThieu` (§7.4.3 Bước 8).
+Kiểm (K_QĐ1, §7.4.3 Bước 4): mỗi dòng `SoLuong>0`, `DonGia>0`, và **`SoLuong ≤ TonHienTai`** (ràng buộc §2.4 #3 — vượt tồn → `409 CONFLICT_STATE`). *(Quán 1 bếp nên bỏ trường "bộ phận nhận"; nơi nhận ghi ở `GhiChu` nếu cần.)* **Transaction**: INSERT phiếu + chi tiết + `UPDATE "NguyenLieu" SET "TonHienTai" = "TonHienTai" - $2 WHERE "NguyenLieuID" = $1 AND "TonHienTai" >= $2` (kiểm tra lại trong UPDATE chống tranh chấp; nếu `rowCount=0` → rollback). Trả `201` kèm cờ cảnh báo NVL có `TonHienTai ≤ DinhMucToiThieu` (§7.4.3 Bước 8).
 
 ### 4.7.4. Báo cáo tồn / nhập / xuất (DFD §7.4.2/§7.4.4/§7.4.5; K_BM3/4/5)
 
@@ -910,7 +910,7 @@ Giả mã cho các **hàm nghiệp vụ lõi** (tầng service) — những hàm
 - `repo.X(...)` = tầng repository (truy vấn SQL); `nguoiDung` = thông tin lấy từ JWT (`UserID`, `RoleID`).
 - `Hằng.X` = hằng số trong `config/constants.js`.
 - `NÉM_LỖI(<mã_HTTP>, '<CODE>', '<thông điệp>')` → controller bắt và trả envelope lỗi (§4.0). Sau khi ném, hàm dừng.
-- `GIAO_DỊCH { ... }` = `BEGIN TRAN … COMMIT`; nếu có lỗi/`NÉM_LỖI` bên trong → tự `ROLLBACK` (atomic, yêu cầu chất lượng §6.9).
+- `GIAO_DỊCH { ... }` = `BEGIN … COMMIT`; nếu có lỗi/`NÉM_LỖI` bên trong → tự `ROLLBACK` (atomic, yêu cầu chất lượng §6.9).
 - `Bây_giờ()` = thời điểm hiện tại; `LàmTròn(x)` = làm tròn 0 chữ số thập phân.
 
 ## 5.1. Hàm dùng chung — Cập nhật trạng thái bàn
@@ -1203,8 +1203,8 @@ HÀM LapPhieuXuatKho(dl):   // dl: NgayXuat, GhiChu, ChiTiet[{ NguyenLieuID, SoL
         VỚI MỖI ct TRONG dl.ChiTiet LÀM
             repo.Them('ChiTietXuatKho', { PhieuXuatKhoID: phieu.PhieuXuatKhoID, …ct })
             soDongCapNhat ← repo.TruTonKhoCoKiemTra(ct.NguyenLieuID, ct.SoLuong)
-                     // UPDATE NguyenLieu SET TonHienTai -= SoLuong, ThoiGianCapNhatTon = now
-                     //   WHERE NguyenLieuID = ? AND TonHienTai >= SoLuong ;  trả @@ROWCOUNT
+                     // UPDATE "NguyenLieu" SET "TonHienTai" = "TonHienTai" - $2, "ThoiGianCapNhatTon" = CURRENT_TIMESTAMP
+                     //   WHERE "NguyenLieuID" = $1 AND "TonHienTai" >= $2 ;  trả rowCount
             NẾU soDongCapNhat = 0 THÌ
                 NÉM_LỖI(409, 'CONFLICT_STATE', 'Xuất quá tồn kho')      // tự ROLLBACK
             HẾT_NẾU

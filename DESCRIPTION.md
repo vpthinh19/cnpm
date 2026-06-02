@@ -636,7 +636,7 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 >
 > **Bước 8:** Kết thúc.
 
-*Ghi chú:* Khi khách đến, Phục vụ vào màn "Tiếp nhận đặt bàn", tìm phiếu theo SĐT/mã đặt, bấm "Đã nhận bàn" → hệ thống cập nhật `PhieuDatBan.trang_thai = 'DaNhanBan'` và `Ban.trang_thai = 'CoKhach'` (thao tác đơn giản trên màn quản lý, không tách thành DFD riêng).
+*Ghi chú:* Khi khách đến, Phục vụ vào màn "Tiếp nhận đặt bàn", tìm phiếu theo SĐT/mã đặt, bấm "Đã nhận bàn" → hệ thống cập nhật `PhieuDatBan.TrangThai = 'DaNhanBan'` và `Ban.TrangThai = 'CoKhach'` (thao tác đơn giản trên màn quản lý, không tách thành DFD riêng).
 
 ### 7.1.2. Ghi nhận gọi món (Loại: Lưu trữ) {#ghi-nhận-gọi-món-loại-lưu-trữ}
 
@@ -1372,7 +1372,7 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 >
 > **Bước 4:** So khớp mật khẩu (hash). Nếu sai → ghi D4 (tăng số lần sai); nếu lần sai ≥ 5 → khóa tài khoản; thông báo lỗi D6 → kết thúc.
 >
-> **Bước 5:** Nếu đúng → ghi D4: reset số lần sai, cập nhật thời gian đăng nhập. Tạo JWT (payload: `ma_nguoi_dung`, `ma_vai_tro`; hạn = giờ hiện tại + thời gian phiên).
+> **Bước 5:** Nếu đúng → ghi D4: reset số lần sai, cập nhật thời gian đăng nhập. Tạo JWT (payload: `UserID`, `RoleID`; hạn = giờ hiện tại + thời gian phiên).
 >
 > **Bước 6:** Hiển thị D6: mở giao diện theo vai trò, lưu JWT ở client (localStorage).
 >
@@ -1380,4 +1380,4 @@ Phần này trình bày sơ đồ luồng dữ liệu (DFD) cho các yêu cầu 
 >
 > **Bước 8:** Kết thúc.
 
-*Ghi chú:* JWT stateless — không có bảng phiên đăng nhập phía server. Đăng xuất chỉ cần client xóa token; nếu cần thu hồi sớm trước hạn token (vd Admin khóa tài khoản), middleware xác thực kiểm tra lại `NguoiDung.trang_thai` mỗi request.
+*Ghi chú:* JWT stateless — không có bảng phiên đăng nhập phía server. Đăng xuất chỉ cần client xóa token; nếu cần thu hồi sớm trước hạn token (vd Admin khóa tài khoản), middleware xác thực kiểm tra lại `User.Status` mỗi request.
