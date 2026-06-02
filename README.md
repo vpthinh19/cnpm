@@ -17,11 +17,14 @@ npm install
 #    (mặc định: localhost:5432, user postgres, DB BoNeMyCanh)
 
 # 3) Tạo CSDL + nạp schema/seed
-psql -U postgres -c "CREATE DATABASE \"BoNeMyCanh\";"
+psql -U postgres -c 'CREATE DATABASE \"BoNeMyCanh\";'
 psql -U postgres -d BoNeMyCanh -f database.sql
+# nếu lỗi UTF-8 thì chạy `chcp 6500` và `set PGCLIENTENCODING=utf8` (đối với CMD) hoặc `$env:PGCLIENTENCODING="utf8"` (đối với POWERSHELL)
+# mở trực tiếp database.sql bằng pqAdmin sẽ dễ hơn, ko lỗi
 
 # 4) Chạy server (backend API + giao diện web cùng 1 cổng)
-npm start          # API: http://localhost:3000/api/v1
+npm start
+# API: http://localhost:3000/api/v1
 # hoặc: npm run dev  (tự reload khi đổi mã)
 
 # 5) Mở giao diện trên trình duyệt
