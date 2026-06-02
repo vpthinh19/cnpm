@@ -107,6 +107,9 @@ body {
 .card > .card-body { padding: 18px; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .split { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; align-items: start; }
+/* Ô lưới được phép co lại (bảng/nội dung rộng cuộn trong khung, không đẩy
+   cả cột vượt bề ngang màn hình). */
+.grid-2 > *, .split > * { min-width: 0; }
 
 /* ---------- Form ---------- */
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; }
@@ -161,7 +164,7 @@ table.tbl td input[type="number"], table.tbl td input[type="text"] { padding: 5p
 /* Danh sách cuộn trong khung: lấp phần cao còn lại của 1 màn hình (trừ hao
    topbar + tiêu đề/bộ lọc + lề), không kéo dài trang theo số dòng.
    Tiêu đề cột dính trên đầu khi cuộn. */
-.table-scroll { max-height: max(220px, calc(100vh - 360px)); overflow-y: auto; }
+.table-scroll { max-height: max(220px, calc(100vh - 360px)); overflow-y: auto; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 table.tbl thead th { position: sticky; top: 0; z-index: 1; }
 table.tbl tfoot td { position: sticky; bottom: 0; background: var(--c-surface); }
 
@@ -211,6 +214,8 @@ table.tbl tfoot td { position: sticky; bottom: 0; background: var(--c-surface); 
   .app { flex-direction: column; height: auto; overflow: visible; }
   .table-scroll { max-height: 55vh; overflow-y: auto; }
   .split > section:last-child .table-scroll { max-height: none; overflow: visible; }
+  /* Khu xem trước phiếu in: thu lề để phiếu 320px không tràn ngang trên phone */
+  .print-stage { padding: 12px; overflow-x: auto; }
 
   .sidebar {
     width: 100%; flex: none; order: 2;
