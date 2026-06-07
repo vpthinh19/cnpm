@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Danh mục nguyên liệu — Bộ phận Kho</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- Quản lý danh mục nguyên liệu (NguyenLieu). Tồn hiện tại chỉ thay đổi qua phiếu nhập/xuất.
+     API: GET/POST /kho/nguyen-lieu, PUT /kho/nguyen-lieu/:id, DELETE /kho/nguyen-lieu/:id -->
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">🥩</span> Bò Né Mỹ Cảnh</div>
+    <nav>
+      <a href="kho-nhap.html">📥 Nhập kho</a>
+      <a href="kho-xuat.html">📤 Xuất kho</a>
+      <a href="kho-nguyen-lieu.html" class="active">🥬 Nguyên liệu</a>
+      <a href="kho-ncc.html">🏢 Nhà cung cấp</a>
+      <a href="kho-bc-ton.html">📦 Báo cáo tồn</a>
+      <a href="kho-bc-nhap.html">📈 Báo cáo nhập</a>
+      <a href="kho-bc-xuat.html">📉 Báo cáo xuất</a>
+    </nav>
+    <div class="foot">Kho</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="page-title">Danh mục nguyên liệu</div>
+      <div class="user"><div class="avatar">D</div><div><div>Phạm Thị D</div><div class="role">Kho</div></div></div>
+    </header>
+
+    <div class="content">
+      <div class="card">
+        <div class="card-head"><h2>Nguyên liệu</h2><button class="btn btn-primary btn-sm" id="nl_them">+ Thêm nguyên liệu</button></div>
+        <div class="card-body">
+          <div class="toolbar">
+            <div class="search"><input type="text" id="nl_search" placeholder="Tìm theo tên nguyên liệu..."></div>
+          </div>
+          <p class="muted" style="margin:0 0 12px">Tồn hiện tại chỉ thay đổi qua phiếu nhập/xuất — không sửa trực tiếp tại đây.</p>
+          <div class="table-scroll">
+          <table class="tbl">
+            <thead><tr><th>Tên nguyên liệu</th><th>ĐVT</th><th class="num">Tồn hiện tại</th><th class="num">Định mức tối thiểu</th><th class="center">Thao tác</th></tr></thead>
+            <tbody id="nl_list"></tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="js/app.js"></script>
+<script src="js/kho-nguyen-lieu.js"></script>
+</body>
+</html>

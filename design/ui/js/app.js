@@ -221,6 +221,92 @@
     });
   }
 
+  /* ---------- Combobox gõ-để-tìm (dropdown có style, lọc bỏ dấu) ---------- */
+  // Bỏ dấu tiếng Việt để tìm không phân biệt dấu (gõ "pho" khớp "Bánh phở").
+  function boDau(s) {
+    return String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+  }
+  // combobox({ items:[{label, meta?, ...}], placeholder, onChange(item|null) })
+  //   -> { el, get(), set(item), clear(), setItems(list), focus(), destroy() }
+  function combobox(opts) {
+    opts = opts || {};
+    var items = opts.items || [];
+    var selected = null, activeIdx = -1, filtered = items.slice();
+
+    var wrap = document.createElement('div');
+    wrap.className = 'cbx';
+    var input = document.createElement('input');
+    input.type = 'text'; input.className = 'cbx-input'; input.autocomplete = 'off';
+    input.placeholder = opts.placeholder || '';
+    wrap.appendChild(input);
+
+    var panel = document.createElement('div');
+    panel.className = 'cbx-panel'; panel.style.display = 'none';
+    document.body.appendChild(panel);
+
+    function moPanel() { return panel.style.display !== 'none'; }
+    function position() {
+      var r = input.getBoundingClientRect();
+      panel.style.left = r.left + 'px';
+      panel.style.top = (r.bottom + 2) + 'px';
+      panel.style.width = r.width + 'px';
+    }
+    function render() {
+      var q = boDau(input.value.trim());
+      filtered = q ? items.filter(function (it) { return boDau(it.label).indexOf(q) !== -1; }) : items.slice();
+      if (activeIdx >= filtered.length) activeIdx = filtered.length - 1;
+      if (!filtered.length) { panel.innerHTML = '<div class="cbx-empty">Không tìm thấy</div>'; return; }
+      panel.innerHTML = filtered.map(function (it, i) {
+        return '<div class="cbx-opt' + (i === activeIdx ? ' active' : '') + '" data-i="' + i + '">' +
+          '<span>' + escapeHtml(it.label) + '</span>' +
+          (it.meta != null && it.meta !== '' ? '<span class="cbx-meta">' + escapeHtml(it.meta) + '</span>' : '') +
+          '</div>';
+      }).join('');
+      panel.querySelectorAll('.cbx-opt').forEach(function (node) {
+        node.addEventListener('mousedown', function (e) { e.preventDefault(); pick(filtered[Number(node.getAttribute('data-i'))]); });
+      });
+    }
+    function open() { position(); panel.style.display = 'block'; render(); bindScroll(true); }
+    function close() { panel.style.display = 'none'; bindScroll(false); }
+    function pick(it) {
+      selected = it || null;
+      input.value = it ? it.label : '';
+      close();
+      if (opts.onChange) opts.onChange(selected);
+    }
+    function scrollActive() { var a = panel.querySelector('.cbx-opt.active'); if (a) a.scrollIntoView({ block: 'nearest' }); }
+    function onScroll() { if (moPanel()) position(); }
+    function bindScroll(on) {
+      if (on) { window.addEventListener('scroll', onScroll, true); window.addEventListener('resize', onScroll); }
+      else { window.removeEventListener('scroll', onScroll, true); window.removeEventListener('resize', onScroll); }
+    }
+
+    input.addEventListener('focus', open);
+    input.addEventListener('input', function () {
+      selected = null; activeIdx = -1;
+      if (moPanel()) render(); else open();
+      if (opts.onChange) opts.onChange(null);
+    });
+    input.addEventListener('blur', function () { setTimeout(close, 120); });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); if (!moPanel()) open(); activeIdx = Math.min(activeIdx + 1, filtered.length - 1); render(); scrollActive(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); activeIdx = Math.max(activeIdx - 1, 0); render(); scrollActive(); }
+      else if (e.key === 'Enter') { if (moPanel() && filtered[activeIdx]) { e.preventDefault(); pick(filtered[activeIdx]); } }
+      else if (e.key === 'Escape') { close(); }
+    });
+
+    return {
+      el: wrap,
+      get: function () { return selected; },
+      set: function (it) { selected = it || null; input.value = it ? it.label : ''; },
+      clear: function () { selected = null; input.value = ''; },
+      setItems: function (list) { items = list || []; },
+      focus: function () { input.focus(); },
+      destroy: function () { bindScroll(false); panel.remove(); },
+    };
+  }
+
   /* ---------- In ấn ---------- */
   // print(selector): chỉ in đúng vùng cần (phiếu/hóa đơn/báo cáo), không in
   // cả sidebar/topbar/toolbar. Đánh dấu tạm class .print-area cho phần tử
@@ -247,7 +333,7 @@
     api: api, guard: guard, logout: logout, setSession: setSession, token: token, user: user,
     money: money, qty: qty, dateTime: dateTime, timeShort: timeShort, dateVN: dateVN, todayISO: todayISO,
     escapeHtml: escapeHtml, badge: badge, trangThaiLabel: trangThaiLabel,
-    toast: toast, showError: showError, el: el, on: on, formModal: formModal, print: print,
+    toast: toast, showError: showError, el: el, on: on, formModal: formModal, combobox: combobox, print: print,
     ROLE_LABEL: ROLE_LABEL, ROLE_HOME: ROLE_HOME,
   };
 })(window);

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nhà cung cấp — Bộ phận Kho</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- Quản lý danh mục nhà cung cấp (NhaCungCap).
+     API: GET/POST /kho/ncc, PUT /kho/ncc/:id, DELETE /kho/ncc/:id -->
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">🥩</span> Bò Né Mỹ Cảnh</div>
+    <nav>
+      <a href="kho-nhap.html">📥 Nhập kho</a>
+      <a href="kho-xuat.html">📤 Xuất kho</a>
+      <a href="kho-nguyen-lieu.html">🥬 Nguyên liệu</a>
+      <a href="kho-ncc.html" class="active">🏢 Nhà cung cấp</a>
+      <a href="kho-bc-ton.html">📦 Báo cáo tồn</a>
+      <a href="kho-bc-nhap.html">📈 Báo cáo nhập</a>
+      <a href="kho-bc-xuat.html">📉 Báo cáo xuất</a>
+    </nav>
+    <div class="foot">Kho</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="page-title">Nhà cung cấp</div>
+      <div class="user"><div class="avatar">D</div><div><div>Phạm Thị D</div><div class="role">Kho</div></div></div>
+    </header>
+
+    <div class="content">
+      <div class="card">
+        <div class="card-head"><h2>Danh sách nhà cung cấp</h2><button class="btn btn-primary btn-sm" id="ncc_them">+ Thêm nhà cung cấp</button></div>
+        <div class="card-body">
+          <div class="table-scroll">
+          <table class="tbl">
+            <thead><tr><th>Tên nhà cung cấp</th><th>Số điện thoại</th><th>Địa chỉ</th><th class="center">Thao tác</th></tr></thead>
+            <tbody id="ncc_list"></tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="js/app.js"></script>
+<script src="js/kho-ncc.js"></script>
+</body>
+</html>

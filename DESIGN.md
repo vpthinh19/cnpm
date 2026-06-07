@@ -491,6 +491,10 @@ Mỗi màn ánh xạ 1 biểu mẫu (BM) + DFD + endpoint API tương ứng (ghi
 | K_BM3 | Báo cáo tồn kho | [`kho-bc-ton.html`](design/ui/kho-bc-ton.html) | §7.4.2 |
 | K_BM4 | Báo cáo nhập kho | [`kho-bc-nhap.html`](design/ui/kho-bc-nhap.html) | §7.4.4 |
 | K_BM5 | Báo cáo xuất kho | [`kho-bc-xuat.html`](design/ui/kho-bc-xuat.html) | §7.4.5 |
+| — | Danh mục nguyên liệu (quản lý NVL) | [`kho-nguyen-lieu.html`](design/ui/kho-nguyen-lieu.html) | (CRUD §4.7.1) |
+| — | Nhà cung cấp (quản lý NCC) | [`kho-ncc.html`](design/ui/kho-ncc.html) | (CRUD §4.7.1) |
+
+> 2 màn cuối là màn quản lý **danh mục** (không thuộc 5 biểu mẫu K_BM), gọi API CRUD ở §4.7.1. Tồn `NguyenLieu.TonHienTai` chỉ đổi qua phiếu nhập/xuất — màn danh mục không sửa tồn trực tiếp.
 
 | Desktop | Mobile |
 |--|--|

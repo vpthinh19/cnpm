@@ -3,23 +3,18 @@
   var u = App.guard(['Kho', 'Admin']);
   if (!u) return;
 
-  var nvlList = [];
-  var nvlMap = {};
+  var nvlItems = []; // [{ label: TenNVL, meta: ĐVT, raw: NVL }]
 
-  function nvlOptions() {
-    return nvlList.map(function (n) { return '<option value="' + n.NguyenLieuID + '">' + App.escapeHtml(n.TenNVL) + '</option>'; }).join('');
-  }
   function napNVL() {
     return App.api('/kho/nguyen-lieu').then(function (rows) {
-      nvlList = rows; nvlMap = {};
-      rows.forEach(function (n) { nvlMap[n.NguyenLieuID] = n; });
+      nvlItems = rows.map(function (n) { return { label: n.TenNVL, meta: n.DonViTinh, raw: n }; });
     });
   }
 
   function themDong() {
     var tr = document.createElement('tr');
     tr.innerHTML =
-      '<td><select class="kx-nvl">' + nvlOptions() + '</select></td>' +
+      '<td class="kx-nvl-cell"></td>' +
       '<td class="muted kx-dvt"></td>' +
       '<td class="num kx-ton"></td>' +
       '<td class="center"><input type="number" class="kx-sl" value="1" min="0" step="any" style="width:70px;text-align:center"></td>' +
@@ -27,27 +22,32 @@
       '<td class="num money kx-tt">0</td>' +
       '<td class="center"><button class="btn btn-sm btn-danger kx-del">✕</button></td>';
     App.el('kx_lines').appendChild(tr);
-    capNhatNVL(tr);
-    tr.querySelector('.kx-nvl').addEventListener('change', function () { capNhatNVL(tr); });
+    var cbx = App.combobox({ items: nvlItems, placeholder: 'Gõ tên nguyên liệu...', onChange: function () { capNhatNVL(tr); } });
+    tr._cbx = cbx;
+    tr.querySelector('.kx-nvl-cell').appendChild(cbx.el);
     tr.querySelector('.kx-sl').addEventListener('input', function () { tinhDong(tr); });
     tr.querySelector('.kx-dg').addEventListener('input', function () { tinhDong(tr); });
-    tr.querySelector('.kx-del').addEventListener('click', function () { tr.remove(); tinhTong(); });
+    tr.querySelector('.kx-del').addEventListener('click', function () { cbx.destroy(); tr.remove(); tinhTong(); });
   }
 
   function capNhatNVL(tr) {
-    var n = nvlMap[tr.querySelector('.kx-nvl').value];
+    var it = tr._cbx.get();
+    var n = it ? it.raw : null;
     tr.querySelector('.kx-dvt').textContent = n ? n.DonViTinh : '';
     var tonCell = tr.querySelector('.kx-ton');
     if (n) {
       tonCell.textContent = App.qty(n.TonHienTai);
       tonCell.style.color = Number(n.TonHienTai) <= Number(n.DinhMucToiThieu) ? 'var(--c-danger)' : '';
+    } else {
+      tonCell.textContent = ''; tonCell.style.color = '';
     }
     tinhDong(tr);
   }
   function tinhDong(tr) {
     var sl = Number(tr.querySelector('.kx-sl').value) || 0;
     var dg = Number(tr.querySelector('.kx-dg').value) || 0;
-    var n = nvlMap[tr.querySelector('.kx-nvl').value];
+    var it = tr._cbx.get();
+    var n = it ? it.raw : null;
     var slInput = tr.querySelector('.kx-sl');
     slInput.style.color = (n && sl > Number(n.TonHienTai)) ? 'var(--c-danger)' : '';
     tr.querySelector('.kx-tt').textContent = App.money(sl * dg);
@@ -60,19 +60,26 @@
     });
     App.el('kx_total').textContent = App.money(tong);
   }
+  function xoaTatCaDong() {
+    App.el('kx_lines').querySelectorAll('tr').forEach(function (tr) { if (tr._cbx) tr._cbx.destroy(); });
+    App.el('kx_lines').innerHTML = '';
+  }
 
   function luu() {
     var rows = App.el('kx_lines').querySelectorAll('tr');
     if (!rows.length) { App.toast('Thêm ít nhất 1 dòng', 'warn'); return; }
     var ChiTiet = [];
-    var loi = false;
+    var loiNVL = false, loiSo = false;
     rows.forEach(function (tr) {
+      var it = tr._cbx.get();
       var SoLuong = Number(tr.querySelector('.kx-sl').value);
       var DonGia = Number(tr.querySelector('.kx-dg').value);
-      if (!(SoLuong > 0) || !(DonGia > 0)) loi = true;
-      ChiTiet.push({ NguyenLieuID: Number(tr.querySelector('.kx-nvl').value), SoLuong: SoLuong, DonGia: DonGia });
+      if (!it) { loiNVL = true; return; }
+      if (!(SoLuong > 0) || !(DonGia > 0)) loiSo = true;
+      ChiTiet.push({ NguyenLieuID: it.raw.NguyenLieuID, SoLuong: SoLuong, DonGia: DonGia });
     });
-    if (loi) { App.toast('Số lượng và đơn giá phải > 0', 'warn'); return; }
+    if (loiNVL) { App.toast('Chọn nguyên liệu hợp lệ từ danh sách', 'warn'); return; }
+    if (loiSo) { App.toast('Số lượng và đơn giá phải > 0', 'warn'); return; }
     var body = { NgayXuat: App.el('kx_ngay').value, GhiChu: App.el('kx_ghichu').value.trim(), ChiTiet: ChiTiet };
     App.api('/kho/xuat', { method: 'POST', body: body }).then(function (p) {
       App.toast('Đã lưu phiếu xuất ' + p.MaPhieuXuat);
@@ -82,7 +89,7 @@
         cb.style.color = 'var(--c-danger)';
         cb.textContent = '⚠ Cảnh báo tồn ≤ định mức: ' + p.CanhBao.map(function (c) { return c.TenNVL + ' (' + App.qty(c.TonHienTai) + ' ' + c.DonViTinh + ')'; }).join(', ');
       } else { cb.style.display = 'none'; }
-      App.el('kx_lines').innerHTML = ''; napNVL().then(function () { themDong(); tinhTong(); });
+      xoaTatCaDong(); napNVL().then(function () { themDong(); tinhTong(); });
     }).catch(App.showError);
   }
 

@@ -3,11 +3,7 @@
   var u = App.guard(['Kho', 'Admin']);
   if (!u) return;
 
-  var nvlList = [];
-
-  function nvlOptions() {
-    return nvlList.map(function (n) { return '<option value="' + n.NguyenLieuID + '" data-dvt="' + App.escapeHtml(n.DonViTinh) + '">' + App.escapeHtml(n.TenNVL) + '</option>'; }).join('');
-  }
+  var nvlItems = []; // [{ label: TenNVL, meta: ĐVT, raw: NVL }]
 
   function napNCC() {
     return App.api('/kho/ncc').then(function (rows) {
@@ -16,30 +12,33 @@
     });
   }
   function napNVL() {
-    return App.api('/kho/nguyen-lieu').then(function (rows) { nvlList = rows; });
+    return App.api('/kho/nguyen-lieu').then(function (rows) {
+      nvlItems = rows.map(function (n) { return { label: n.TenNVL, meta: n.DonViTinh, raw: n }; });
+    });
   }
 
   function themDong() {
     var tb = App.el('kn_lines');
     var tr = document.createElement('tr');
     tr.innerHTML =
-      '<td><select class="kn-nvl">' + nvlOptions() + '</select></td>' +
+      '<td class="kn-nvl-cell"></td>' +
       '<td class="muted kn-dvt"></td>' +
       '<td class="center"><input type="number" class="kn-sl" value="1" min="0" step="any" style="width:70px;text-align:center"></td>' +
       '<td class="num"><input type="number" class="kn-dg" value="0" min="0" style="width:110px;text-align:right"></td>' +
       '<td class="num money kn-tt">0</td>' +
       '<td class="center"><button class="btn btn-sm btn-danger kn-del">✕</button></td>';
     tb.appendChild(tr);
-    capNhatDVT(tr);
-    tr.querySelector('.kn-nvl').addEventListener('change', function () { capNhatDVT(tr); });
+    var cbx = App.combobox({ items: nvlItems, placeholder: 'Gõ tên nguyên liệu...', onChange: function () { capNhatDVT(tr); } });
+    tr._cbx = cbx;
+    tr.querySelector('.kn-nvl-cell').appendChild(cbx.el);
     tr.querySelector('.kn-sl').addEventListener('input', function () { tinhDong(tr); });
     tr.querySelector('.kn-dg').addEventListener('input', function () { tinhDong(tr); });
-    tr.querySelector('.kn-del').addEventListener('click', function () { tr.remove(); tinhTong(); });
+    tr.querySelector('.kn-del').addEventListener('click', function () { cbx.destroy(); tr.remove(); tinhTong(); });
   }
 
   function capNhatDVT(tr) {
-    var opt = tr.querySelector('.kn-nvl').selectedOptions[0];
-    tr.querySelector('.kn-dvt').textContent = opt ? opt.getAttribute('data-dvt') : '';
+    var it = tr._cbx.get();
+    tr.querySelector('.kn-dvt').textContent = it ? it.raw.DonViTinh : '';
     tinhDong(tr);
   }
   function tinhDong(tr) {
@@ -55,24 +54,30 @@
     });
     App.el('kn_total').textContent = App.money(tong);
   }
+  function xoaTatCaDong() {
+    App.el('kn_lines').querySelectorAll('tr').forEach(function (tr) { if (tr._cbx) tr._cbx.destroy(); });
+    App.el('kn_lines').innerHTML = '';
+  }
 
   function luu() {
     var rows = App.el('kn_lines').querySelectorAll('tr');
     if (!rows.length) { App.toast('Thêm ít nhất 1 dòng', 'warn'); return; }
     var ChiTiet = [];
-    var loi = false;
+    var loiNVL = false, loiSo = false;
     rows.forEach(function (tr) {
-      var NguyenLieuID = Number(tr.querySelector('.kn-nvl').value);
+      var it = tr._cbx.get();
       var SoLuong = Number(tr.querySelector('.kn-sl').value);
       var DonGia = Number(tr.querySelector('.kn-dg').value);
-      if (!(SoLuong > 0) || !(DonGia > 0)) loi = true;
-      ChiTiet.push({ NguyenLieuID: NguyenLieuID, SoLuong: SoLuong, DonGia: DonGia });
+      if (!it) { loiNVL = true; return; }
+      if (!(SoLuong > 0) || !(DonGia > 0)) loiSo = true;
+      ChiTiet.push({ NguyenLieuID: it.raw.NguyenLieuID, SoLuong: SoLuong, DonGia: DonGia });
     });
-    if (loi) { App.toast('Số lượng và đơn giá phải > 0', 'warn'); return; }
+    if (loiNVL) { App.toast('Chọn nguyên liệu hợp lệ từ danh sách', 'warn'); return; }
+    if (loiSo) { App.toast('Số lượng và đơn giá phải > 0', 'warn'); return; }
     var body = { NhaCungCapID: Number(App.el('kn_ncc').value), NgayNhap: App.el('kn_ngay').value, GhiChu: App.el('kn_ghichu').value.trim(), ChiTiet: ChiTiet };
     App.api('/kho/nhap', { method: 'POST', body: body }).then(function (p) {
       App.toast('Đã lưu phiếu nhập ' + p.MaPhieuNhap);
-      App.el('kn_lines').innerHTML = ''; themDong(); tinhTong();
+      xoaTatCaDong(); themDong(); tinhTong();
       napRecent();
     }).catch(App.showError);
   }
